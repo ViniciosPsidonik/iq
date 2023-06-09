@@ -25,13 +25,6 @@ server.on('connection', (socket) => {
     console.log('Cliente desconectado');
   });
 });
-server.on('error', err => {
-    console.log(err);
-})
-
-server.on('listening', err => {
-    console.log(err);
-})
 
 
 console.log(`Servidor WebSocket ouvindo na porta ${serverPort}`);

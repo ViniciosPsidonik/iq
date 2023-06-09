@@ -41,7 +41,7 @@ let bancaAtual = 0
 function winMass() {
     lossMass('W')
 
-    if (getCell('I' + (countMass - 1)) == "◄◄") {
+    if (getCell('F' + (countMass -1)) > getCell('N12')) {
         console.log(`Takeeee `.green)
         loss = 0
         win = 0
@@ -157,14 +157,13 @@ const openDigitDiff = async (api) => {
 let lastDigits = [0, 1, 2]
 
 const tickhes = async () => {
-    console.log('=====================');
     const connection = new WebSocket('wss://ws.binaryws.com/websockets/v3?app_id=34942');
     const api = new DerivAPI({ connection });
 
     balance = await api.account('pbZQyrw6BRt0lu5');
 
     // a ticks object you can get the ticks from or listen to updates
-    const ticks = await api.ticks('R_100');
+    // const ticks = await api.ticks('R_100');
     if (!bancaAtual)
         bancaAtual = balance.balance.amount.value
 
@@ -184,82 +183,90 @@ const tickhes = async () => {
         amount = parseFloat(getCell('D' + countMass)).toFixed(2)
     }
 
-    ticks.onUpdate(async tick => {
-        // console.log(parseInt(tick.raw.quote.toString().slice(-1)));
-        lastDigits[2] = lastDigits[1]
-        lastDigits[1] = lastDigits[0]
-        lastDigits[0] = parseInt(tick.raw.quote.toString().slice(-1))
+    // ticks.onUpdate(async tick => {
+    //     // console.log(parseInt(tick.raw.quote.toString().slice(-1)));
+    //     lastDigits[2] = lastDigits[1]
+    //     lastDigits[1] = lastDigits[0]
+    //     lastDigits[0] = parseInt(tick.raw.quote.toString().slice(-1))
         // console.log(lastDigits);
         // if (lastDigits[0] == 5 && lastDigits[1] != lastDigits[2]) {
-        let contract = await api.contract({
-            contract_type: 'DIGITDIFF',
-            symbol: 'R_100',
-            duration: 1,
-            duration_unit: 't',
-            currency: 'USD',
-            barrier: lastDigits[2],
-            proposal: 1,
-            basis: 'stake',
-            amount: parseFloat(amount).toFixed(2)
-        }).catch(err => console.log(err));
-        contract.buy().catch(err => {
-            console.log(err)
-            // trade()
-        });
-
-        // contract.buy().catch(err => {
-        //     console.log('err 1');
-        //     console.log(err)
-        //     // trade()
-        // });
-
-        contract.onUpdate().subscribe(async contract => {
-            if (contract.is_sold) {
-                const intttt = setInterval(() => {
-                    if (contract.status == 'won') {
-                        if (balance.balance.amount.value > bancaAtual) {
-                            // console.log(balance.balance.amount.value)
-                            bancaAtual = balance.balance.amount.value
-                            // console.log(contract.profit);
-                            // profitSession += contract.profit.value
-                            // bancaAtual += profitSession
-                            console.log('WIIN'.green);
-                            win++
-                            console.log(`Wins: ${win} || Loss: ${loss}`)
-                            winMass()
-
-
-
-                            // resolve()
-                            contract = undefined
-                            connection.terminate()
-                            console.log('tickhes');
-                            clearInterval(intttt)
-                            tickhes()
-                        }
-                    } else {
-                        if (balance.balance.amount.value < bancaAtual) {
-                            // console.log(balance.balance.amount.value)
-                            bancaAtual = balance.balance.amount.value
-                            // console.log(contract.profit);
-                            // profitSession -= contract.profit.value
-                            // bancaAtual += profitSession
-                            console.log('LOSS'.red);
-                            loss++
-                            console.log(`Wins: ${win} || Loss: ${loss}`)
-                            lossMass('L')
-                            contract = undefined
-                            connection.terminate()
-                            console.log('tickhes');
-                            clearInterval(intttt)
-                            tickhes()
-                        }
-                    }
-                }, 750);
-            }
-        })
+        await buyRec(api, connection);
         // }
-    });
+    // });
 }
 tickhes()
+
+async function buyRec(api, connection) {
+    console.log('====================='); 
+    console.log(amount);
+    let contract = await api.contract({
+        // contract_type: 'DIGITDIFF',
+        contract_type: 'DIGITOVER',
+        symbol: 'R_100',
+        duration: 1,
+        duration_unit: 't',
+        currency: 'USD',
+        barrier: 5,
+        proposal: 1,
+        basis: 'stake',
+        amount: parseFloat(amount).toFixed(2)
+    }).catch(err => console.log(err));
+    contract.buy().catch(err => {
+        console.log(err);
+        // trade()
+    });
+
+    // contract.buy().catch(err => {
+    //     console.log('err 1');
+    //     console.log(err)
+    //     // trade()
+    // });
+    contract.onUpdate().subscribe(async (contract) => {
+        if (contract.is_sold) {
+            const intttt = setInterval(() => {
+                if (contract.status == 'won') {
+                    if (balance.balance.amount.value > bancaAtual) {
+                        // console.log(contract.profit);
+                        bancaAtual = balance.balance.amount.value;
+                        // console.log(contract.profit);
+                        // profitSession += contract.profit.value
+                        // bancaAtual += profitSession
+                        console.log('WIIN'.green);
+                        win++;
+                        console.log(`Wins: ${win} || Loss: ${loss}`);
+                        winMass();
+
+
+
+                        // resolve()
+                        // contract = undefined;
+                        // connection.terminate();
+                        clearInterval(intttt);
+                        setTimeout(() => {
+                            buyRec(api, connection);
+                        }, 5000);
+                    }
+                } else {
+                    if (balance.balance.amount.value < bancaAtual) {
+                        // console.log(balance.balance.amount.value)
+                        bancaAtual = balance.balance.amount.value;
+                        // console.log(contract.profit);
+                        // profitSession -= contract.profit.value
+                        // bancaAtual += profitSession
+                        console.log('LOSS'.red);
+                        loss++;
+                        console.log(`Wins: ${win} || Loss: ${loss}`);
+                        lossMass('L');
+                        // contract = undefined;
+                        // connection.terminate();
+                        clearInterval(intttt);
+                        setTimeout(() => {
+                            buyRec(api, connection);
+                        }, 5000);
+                    }
+                }
+            }, 750);
+        }
+    });
+}
 // trade()

@@ -889,37 +889,6 @@ const onMessage = e => {
         connectedd = true
 
         //noticias...
-        if (noticiasObj.length > 0) {
-            for (let index = 0; index < noticiasObj.length; index++) {
-                const noticia = noticiasObj[index];
-
-
-                let beforeTime = moment(moment().format("YYYY-MM-DD ") + noticia.time).subtract(10, 'minutes')
-                let afterTime = moment(moment().format("YYYY-MM-DD ") + noticia.time).add(30, 'minutes')
-
-                let isBettween = moment(moment().format("YYYY-MM-DD ") + currentTimehhmmss).isBetween(beforeTime, afterTime)
-                // console.log(isBettween);
-                if (isBettween && (noticia.par == 'EUR' || noticia.par == 'USD')) {
-                    stopOrders = true
-                    break;
-                } else if (stopOrders && (noticia.par == 'EUR' || noticia.par == 'USD') && moment(moment().format("YYYY-MM-DD ") + currentTimehhmmss).isAfter(afterTime)) {
-                    console.log(`${currentTimehhmmss} || is after`);
-                    stopOrders = false
-                    noticiasObj.splice(index, 1)
-                    index--
-                } else
-                    if (isBettween && !stopOrdersPares.includes(noticia.par)) {
-                        console.log('par betwenn');
-                        stopOrdersPares.push(noticia.par)
-                    } else if (stopOrdersPares.includes(noticia.par) && moment(moment().format("YYYY-MM-DD ") + currentTimehhmmss).isAfter(afterTime)) {
-                        console.log('par end');
-                        let indexx = stopOrdersPares.indexOf(noticia.par)
-                        stopOrdersPares.splice(indexx, 1)
-                        noticiasObj.splice(index, 1)
-                        index--
-                    }
-            }
-        }
     }
 
     // if (message.name == 'candles') {

@@ -24,12 +24,64 @@ const func = () => {
 
 
 setInterval(() => {
-    robot.mouseClick();
-    robot.keyTap("tab","control");
+    // robot.mouseClick();
+    // robot.keyTap("tab","control");
 }, 10000);
 
 
 let count = 0
+
+
+async function crono(){
+    robot.moveMouse(194, 303);
+    robot.mouseClick();
+    await func()
+    robot.moveMouse(186, 398);
+    robot.mouseClick();
+    await func()
+    robot.moveMouse(170, 323);
+    robot.mouseClick();
+    await func()
+    robot.moveMouse(151, 405);
+    robot.mouseClick();
+    await func()
+    robot.moveMouse(362, 261);
+    robot.mouseClick();
+    await func()
+    robot.moveMouse(365, 298);
+    robot.mouseClick();
+    await func()
+    robot.moveMouse(357, 284);
+    robot.mouseClick();
+    await func()
+    robot.moveMouse(350, 362);
+    robot.mouseClick();
+    await func()
+    robot.moveMouse(601, 295);
+    robot.mouseClick();
+    await func()
+    robot.moveMouse(664, 296);
+    robot.mouseClick();
+    await func()
+    robot.moveMouse(603, 322);
+    robot.mouseClick();
+    await func()
+    robot.moveMouse(667, 319);
+    robot.mouseClick();
+    await func()
+    robot.moveMouse(749, 294);
+    robot.mouseClick();
+    await func()
+    robot.moveMouse(729, 315);
+    robot.mouseClick();
+ 
+
+
+
+
+}
+
+crono()
 
 async function loop() {
     if (sql) {
@@ -159,10 +211,19 @@ async function loop1() {
 }
 
 
-setTimeout(() => {
-    robot.mouseClick();
-}, 5000);
+// setTimeout(() => {
+//     robot.mouseClick();
+// }, 5000);
 
+setInterval(() => {
+    // robot.keyTap("end","control");
+    // robot.keyTap("end","control");
+    
+
+    // robot.mouseClick();
+    // robot.keyTap("v","control");
+    // robot.keyTap("enter");
+}, 1500);
 
 
 // loop()

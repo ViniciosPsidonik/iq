@@ -11,6 +11,111 @@ let config = JSON.parse(fsConfig)
 let openedMap = new Map()
 let openedMapDigital = new Map()
 
+let fstaxas = fs.readFileSync('taxas.json')
+let taxasjson = JSON.parse(fstaxas)
+
+let pricesToSend = fs.readFileSync('pricesToSend.json')
+let pricesToSendObj = JSON.parse(pricesToSend)
+let pricesToSendMap = new Map()
+
+var express = require('express')
+var app = express()
+const cors = require('cors')
+const bodyParser = require('body-parser')
+app.use(cors({ origin: '*' }))
+app.use(bodyParser.json())
+app.use(bodyParser.urlencoded({     // to support URL-encoded bodies
+    extended: true
+}));
+
+app.use(express.json());       // to support JSON-encoded bodies
+app.use(express.urlencoded());
+
+let candlesticksMap = new Map()
+
+app.get('/candlestick/:actives', function (req, res) {
+    let actives = req.params.actives
+    getCandleTime(activesMapString.get(actives), 5, 500)
+    const getActives = setInterval(() => {
+        if (candlesticksMap.has(actives)) {
+            clearInterval(getActives)
+            res.send(candlesticksMap.get(actives))
+        }
+    }, 1000)
+})
+
+app.get('/clear', function (req, res) {
+    taxasM5 = ''
+    toCloseM5 = ''
+    taxasObj = []
+    toCloseM5Obj = new Map()
+    res.sendStatus(200)
+})
+
+app.get('/clearAll', function (req, res) {
+    pricesToSendObj = []
+    fs.writeFile('pricesToSend.json', JSON.stringify(pricesToSendObj, null, 4), err => {
+    });
+    res.sendStatus(200)
+})
+
+app.get('/getlast', function (req, res) {
+    res.send(pricesToSendObj)
+    // res.sendStatus(200)
+})
+
+app.post('/taxas', function (req, resp) {
+    let par = req.body.moeda
+    let res = req.body.taxa.res
+    let resd = req.body.taxa.resd
+    let sup = req.body.taxa.sup
+    let supd = req.body.taxa.supd
+
+    console.log(req.body);
+
+    if (res) {
+        taxasM5 += par + ' ' + 'PUT' + ' ' + res + ';'
+    }
+    if (sup) {
+        taxasM5 += par + ' ' + 'CALL' + ' ' + sup + ';'
+    }
+
+    if (resd) {
+        toCloseM5 += par + ',' + resd
+    }
+    if (supd) {
+        toCloseM5 += ',' + supd + ';'
+    } else {
+        toCloseM5 += ';'
+    }
+
+    console.log(taxasM5);
+    console.log(toCloseM5);
+
+    stasttaxasm5()
+    stasttoclosem5()
+    resp.sendStatus(200)
+
+    for (let index = 0; index < pricesToSendObj.length; index++) {
+        const element = pricesToSendObj[index];
+        if(element.moeda == par){
+            pricesToSendObj.splice(index, 1)
+        }
+    }
+    pricesToSendObj.push({ moeda: par, taxa: { res, resd, sup, supd } })
+    console.log(pricesToSendObj);
+    fs.writeFile('pricesToSend.json', JSON.stringify(pricesToSendObj, null, 4), err => {
+    });
+})
+
+
+const PORT = process.env.PORT || 1234
+app.listen(PORT)
+
+
+// setTimeout(() => {
+//     buyBeforOne('put', 1, 1);
+// }, 5000);
 //55099058
 const url = 'wss://iqoption.com/echo/websocket'
 let userBalanceId = 0
@@ -144,7 +249,7 @@ const getOpened = () => {
         axios.get(`http://localhost:3000/opened/turbo`).then((res) => {
             return resolve(res.data)
         }).catch((err) => {
-            console.log('getOpened');
+            // console.log('getOpened');
             // console.log(err);
             return resolve([[]])
         })
@@ -156,20 +261,12 @@ const getOpenedDigital = () => {
         axios.get(`http://localhost:3000/opened/digital`).then((res) => {
             return resolve(res.data)
         }).catch((err) => {
-            console.log('getOpenedDigital');
+            // console.log('getOpenedDigital');
             // console.log(err);
             return resolve([[]])
         })
     })
 }
-
-setInterval(async () => {
-    intervalGetPayout()
-    openedMap = new Map(await getOpened())
-    openedMapDigital = new Map(await getOpenedDigital())
-    // console.log(openedMap);
-    // console.log(openedMapDigital)
-}, 10000);
 
 const intervalGetPayout = async () => {
     let activesPayout = new Map()
@@ -312,70 +409,125 @@ for (let index = 0; index < toClose15Array.length; index++) {
     })
 }
 
-let toCloseM5Obj = new Map()
-let toClose5Array = toCloseM5.split(';')
-for (let index = 0; index < toClose5Array.length; index++) {
-    const close = toClose5Array[index].split(',');
-    toCloseM5Obj.set(close[0], {
-        max: close[1],
-        min: close[2]
-    })
-}
+let currentMoeda = ''
+taxasM5 = ''
+toCloseM5 = ''
+for (const [key, value] of Object.entries(taxasjson)) {
 
+    // console.log(`${key}: ${value}`);
+    let close = key.split('-')[2]
 
-let taxasArray = taxasM5.split(';')
-for (let index = 0; index < taxasArray.length; index++) {
-    const taxas = taxasArray[index];
-    let taxa = taxas.split(' ');
-    let found = false
-    let indexxxx = 0;
-    for (let index1 = 0; index1 < taxasObj.length; index1++) {
-        const elementtt = taxasObj[index1];
-        if (elementtt.par == taxa[0]) {
-            found = true
-            indexxxx = index1
-            break
+    if (value) {
+        let moeda = key.split('-')[0]
+        let direction = key.split('-')[1]
+
+        if (currentMoeda != moeda) {
+            currentMoeda = moeda
         }
-    }
 
-    if (!found) {
-        if (taxa.includes('PUT')) {
-            taxasObj.push({
-                par: taxa[0],
-                max: parseFloat(taxa[2]),
-                min: 0
-            })
+        if (typeof close == 'undefined') {
+            if (direction == 'P') {
+                taxasM5 += moeda + ' ' + 'PUT' + ' ' + value + ';'
+            } else if (direction == 'C') {
+                taxasM5 += moeda + ' ' + 'CALL' + ' ' + value + ';'
+            }
         } else {
-            taxasObj.push({
-                par: taxa[0],
-                min: parseFloat(taxa[2]),
-                max: 0
-            })
+            if (direction == 'P') {
+                toCloseM5 += moeda + ',' + value
+            } else if (direction == 'C') {
+                toCloseM5 += ',' + value + ';'
+            }
         }
     } else {
-        let par = taxasObj[indexxxx].par
-        let min = taxasObj[indexxxx].min
-        let max = taxasObj[indexxxx].max
+        if (typeof close != 'undefined') {
+            toCloseM5 += ';'
+        }
+    }
+}
 
-        taxasObj.splice(indexxxx, 1)
+// console.log(taxasM5);
+// console.log(toCloseM5);
 
-        if (taxa.includes('PUT')) {
-            taxasObj.push({
-                par,
-                min,
-                max: parseFloat(taxa[2])
-            })
-        } else {
-            taxasObj.push({
-                par,
-                max,
-                min: parseFloat(taxa[2])
+config.taxasM5 = taxasM5;
+config.toCloseM5 = toCloseM5;
+
+fs.writeFile('config.json', JSON.stringify(config, null, 4), err => {
+    // console.log(err || 'Arquivo salvo');
+});
+
+
+let toCloseM5Obj = new Map()
+function stasttoclosem5() {
+    let toClose5Array = toCloseM5.split(';')
+    for (let index = 0; index < toClose5Array.length; index++) {
+        if (toClose5Array[index]) {
+            const close = toClose5Array[index].split(',');
+            toCloseM5Obj.set(close[0], {
+                max: parseFloat(close[1]),
+                min: parseFloat(close[2])
             })
         }
     }
-
+    console.log(toCloseM5Obj);
 }
-console.log(taxasObj);
+
+
+function stasttaxasm5() {
+    let taxasArray = taxasM5.split(';')
+    for (let index = 0; index < taxasArray.length; index++) {
+        if (taxasArray[index]) {
+            const taxas = taxasArray[index];
+            let taxa = taxas.split(' ');
+            let found = false
+            let indexxxx = 0;
+            for (let index1 = 0; index1 < taxasObj.length; index1++) {
+                const elementtt = taxasObj[index1];
+                if (elementtt.par == taxa[0]) {
+                    found = true
+                    indexxxx = index1
+                    break
+                }
+            }
+
+            if (!found) {
+                if (taxa.includes('PUT')) {
+                    taxasObj.push({
+                        par: taxa[0],
+                        max: parseFloat(taxa[2]),
+                        min: 0
+                    })
+                } else {
+                    taxasObj.push({
+                        par: taxa[0],
+                        min: parseFloat(taxa[2]),
+                        max: 0
+                    })
+                }
+            } else {
+                let par = taxasObj[indexxxx].par
+                let min = taxasObj[indexxxx].min
+                let max = taxasObj[indexxxx].max
+
+                taxasObj.splice(indexxxx, 1)
+
+                if (taxa.includes('PUT')) {
+                    taxasObj.push({
+                        par,
+                        min,
+                        max: parseFloat(taxa[2])
+                    })
+                } else {
+                    taxasObj.push({
+                        par,
+                        max,
+                        min: parseFloat(taxa[2])
+                    })
+                }
+            }
+        }
+    }
+    console.log(taxasObj);
+}
 
 let taxasArray15 = taxasM15.split(';')
 for (let index = 0; index < taxasArray15.length; index++) {
@@ -585,7 +737,7 @@ function notify(title, message) {
 }
 
 let openOrderNextCandle = []
-
+let lastTickCandles = new Map()
 
 const onMessage = e => {
     // if (ws.readyState === WebSocket.OPEN) {
@@ -604,11 +756,11 @@ const onMessage = e => {
         process.exit()
     }
 
-    if (1 <= StopLoss) {
-        console.log('Stop Loss Alcançado...')
-        notify('Stop', `Stop Loss Alcançado...`);
-        process.exit(1)
-    }
+    // if (1 <= StopLoss) {
+    //     console.log('Stop Loss Alcançado...')
+    //     notify('Stop', `Stop Loss Alcançado...`);
+    //     process.exit(1)
+    // }
 
     if (message.name == 'profile' && message.msg) {
         profileStuf(message, 'live-deal-binary-option-placed')
@@ -662,6 +814,7 @@ const onMessage = e => {
         currentTimemm = moment.unix(currentTime / 1000).utcOffset(-3).format("mm")
         currentTimemmssDate = moment.unix(currentTime / 1000).utcOffset(-3).format("YYYY-MM-DD HH:mm:ss")
         currentTimehhmmss = moment.unix(currentTime / 1000).utcOffset(-3).format("HH:mm:ss")
+        currentTimess = moment.unix(currentTime / 1000).utcOffset(-3).format("ss")
 
         //noticias...
         if (noticiasObj.length > 0) {
@@ -669,8 +822,8 @@ const onMessage = e => {
                 const noticia = noticiasObj[index];
 
 
-                let beforeTime = moment(moment().format("YYYY-MM-DD ") + noticia.time).subtract(10, 'minutes')
-                let afterTime = moment(moment().format("YYYY-MM-DD ") + noticia.time).add(30, 'minutes')
+                let beforeTime = moment(moment().format("YYYY-MM-DD ") + noticia.time).subtract(5, 'minutes')
+                let afterTime = moment(moment().format("YYYY-MM-DD ") + noticia.time).add(5, 'minutes')
 
                 let isBettween = moment(moment().format("YYYY-MM-DD ") + currentTimehhmmss).isBetween(beforeTime, afterTime)
                 // console.log(isBettween);
@@ -698,159 +851,171 @@ const onMessage = e => {
     }
 
     if (message.name == 'candles') {
-        if (message.request_id.includes('/5')) {
-            let candles = message.msg.candles
-            let price = candles[1].close
-            let open = candles[1].open
+        try {
+            if (message.msg.candles.length > 10) {
 
-            let closeLast = candles[0].close
-            let minLast = candles[0].min
-            let maxLast = candles[0].max
+                candlesticksMap.set(getActiveString(parseInt(message.request_id.split('/')[0]), activesDigitalMapString), message.msg.candles)
+            } else if (message.request_id.includes('/5')) {
+                let candles = message.msg.candles
+                let price = candles[1].close
+                let open = candles[1].open
+                let thisCandlePar = parseInt(message.request_id.split('/')[0])
 
-            for (let index = 0; index < taxasObj.length; index++) {
-                const element = taxasObj[index];
-                let parInt = activesMapString.get(element.par)
-                let max = parseFloat(element.max)
-                let min = parseFloat(element.min)
+                let closeLast = candles[0].close
+                let minLast = candles[0].min
+                let maxLast = candles[0].max
 
-                if (verpar && parseInt(message.request_id) == activesMapString.get(verpar)) {
-                    console.log(price);
-                }
+                for (let index = 0; index < taxasObj.length; index++) {
+                    const element = taxasObj[index];
+                    let parInt = activesMapString.get(element.par)
+                    let max = parseFloat(element.max)
+                    let min = parseFloat(element.min)
 
-                let direction
-
-                if (parseInt(message.request_id.split('/')[0]) == parInt && !openedOrders.includes(parInt) && !notOrder.includes(parInt)) {
-
-                    let breakaa = false
-                    breakaa = getBreakaa(price, index, parInt, breakaa);
-                    if (breakaa)
-                        break
-
-                    if (max != 0 && price >= max) {
-                        // let minVela = parseInt(currentTimemm.substring(currentTimemm.length, currentTimemm.length - 1))
-
-                        // let achouOpenOrder = false
-                        // for (let index = 0; index < openOrderNextCandle.length; index++) {
-                        //     const element = openOrderNextCandle[index];
-                        //     if (element.par == parInt) {
-                        //         achouOpenOrder = true
-                        //         break
-                        //     }
-                        // }
-
-                        // if (!achouOpenOrder && (minVela == 0 || minVela == 5 || minVela == 4 || minVela == 9)) {
-                        //     console.log(`${currentTimehhmmss} || Rompeu 1 Vela -> ${getActiveString(parInt, activesMapString)} - put`);
-                        //     notify('Vish', `Rompeu 1 Vela -> ${getActiveString(parInt, activesMapString)} - put`);
-                        //     openOrderNextCandle.push({
-                        //         par: parInt,
-                        //         max,
-                        //         min: 0,
-                        //         minute: parseInt(currentTimemm) + 5
-                        //     })
-                        // } else if (!achouOpenOrder) {
-
-                        taxasObj[index].max = 0
-                        direction = 'put'
-
-                        let isStopedPar = false
-                        for (let index = 0; index < stopOrdersPares.length; index++) {
-                            const stopOrdersPar = stopOrdersPares[index];
-                            if (getActiveString(parInt, activesMapString).includes(stopOrdersPar)) {
-                                isStopedPar = true
-                                break
-                            }
-                        }
-
-                        let toClose = false
-                        let max
-                        if (toCloseM5Obj.has(getActiveString(parInt, activesMapString))) {
-                            if (toCloseM5Obj.get(getActiveString(parInt, activesMapString)).max != 0 && parseFloat(open) > parseFloat(toCloseM5Obj.get(getActiveString(parInt, activesMapString)).max)) {
-                                toClose = true
-                                max = toCloseM5Obj.get(getActiveString(parInt, activesMapString)).max
-                            }
-                        }
-
-                        if (!stopOrders && !isStopedPar && !toClose && openedOrders.length == 0) {
-
-                            buyBefor(direction, parInt, 5);
-
-                        } else if (toClose) {
-                            console.log(`${currentTimehhmmss} || Vela iniciou muito proximo do preço -> ${getActiveString(parInt, activesMapString)} - ${direction}`);
-                            notify('To Close', `Vela iniciou muito proximo do preço -> ${getActiveString(parInt, activesMapString)} - ${direction}`);
-                        } else if (openedOrders.length != 0) {
-                            console.log(`${currentTimehhmmss} || Já possui ordens abertas. -> ${getActiveString(parInt, activesMapString)} - ${direction}`);
-                            notify('OpenedOrder', `Já possui ordens abertas. -> ${getActiveString(parInt, activesMapString)} - ${direction}`);
-                        } else {
-                            console.log(`${currentTimehhmmss} || Rompeu Noticia -> ${getActiveString(parInt, activesMapString)} - ${direction} / stopOrders = ${stopOrders} / isStopedPar = ${isStopedPar}`);
-                            notify('Noticia', `Rompeu -> ${getActiveString(parInt, activesMapString)} - ${direction} / stopOrders = ${stopOrders} / isStopedPar = ${isStopedPar}`);
-                        }
-
-                        setConfig(element, direction, 5);
-                        // }
-                    } else if (min != 0 && price <= min) {
-                        // let minVela = parseInt(currentTimemm.substring(currentTimemm.length, currentTimemm.length - 1))
-
-                        // let achouOpenOrder = false
-                        // for (let index = 0; index < openOrderNextCandle.length; index++) {
-                        //     const element = openOrderNextCandle[index];
-                        //     if (element.par == parInt) {
-                        //         achouOpenOrder = true
-                        //         break
-                        //     }
-                        // }
-
-                        // if (!achouOpenOrder && (minVela == 0 || minVela == 5 || minVela == 4 || minVela == 9)) {
-                        //     console.log(`${currentTimehhmmss} || Rompeu 1 Vela -> ${getActiveString(parInt, activesMapString)} - call`);
-                        //     notify('Vish', `Rompeu 1 Vela -> ${getActiveString(parInt, activesMapString)} - call`);
-                        //     openOrderNextCandle.push({
-                        //         par: parInt,
-                        //         max: 0,
-                        //         min,
-                        //         minute: parseInt(currentTimemm) + 5,
-                        //     })
-                        // } else if (!achouOpenOrder) {
-
-                        taxasObj[index].min = 0
-                        direction = 'call'
-
-                        let isStopedPar = false
-                        for (let index = 0; index < stopOrdersPares.length; index++) {
-                            const stopOrdersPar = stopOrdersPares[index];
-                            if (getActiveString(parInt, activesMapString).includes(stopOrdersPar)) {
-                                isStopedPar = true
-                                break
-                            }
-                        }
-
-                        let toClose = false
-                        let min
-                        if (toCloseM5Obj.has(getActiveString(parInt, activesMapString))) {
-                            if (toCloseM5Obj.get(getActiveString(parInt, activesMapString)).min != 0 && parseFloat(open) < parseFloat(toCloseM5Obj.get(getActiveString(parInt, activesMapString)).min)) {
-                                toClose = true
-                                min = toCloseM5Obj.get(getActiveString(parInt, activesMapString)).min
-                            }
-                        }
-
-                        if (!stopOrders && !isStopedPar && !toClose && openedOrders.length == 0) {
-                            buyBefor(direction, parInt, 5);
-                        } else if (toClose) {
-                            console.log(`${currentTimehhmmss} || Vela iniciou muito proximo do preço -> ${getActiveString(parInt, activesMapString)} - ${direction}`);
-                            notify('To Close', `Vela iniciou muito proximo do preço -> ${getActiveString(parInt, activesMapString)} - ${direction}`);
-                        } else if (openedOrders.length != 0) {
-                            console.log(`${currentTimehhmmss} || Já possui ordens abertas. -> ${getActiveString(parInt, activesMapString)} - ${direction}`);
-                            notify('OpenedOrder', `Já possui ordens abertas. -> ${getActiveString(parInt, activesMapString)} - ${direction}`);
-                        } else {
-                            console.log(`${currentTimehhmmss} || Rompeu Noticia -> ${getActiveString(parInt, activesMapString)} - ${direction} / stopOrders = ${stopOrders} / isStopedPar = ${isStopedPar}`);
-                            notify('Noticia', `Rompeu -> ${getActiveString(parInt, activesMapString)} - ${direction} / stopOrders = ${stopOrders} / isStopedPar = ${isStopedPar}`);
-                        }
-                        // }
-                        setConfig(element, 'call', 5);
+                    if (verpar && parseInt(message.request_id) == activesMapString.get(verpar)) {
+                        console.log(price);
                     }
-                    break
+
+                    let direction
+
+                    if (thisCandlePar == parInt && !openedOrders.includes(parInt) && !notOrder.includes(parInt)) {
+
+                        let breakaa = false
+                        breakaa = getBreakaa(price, index, parInt, breakaa);
+                        if (breakaa)
+                            break
+
+                        if (max != 0 && price >= max) {
+                            // let minVela = parseInt(currentTimemm.substring(currentTimemm.length, currentTimemm.length - 1))
+
+                            // let achouOpenOrder = false
+                            // for (let index = 0; index < openOrderNextCandle.length; index++) {
+                            //     const element = openOrderNextCandle[index];
+                            //     if (element.par == parInt) {
+                            //         achouOpenOrder = true
+                            //         break
+                            //     }
+                            // }
+
+                            // if (!achouOpenOrder && (minVela == 0 || minVela == 5 || minVela == 4 || minVela == 9)) {
+                            //     console.log(`${currentTimehhmmss} || Rompeu 1 Vela -> ${getActiveString(parInt, activesMapString)} - put`);
+                            //     notify('Vish', `Rompeu 1 Vela -> ${getActiveString(parInt, activesMapString)} - put`);
+                            //     openOrderNextCandle.push({
+                            //         par: parInt,
+                            //         max,
+                            //         min: 0,
+                            //         minute: parseInt(currentTimemm) + 5
+                            //     })
+                            // } else if (!achouOpenOrder) {
+
+                            taxasObj[index].max = 0
+                            direction = 'put'
+
+                            let isStopedPar = false
+                            for (let index = 0; index < stopOrdersPares.length; index++) {
+                                const stopOrdersPar = stopOrdersPares[index];
+                                if (getActiveString(parInt, activesMapString).includes(stopOrdersPar)) {
+                                    isStopedPar = true
+                                    break
+                                }
+                            }
+
+                            let toClose = false
+                            let max
+                            if (toCloseM5Obj.has(getActiveString(parInt, activesMapString))) {
+                                if (toCloseM5Obj.get(getActiveString(parInt, activesMapString)).max != 0 && lastTickCandles.get(parInt) > parseFloat(toCloseM5Obj.get(getActiveString(parInt, activesMapString)).max)) {
+                                    toClose = true
+                                    max = toCloseM5Obj.get(getActiveString(parInt, activesMapString)).max
+                                }
+                            }
+
+                            if (!stopOrders && !isStopedPar && !toClose && openedOrders.length == 0) {
+
+                                buyBeforOne(direction, parInt, 1);
+
+                            } else if (toClose) {
+                                console.log(`${currentTimehhmmss} || Vela iniciou muito proximo do preço -> ${getActiveString(parInt, activesMapString)} - ${direction}`);
+                                notify('To Close', `Vela iniciou muito proximo do preço -> ${getActiveString(parInt, activesMapString)} - ${direction}`);
+                            } else if (openedOrders.length != 0) {
+                                console.log(`${currentTimehhmmss} || Já possui ordens abertas. -> ${getActiveString(parInt, activesMapString)} - ${direction}`);
+                                notify('OpenedOrder', `Já possui ordens abertas. -> ${getActiveString(parInt, activesMapString)} - ${direction}`);
+                            } else {
+                                console.log(`${currentTimehhmmss} || Rompeu Noticia -> ${getActiveString(parInt, activesMapString)} - ${direction} / stopOrders = ${stopOrders} / isStopedPar = ${isStopedPar}`);
+                                notify('Noticia', `Rompeu -> ${getActiveString(parInt, activesMapString)} - ${direction} / stopOrders = ${stopOrders} / isStopedPar = ${isStopedPar}`);
+                            }
+
+                            setConfig(element, direction, 5);
+                            // }
+                        } else if (min != 0 && price <= min) {
+                            // let minVela = parseInt(currentTimemm.substring(currentTimemm.length, currentTimemm.length - 1))
+
+                            // let achouOpenOrder = false
+                            // for (let index = 0; index < openOrderNextCandle.length; index++) {
+                            //     const element = openOrderNextCandle[index];
+                            //     if (element.par == parInt) {
+                            //         achouOpenOrder = true
+                            //         break
+                            //     }
+                            // }
+
+                            // if (!achouOpenOrder && (minVela == 0 || minVela == 5 || minVela == 4 || minVela == 9)) {
+                            //     console.log(`${currentTimehhmmss} || Rompeu 1 Vela -> ${getActiveString(parInt, activesMapString)} - call`);
+                            //     notify('Vish', `Rompeu 1 Vela -> ${getActiveString(parInt, activesMapString)} - call`);
+                            //     openOrderNextCandle.push({
+                            //         par: parInt,
+                            //         max: 0,
+                            //         min,
+                            //         minute: parseInt(currentTimemm) + 5,
+                            //     })
+                            // } else if (!achouOpenOrder) {
+
+                            taxasObj[index].min = 0
+                            direction = 'call'
+
+                            let isStopedPar = false
+                            for (let index = 0; index < stopOrdersPares.length; index++) {
+                                const stopOrdersPar = stopOrdersPares[index];
+                                if (getActiveString(parInt, activesMapString).includes(stopOrdersPar)) {
+                                    isStopedPar = true
+                                    break
+                                }
+                            }
+
+                            let toClose = false
+                            let min
+                            if (toCloseM5Obj.has(getActiveString(parInt, activesMapString))) {
+                                if (toCloseM5Obj.get(getActiveString(parInt, activesMapString)).min != 0 && lastTickCandles.get(parInt) < parseFloat(toCloseM5Obj.get(getActiveString(parInt, activesMapString)).min)) {
+                                    toClose = true
+                                    min = toCloseM5Obj.get(getActiveString(parInt, activesMapString)).min
+                                }
+                            }
+
+                            if (!stopOrders && !isStopedPar && !toClose && openedOrders.length == 0) {
+                                buyBeforOne(direction, parInt, 1);
+                            } else if (toClose) {
+                                console.log(`${currentTimehhmmss} || Vela iniciou muito proximo do preço -> ${getActiveString(parInt, activesMapString)} - ${direction}`);
+                                notify('To Close', `Vela iniciou muito proximo do preço -> ${getActiveString(parInt, activesMapString)} - ${direction}`);
+                            } else if (openedOrders.length != 0) {
+                                console.log(`${currentTimehhmmss} || Já possui ordens abertas. -> ${getActiveString(parInt, activesMapString)} - ${direction}`);
+                                notify('OpenedOrder', `Já possui ordens abertas. -> ${getActiveString(parInt, activesMapString)} - ${direction}`);
+                            } else {
+                                console.log(`${currentTimehhmmss} || Rompeu Noticia -> ${getActiveString(parInt, activesMapString)} - ${direction} / stopOrders = ${stopOrders} / isStopedPar = ${isStopedPar}`);
+                                notify('Noticia', `Rompeu -> ${getActiveString(parInt, activesMapString)} - ${direction} / stopOrders = ${stopOrders} / isStopedPar = ${isStopedPar}`);
+                            }
+                            // }
+                            setConfig(element, 'call', 5);
+                        }
+                        break
+                    }
+
                 }
 
+                lastTickCandles.set(thisCandlePar, price)
+                // console.log(lastTickCandles);
             }
-        } else {
+        } catch (error) {
+
+        }
+        /*else {
             let candles = message.msg.candles
             let price = candles[1].close
             let open = candles[1].open
@@ -938,7 +1103,7 @@ const onMessage = e => {
                 }
 
             }
-        }
+        }*/
     }
 }
 
@@ -1019,9 +1184,67 @@ function setConfig(element, direction, m) {
         config.taxasM15 = m5taxasSplitedAux;
     }
 
+
+    for (const [key, value] of Object.entries(taxasjson)) {
+
+        // console.log(`${key}: ${value}`);
+        let directiona = key.split('-')[1]
+        let moeda = key.split('-')[0]
+
+        if (moeda == element.par && directiona == direction.substring(0, 1).toUpperCase()) {
+            taxasjson[key] = ''
+        }
+    }
+    fs.writeFile('taxas.json', JSON.stringify(taxasjson, null, 4), err => {
+        // console.log(err || 'Arquivo salvo');
+    });
+
+
     fs.writeFile('config.json', JSON.stringify(config, null, 4), err => {
         // console.log(err || 'Arquivo salvo');
     });
+}
+
+function buyBeforOne(direction, parInt, type) {
+    let timeFrameL = null
+    let timeFrame = 1
+
+    // console.log(direction);
+    // console.log(parInt);
+    // console.log(type);
+    let timeInt = parseInt(currentTimehhmm.substring(currentTimehhmm.length - 2, currentTimehhmm.length));
+
+    // parseInt(currentTimess) >= 30 
+
+    if (type == 1) {
+        timeFrameL = 1
+
+    } else {
+        let resto = timeInt % timeFrame;
+        timeFrameL = timeFrame
+        if (resto != 0) {
+            timeFrameL = timeFrameL - resto;
+        }
+    }
+
+
+    let hourmm
+    if (type == 1) {
+        if (parseInt(currentTimess) >= 30) {
+            hourmm = moment.unix(currentTime / 1000).utcOffset(-3).add(2, 'm').format(" HH:mm");
+        } else {
+            hourmm = moment.unix(currentTime / 1000).utcOffset(-3).add(1, 'm').format(" HH:mm");
+        }
+    } else if (type == 5) {
+        if (parseInt(currentTimess) >= 30) {
+            hourmm = moment.unix(currentTime / 1000).utcOffset(-3).add(6, 'm').format(" HH:mm");
+        } else {
+            hourmm = moment.unix(currentTime / 1000).utcOffset(-3).add(5, 'm').format(" HH:mm");
+        }
+    } else {
+        hourmm = moment.unix(currentTime / 1000).utcOffset(-3).add(2, 'seconds').add(15, 'm').format(" HH:mm");
+    }
+    checkOpenedPayoutBeforeBuy(parInt, direction, hourmm, type);
 }
 
 function buyBefor(direction, parInt, type) {
@@ -1081,6 +1304,10 @@ let notOrder = []
 function checkOpenedPayoutBeforeBuy(parInt, direction, hourmm) {
     let turboPayout = null;
     let digitalPayout = null;
+
+    openOrderDigital(direction, parInt, hourmm);
+    return
+
     if (payoutMap.has('turbo')) {
         if (payoutMap.get('turbo').has(parInt)) {
             turboPayout = payoutMap.get('turbo').get(parInt);
@@ -1122,9 +1349,26 @@ function openOrderBinary(direction, parInt, hourmm) {
 function openOrderDigital(direction, parInt, hourmm) {
     console.log(`${currentTimehhmmss} || ${direction} / ${getActiveString(parInt, activesMapString)} / ${amount} / Digital`);
     notify('[Order Digital]', `${direction} / ${getActiveString(parInt, activesMapString)} / ${amount}`);
-    buy(amount, parInt, direction, parseInt(moment(moment().format("YYYY-MM-DD ") + hourmm).utcOffset(0).format('X')), 'PT5M');
+    buy(amount, parInt, direction, parseInt(moment(moment().format("YYYY-MM-DD ") + hourmm).utcOffset(0).format('X')), 'PT1M');
     totalOrderss++;
     openedOrders.push(parInt);
+}
+
+function getCandleTime(active_id, time, count) {
+    let data = {
+        "name": "get-candles",
+        "version": "2.0",
+        "body": {
+            "active_id": active_id,
+            "size": 60 * time,
+            "to": currentTime,
+            "count": count,
+        }
+    };
+    if (ws.readyState === WebSocket.OPEN) {
+        // console.log(JSON.stringify(messageHeader(data, 'sendMessage', active_id + '/' + time)));
+        ws.send(JSON.stringify(messageHeader(data, 'sendMessage', active_id + '/' + time)));
+    }
 }
 
 function getCandle(active_id, time) {
@@ -1173,7 +1417,7 @@ function optionClosed(message) {
         if (doispraum) {
             winss = 0
             console.log(`${currentTimehhmmss} || StopLoss alcançado`.red)
-            process.exit(1)
+            // process.exit(1)
         }
     } else if (profitAmount == 0) {
         console.log(`${currentTimehhmmss} || ${profitAmount < 0 ? "Loss" : "Win"} ${profitAmount.toFixed(2)} / Balance: ${parseFloat(sessionBalance.toFixed(2))} / ${getActiveString(active, activesMapString) ? getActiveString(active, activesMapString) : active} / Binario`.red)
@@ -1235,7 +1479,7 @@ function positionChangedStuff(message) {
             console.log(`${currentTimehhmmss} || ${profitAmount < 0 ? "Loss" : "Win"} ${profitAmount.toFixed(2)} / Balance: ${parseFloat(sessionBalance.toFixed(2))} / ${getActiveString(active, activesMapString) ? getActiveString(active, activesMapString) : active} / Digital`.red)
             notify('Loss', `${profitAmount < 0 ? "Loss" : "Win"} ${profitAmount.toFixed(2)} / Balance: ${parseFloat(sessionBalance.toFixed(2))} / ${getActiveString(active, activesMapString) ? getActiveString(active, activesMapString) : active} / Digital`);
             console.log(`${currentTimehhmmss} || StopLoss alcançado`.red)
-            process.exit(1)
+            // process.exit(1)
         } else if (profitAmount == 0) {
             console.log(`${currentTimehhmmss} || ${profitAmount < 0 ? "Loss" : "Win"} ${profitAmount.toFixed(2)} / Balance: ${parseFloat(sessionBalance.toFixed(2))} / ${getActiveString(active, activesMapString) ? getActiveString(active, activesMapString) : active} / Digital`.red)
             notify('Empate', `Empate ${profitAmount.toFixed(2)} / Balance: ${parseFloat(sessionBalance.toFixed(2))} / ${getActiveString(active, activesMapString) ? getActiveString(active, activesMapString) : active} / Digital`);

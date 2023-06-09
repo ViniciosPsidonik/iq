@@ -240,6 +240,7 @@ const tickhes = async () => {
                     if (contract.is_sold) {
                         // console.log(contract);
                         const intttt = setInterval(() => {
+                            console.log(contract);
                             if (contract.status == 'won') {
                                 if (balance.balance.amount.value > bancaAtual) {
                                     // console.log(balance.balance.amount.value)
