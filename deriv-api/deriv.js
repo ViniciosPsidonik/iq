@@ -244,7 +244,7 @@ async function buyRec(api, connection) {
                         clearInterval(intttt);
                         setTimeout(() => {
                             buyRec(api, connection);
-                        }, 5000);
+                        }, 2000);
                     }
                 } else {
                     if (balance.balance.amount.value < bancaAtual) {
@@ -262,11 +262,16 @@ async function buyRec(api, connection) {
                         clearInterval(intttt);
                         setTimeout(() => {
                             buyRec(api, connection);
-                        }, 5000);
+                        }, 2000);
                     }
                 }
             }, 750);
         }
     });
 }
+
+
+function getRandomValue() {
+    return Math.floor(Math.random() * (5000 - 1000 + 1)) + 1000;
+  }
 // trade()

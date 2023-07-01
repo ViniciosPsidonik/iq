@@ -743,8 +743,8 @@ const onMessage = e => {
     // if (ws.readyState === WebSocket.OPEN) {
     const message = JSON.parse(e.data)
 
-    // console.log('RES = ' + e.data);
     if (message.name == 'instrument-quotes-generated') {
+        // console.log('RES = ' + e.data);
     }
 
     // if (message.name != 'instrument-quotes-generated' && message.name != 'api_option_init_all_result')
@@ -922,7 +922,7 @@ const onMessage = e => {
                             let toClose = false
                             let max
                             if (toCloseM5Obj.has(getActiveString(parInt, activesMapString))) {
-                                if (toCloseM5Obj.get(getActiveString(parInt, activesMapString)).max != 0 && lastTickCandles.get(parInt) > parseFloat(toCloseM5Obj.get(getActiveString(parInt, activesMapString)).max)) {
+                                if (toCloseM5Obj.get(getActiveString(parInt, activesMapString)).max != 0 && open > parseFloat(toCloseM5Obj.get(getActiveString(parInt, activesMapString)).max)) {
                                     toClose = true
                                     max = toCloseM5Obj.get(getActiveString(parInt, activesMapString)).max
                                 }
@@ -983,7 +983,7 @@ const onMessage = e => {
                             let toClose = false
                             let min
                             if (toCloseM5Obj.has(getActiveString(parInt, activesMapString))) {
-                                if (toCloseM5Obj.get(getActiveString(parInt, activesMapString)).min != 0 && lastTickCandles.get(parInt) < parseFloat(toCloseM5Obj.get(getActiveString(parInt, activesMapString)).min)) {
+                                if (toCloseM5Obj.get(getActiveString(parInt, activesMapString)).min != 0 && open < parseFloat(toCloseM5Obj.get(getActiveString(parInt, activesMapString)).min)) {
                                     toClose = true
                                     min = toCloseM5Obj.get(getActiveString(parInt, activesMapString)).min
                                 }

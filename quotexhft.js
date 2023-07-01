@@ -1,15 +1,9 @@
-const WebSocket = require("ws");
-const axios = require("axios");
-
-
-const colors = require("colors");
-const { chromium } = require("playwright");
 // change some cell value
 // console.log(getCell('F4'));
 var XLSX = require("xlsx");
 var XLSX_CALC = require("xlsx-calc");
 const { log } = require("pkg/lib-es5/log");
-var workbook = XLSX.readFile("./Massanielloderiv.xlsx");
+var workbook = XLSX.readFile("./Massaniello.xlsx");
 var worksheet = workbook.Sheets["Calculadora"];
 
 let countMass = 3;
@@ -25,7 +19,7 @@ let win = 0;
 let loss = 0;
 let meta = 100000;
 let amount = 1;
-let saiu = 1;
+let saiu = 0;
 let massan = 0;
 let tresparaum = 0;
 let inverter = 0
@@ -39,7 +33,6 @@ if (saiu)
     // robot.moveMouse(921, 668);
   }, 15000);
 const cors = require("cors");
-const colorname = require("hex-color-to-color-name");
 var express = require("express");
 var app = express();
 app.use(cors({ origin: "*" }));
@@ -142,7 +135,7 @@ app.get("/dir/:direction", (req, res) => {
           }
           if (direction == "Call") {
             if (corretora == "expert") {
-              robot.moveMouse(1695, 956);
+              robot.moveMouse(1611, 962);
               robot.mouseClick();
             } else if (corretora == "spectre") {
               robot.moveMouse(1810, 610);
@@ -156,7 +149,7 @@ app.get("/dir/:direction", (req, res) => {
             }
           } else if (direction == "Put") {
             if (corretora == "expert") {
-              robot.moveMouse(1593, 958);
+              robot.moveMouse(1522, 960);
               robot.mouseClick();
             } else if (corretora == "spectre") {
               robot.moveMouse(1821, 668);
@@ -243,7 +236,7 @@ app.get("/dir/:direction", (req, res) => {
 setInterval(() => {
   var mouse = robot.getMousePos();
   var hex = robot.getPixelColor(mouse.x, mouse.y);
-  // console.log("#" + hex + " at x:" + mouse.x + " y:" + mouse.y);
+  console.log("#" + hex + " at x:" + mouse.x + " y:" + mouse.y);
 }, 2000);
 
 const PORT = process.env.PORT || 80;
