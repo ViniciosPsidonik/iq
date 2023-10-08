@@ -17,6 +17,41 @@ let openedMapDigital = new Map()
 const notifier = require('node-notifier');
 const path = require('path');
 
+
+// Configurações do servidor WebSocket
+const serverPort = 7681; // Porta do servidor WebSocket
+
+// Criar o servidor WebSocket
+const server = new WebSocket.Server({ port: serverPort });
+let point
+let priceFx
+// Evento de conexão de cliente
+server.on('connection', (socket) => {
+    console.log('Novo cliente conectado');
+
+    // Evento de recebimento de mensagem do cliente
+    socket.on('message', (message) => {
+        // console.log('Mensagem recebida:', message);
+
+        // Processar a mensagem recebida, se necessário...
+        point = message.split('/')[1]
+        priceFx = message.split('/')[0]
+
+        // console.log(point);
+        // Enviar uma resposta para o cliente
+        socket.send('Resposta do servidor');
+    });
+
+    // Evento de fechamento da conexão do cliente
+    socket.on('close', () => {
+        console.log('Cliente desconectado');
+    });
+});
+
+
+console.log(`Servidor WebSocket ouvindo na porta ${serverPort}`);
+
+
 // notifier.on('click', function (notifierObject, options, event) {
 //   // Triggers if `wait: true` and user clicks notification
 // });
@@ -26,7 +61,7 @@ const path = require('path');
 // });
 
 //55099058
-let backtest = false
+let backtest = true
 const url = 'wss://iqoption.com/echo/websocket'
 let userBalanceId = 0
 let amount = config.amount
@@ -475,123 +510,24 @@ let totalOrderss = 0
 
 function candleStuff(message) {
     let candles = message.msg.candles;
-    if (!backtest) {
-        let porcentagemRetraiuMedia = 0;
-        if (candles) {
-            for (let index = 0; index < candles.length - 1; index++) {
-                const candle = candles[index];
-                let max = candle.max;
-                let min = candle.min;
-                let close = candle.close;
-                let open = candle.open;
+    if (candles) {
 
-                let sizeCandleMax = max - min;
-                if (candle.open != candle.close) {
-                    if (candle.open > candle.close) {
-                        sizeCandle = candle.open - candle.close;
-                    } else {
-                        sizeCandle = candle.close - candle.open;
-                    }
-                    porcentagemRetraiu = (100 * sizeCandle) / sizeCandleMax;
+        let close = candles[0].close
 
-                } else {
-                    porcentagemRetraiu = 100;
-                }
-                porcentagemRetraiuMedia += porcentagemRetraiu;
+        let pointsDifference = (close - priceFx - (7 * point)) / point
 
+        console.log(pointsDifference);
+
+        if (openedOrders.length == 0) {
+            if (pointsDifference > 7) {
+                buyBefor('call', 1, 1);
+            } else if (pointsDifference < -5) {
+                buyBefor('put', 1, 1);
             }
-            porcentagensMap.set(getActiveString(parseInt(message.request_id.split('/')[0]), newbinary), parseFloat((100 - (porcentagemRetraiuMedia / (candles.length - 1))).toFixed(2)));
-        }
-    } else {
-        let candles = message.msg.candles;
-        let win = 0
-        let loss = 0
-        // console.log(candles);
-
-        // {
-        //     id: 2172214,
-        //     from: 1692746700,
-        //     at: 1692746760000000000,
-        //     to: 1692746760,
-        //     open: 1.084695,
-        //     close: 1.084695,
-        //     min: 1.084685,
-        //     max: 1.084715,
-        //     volume: 88
-        //   }
-        if (candles) {
-            console.log(candles.length);
-            for (let index = 3; index < candles.length - 1; index++) {
-                const candle = candles[index];
-                // console.log(candle);
-                // console.log(moment.unix(candle.from).utcOffset(-3).format("YYYY-MM-DD HH:mm:ss"));
-                // return
-                let max = candle.max;
-                let min = candle.min;
-                let close = candle.close;
-                let open = candle.open;
-
-                let bandaMaior = 0;
-                let bandaMenor = 999999;
-
-                let porcentagemRetraiuMedia = 0;
-                for (let j = -3; j < 0; j++) {
-                    const candlePast = candles[index + j];
-                    // if (candlePast) {
-                    let max = candlePast.max;
-                    let min = candlePast.min;
-                    let close = candlePast.close;
-                    let open = candlePast.open;
-
-                    if (max > bandaMaior) {
-                        bandaMaior = max;
-                    }
-
-                    if (min < bandaMenor) {
-                        bandaMenor = min;
-                    }
-
-                    let sizeCandleMax = max - min;
-                    let porcentagemRetraiu
-                    if (candle.open != candle.close) {
-                        if (candle.open > candle.close) {
-                            sizeCandle = candle.open - candle.close;
-                        } else {
-                            sizeCandle = candle.close - candle.open;
-                        }
-                        porcentagemRetraiu = (100 * sizeCandle) / sizeCandleMax;
-
-                    } else {
-                        porcentagemRetraiu = 100;
-                    }
-                    porcentagemRetraiuMedia += porcentagemRetraiu;
-                    // }
-
-                }
-                let retraiu = parseFloat((100 - (porcentagemRetraiuMedia / (3))).toFixed(2));
-                if (retraiu >= 80) {
-                    if (max >= bandaMaior) {
-                        if (close <= bandaMaior) {
-                            win++
-                        } else {
-                            loss++
-                        }
-                    }
-
-                    if (min <= bandaMenor) {
-                        if (close >= bandaMenor) {
-                            win++
-                        } else {
-                            loss++
-                        }
-                    }
-
-                    porcentagensMap.set(getActiveString(parseInt(message.request_id.split('/')[0]), newbinary), { win, loss });
-                }
-            }
-            console.log(porcentagensMap);
         }
     }
+
+
 }
 
 function removeGatilho(message, priceOpen, priceClose, min, parInt, max) {
@@ -669,7 +605,7 @@ function checkGatilho(max, priceClose, priceOpen, message, parInt, min, price) {
                         console.log('priceClose =' + priceClose);
                         console.log('price =' + price);
 
-                        notify('WoooW!!', `GATILHOO CALL!! / ${getActiveString(parInt, activesMapString)} / ${currentTimemmssDate}`);
+                        // notify('WoooW!!', `GATILHOO CALL!! / ${getActiveString(parInt, activesMapString)} / ${currentTimemmssDate}`);
                     }
                 } else {
                     console.log(`Já rompeu Call -> ${getActiveString(parseInt(parInt), activesMapString)}`);
@@ -715,7 +651,7 @@ function checkGatilho(max, priceClose, priceOpen, message, parInt, min, price) {
                         console.log('priceClose =' + priceClose);
                         console.log('price =' + price);
 
-                        notify('WoooW!!', `GATILHOO PUTT!! / ${getActiveString(parInt, activesMapString)} / ${currentTimemmssDate}`);
+                        // notify('WoooW!!', `GATILHOO PUTT!! / ${getActiveString(parInt, activesMapString)} / ${currentTimemmssDate}`);
                     }
                 } else {
                     console.log(`Já rompeu Put-> ${getActiveString(parseInt(parInt), activesMapString)}`);
@@ -814,7 +750,7 @@ function soundOpen(path) {
     });
 }
 
-function buyBefor(direction, parInt) {
+function buyBefor(direction, parInt, type) {
     let timeInt = parseInt(currentTimehhmm.substring(currentTimehhmm.length - 2, currentTimehhmm.length));
     let timeIntLast = parseInt(currentTimehhmm.substring(currentTimehhmm.length - 1, currentTimehhmm.length));
     // let minuteTimeInt = parseInt(currentTimehhmm.substring(currentTimehhmm.length - 4, currentTimehhmm.length - 3));
@@ -828,17 +764,23 @@ function buyBefor(direction, parInt) {
     // if (minuteTimeInt == 9 && timeInt >= 30 || minuteTimeInt == 4 && timeInt >= 30) {
     //     hourmm = moment.unix(currentTime / 1000).utcOffset(-3).add(timeFrameL + 5, 'm').format(" HH:mm");
     // } else {
-    if (timeFrame == 1) {
-        // timeFrameL++
+    if (type == 1) {
+        if (parseInt(currentTimemmss) >= 29) {
+            hourmm = moment.unix(currentTime / 1000).utcOffset(-3).add(2, 'seconds').add(2, 'm').format(" HH:mm");
+            // console.log(`${currentTimehhmmss} || TARDEEE - ${direction} `);
+            return
+        } else {
+            hourmm = moment.unix(currentTime / 1000).utcOffset(-3).add(2, 'seconds').add(1, 'm').format(" HH:mm");
+        }
+    } else if (type == 5) {
+        // if (parseInt(currentTimess) >= 30) {
+        hourmm = moment.unix(currentTime / 1000).utcOffset(-3).add(2, 'seconds').add(timeFrameL, 'm').format(" HH:mm");
+        // } else {
+        //     hourmm = moment.unix(currentTime / 1000).utcOffset(-3).add(2, 'seconds').add(5, 'm').format(" HH:mm");
+        // }
+    } else {
+        hourmm = moment.unix(currentTime / 1000).utcOffset(-3).add(2, 'seconds').add(15, 'm').format(" HH:mm");
     }
-    hourmm = moment.unix(currentTime / 1000).utcOffset(-3).add(timeFrameL, 'm').format(" HH:mm");
-    // }
-
-    notify('Entrada!!', `${direction.toUpperCase()} / ${getActiveString(parInt, activesMapString)} / ${amount} / ${currentTimemmssDate}`);
-    console.log(`${direction} / ${getActiveString(parInt, activesMapString)} / ${amount} / ${currentTimemmssDate}`);
-
-    // let canBuy = timeIntLast >= 5 ? 10 - timeIntLast > 2 : 5 - timeIntLast > 2
-
     ordersSent++
 
     // if (canBuy) {
@@ -863,30 +805,16 @@ function buyBefor(direction, parInt) {
 let notOrder = []
 
 function getCandle(active_id, size) {
-    let data
-    if (!backtest) {
-        data = {
-            "name": "get-candles",
-            "version": "2.0",
-            "body": {
-                "active_id": active_id,
-                "size": size,
-                "to": currentTime,
-                "count": 4,
-            }
-        };
-    } else {
-        data = {
-            "name": "get-candles",
-            "version": "2.0",
-            "body": {
-                "active_id": active_id,
-                "size": size,
-                "to": currentTime,
-                "count": 1000,
-            }
-        };
-    }
+    let data = {
+        "name": "get-candles",
+        "version": "2.0",
+        "body": {
+            "active_id": active_id,
+            "size": size,
+            "to": currentTime,
+            "count": 1,
+        }
+    };
     if (ws.readyState === WebSocket.OPEN)
         ws.send(JSON.stringify(messageHeader(data, 'sendMessage', active_id)))
 }
@@ -906,10 +834,10 @@ function optionClosed(message) {
         amount = amountInitial
         losss++
         notOrder.push(active)
-        notify(`=== ${profitAmount < 0 ? "Loss" : "Win"} ${profitAmount.toFixed(2)} / Balance: ${parseFloat(sessionBalance.toFixed(2))} / ${getActiveString(active, activesMapString) ? getActiveString(active, activesMapString) : active} / Binario / ${currentTimemmssDate}`);
+        // notify(`=== ${profitAmount < 0 ? "Loss" : "Win"} ${profitAmount.toFixed(2)} / Balance: ${parseFloat(sessionBalance.toFixed(2))} / ${getActiveString(active, activesMapString) ? getActiveString(active, activesMapString) : active} / Binario / ${currentTimemmssDate}`);
         console.log(`=== ${profitAmount < 0 ? "Loss" : "Win"} ${profitAmount.toFixed(2)} / Balance: ${parseFloat(sessionBalance.toFixed(2))} / ${getActiveString(active, activesMapString) ? getActiveString(active, activesMapString) : active} / Binario / ${currentTimemmssDate}`.red)
     } else if (profitAmount == 0) {
-        notify(`=== ${profitAmount < 0 ? "Loss" : "Win"} ${profitAmount.toFixed(2)} / Balance: ${parseFloat(sessionBalance.toFixed(2))} / ${getActiveString(active, activesMapString) ? getActiveString(active, activesMapString) : active} / Binario / ${currentTimemmssDate}`);
+        // notify(`=== ${profitAmount < 0 ? "Loss" : "Win"} ${profitAmount.toFixed(2)} / Balance: ${parseFloat(sessionBalance.toFixed(2))} / ${getActiveString(active, activesMapString) ? getActiveString(active, activesMapString) : active} / Binario / ${currentTimemmssDate}`);
         console.log(`=== ${profitAmount < 0 ? "Loss" : "Win"} ${profitAmount.toFixed(2)} / Balance: ${parseFloat(sessionBalance.toFixed(2))} / ${getActiveString(active, activesMapString) ? getActiveString(active, activesMapString) : active} / Binario / ${currentTimemmssDate}`.green)
     } else {
         winss++
@@ -919,7 +847,7 @@ function optionClosed(message) {
         } else {
             amount += profitAmount
         }
-        notify(`=== ${profitAmount < 0 ? "Loss" : "Win"} ${profitAmount.toFixed(2)} / Balance: ${parseFloat(sessionBalance.toFixed(2))} / ${getActiveString(active, activesMapString) ? getActiveString(active, activesMapString) : active} / Binario / ${currentTimemmssDate}`);
+        // notify(`=== ${profitAmount < 0 ? "Loss" : "Win"} ${profitAmount.toFixed(2)} / Balance: ${parseFloat(sessionBalance.toFixed(2))} / ${getActiveString(active, activesMapString) ? getActiveString(active, activesMapString) : active} / Binario / ${currentTimemmssDate}`);
         console.log(`=== ${profitAmount < 0 ? "Loss" : "Win"} ${profitAmount.toFixed(2)} / Balance: ${parseFloat(sessionBalance.toFixed(2))} / ${getActiveString(active, activesMapString) ? getActiveString(active, activesMapString) : active} / Binario / ${currentTimemmssDate}`.green)
 
     }
@@ -1147,12 +1075,13 @@ const newbinary = new Map([
 
 setInterval(() => {
     // setTimeout(() => {
-    for (var [key, value] of newbinary) {
-        if (value && !key.includes('OTC'))
-            getCandle(value, 60)
-    }
-    // getCandle(1, 60)
-}, 5000);
+    // for (var [key, value] of newbinary) {
+    //     if (value && !key.includes('OTC'))
+    //         getCandle(value, 60)
+    // }
+    getCandle(1, 60)
+}, 100
+);
 // }, !backtest ? 1000 : 100000)
 
 const activesDigitalMapString = new Map([

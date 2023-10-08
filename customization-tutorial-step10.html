@@ -81,9 +81,10 @@
   <script type="text/javascript">
     let currentMoeda = 'EURUSD'
     let pricesToSend = new Map()
-    function myFunction(moeda) {
+    async function myFunction(moeda) {
       chart.remove();
-      getCandleStick(moeda)
+      chart = undefined
+      await getCandleStick(moeda)
       currentMoeda = moeda
       $("#moeda").text(moeda)
     }
@@ -92,7 +93,7 @@
       getLast()
     }
 
-    function clearAll () {
+    function clearAll() {
       axios.get('http://localhost:1234/clearAll')
     }
     async function getLast() {
@@ -100,6 +101,7 @@
         for (const [key, value] of Object.entries(res.data)) {
           pricesToSend.set(value.moeda, value.taxa)
         }
+        console.log(pricesToSend);
       })
     }
 
@@ -125,21 +127,35 @@
           // res.data.length
           for (let index = 0; index < res.data.length; index++) {
             const element = res.data[index];
-            let open = element.open
-            let high = element.max
-            let low = element.min
-            let close = element.close
-            // let time = moment.unix(element.to).format('YYYY-MM-DD hh:mm:ss').toString()
-            let time = element.to
-            if (open && high && low && close && time) {
-              moedas.push({
-                open,
-                high,
-                low,
-                close,
-                // time: time.toString()
-                time
-              })
+            if (typeof element.direction == "undefined") {
+              let open = element.open
+              let high = element.max
+              let low = element.min
+              let close = element.close
+              // let time = moment.unix(element.to).format('YYYY-MM-DD hh:mm:ss').toString()
+              let time = element.to
+              if (open && high && low && close && time) {
+                moedas.push({
+                  open,
+                  high,
+                  low,
+                  close,
+                  // time: time.toString()
+                  time
+                })
+              }
+            } else {
+              console.log(element);
+              for (const [key, value] of pricesToSend) {
+                if (key === element.actives) {
+                  if (element.direction == 'call') {
+                    pricesToSend.set(key, { ...value, sup: undefined, supd: undefined })
+                  } else {
+                    pricesToSend.set(key, { ...value, res: undefined, resd: undefined })
+                  }
+                  console.log('bbbbbbbb');
+                }
+              }
             }
           }
           addChartData(moedas)
@@ -343,16 +359,17 @@
       });
 
       function createPriceLine(priceLine, color, priceValue, title) {
-        if (!priceLine) {
-          priceLine = mainSeries.createPriceLine({
-            price: priceValue,
-            color: color,
-            lineWidth: 2,
-            title
-          })
-        } else {
-          priceLine.applyOptions({ price: priceValue });
-        }
+        if (priceValue)
+          if (!priceLine) {
+            priceLine = mainSeries.createPriceLine({
+              price: priceValue,
+              color: color,
+              lineWidth: 2,
+              title
+            })
+          } else {
+            priceLine.applyOptions({ price: priceValue });
+          }
         return priceLine
       }
     }

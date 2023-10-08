@@ -781,7 +781,6 @@ const onMessage = e => {
             if (candles) {
                 for (let index = 0; index < candles.length - 1; index++) {
                     const candle = candles[index];
-
                     open.push(candle.open)
                     high.push(candle.max)
                     close.push(candle.close)
@@ -844,6 +843,7 @@ const onMessage = e => {
             connectedd = true
 
             getCandle(1, 1)
+            getCandle(2, 1)
             getCandle(4, 1)
             getCandle(5, 1)
             //noticias...

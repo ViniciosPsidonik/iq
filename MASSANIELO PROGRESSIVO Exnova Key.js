@@ -13,7 +13,7 @@ let openedMap = new Map()
 let openedMapDigital = new Map()
 
 //55099058
-const url = 'wss://iqoption.com/echo/websocket'
+const url = 'wss://ws.trade.exnova.com/echo/websocket'
 let userBalanceId = 0
 let userBalanceIdGustavo = 0
 let userBalanceReal = 0
@@ -83,60 +83,65 @@ let toCloseM15 = config.toCloseM15
 let idsArray = []
 
 let payoutMap = new Map()
-let buysCount = new Map()
+let
+    buysCount = new Map()
 let buyUsersIds = []
 let winsInfinity = 0
 let buyssTimess = []
 let buyssTimessBinary = []
 
-Tail = require('tail').Tail;
 
-tail = new Tail('C:/Users/vinícios.psidonik/AppData/Roaming/MetaQuotes/Terminal/2E8DC23981084565FA3E19C061F586B2/MQL4/Files/' + moment().format("YYYYMMDD") + "_retorno.csv", "\n", {}, true);
 
-// tail = new Tail('C:/Users/vinícios.psidonik/AppData/Roaming/MetaQuotes/Terminal/3294B546D50FEEDA6BF3CFC7CF858DB7/MQL4/Files/' + moment().format("YYYYMMDD") + "_retorno.csv", "\n", {}, true);
 
-// setTimeout(() => {
-// buyBefor('put', 1, 1)
-// }, 5000);
+const args = process.argv.slice(2);
+console.log(args);
+let arrayTam = ['q', 'w', 'e', 'r']
 
-tail.on("line", function (data) {
-    let dataSplited = data.split(",")
+var keypress = require("keypress");
+let par
 
-    let parInt = activesMapString.get(dataSplited[1])
-    // console.log(dataSplited);
+// make `process.stdin` begin emitting "keypress" events
+keypress(process.stdin);
 
-    let achouu = false
-    for (let index = 0; index < checkCandle.length; index++) {
-        const element = checkCandle[index];
-        if (element.parInt == parInt) {
-            achouu = true
-            break
-        }
+process.stdin.on("keypress", function (ch, key) {
+    // console.log(key);
+    // console.log(ch);
+    if (key && key.name == "p") {
+        buyBefor('put', activesMapString.get(par), 1)
     }
-    // && parseInt(currentTimess) <= 5
-    if (!achouu && !openedOrders.includes(parInt)) {
-        // console.log(`${currentTimehhmmss} || GATILHO / ${dataSplited[2]} / ${getActiveString(parInt, activesMapString)}`);
-        // notify('[GATILHO]', `${dataSplited[2]} / ${getActiveString(parInt, activesMapString)}`);
+    if (key && key.name == "c") {
+        buyBefor('call', activesMapString.get(par), 1)
+    }
+    if (key && key.name == "q") {
+        par = args[0]
+        console.log(par);
+    }
+    if (key && key.name == "w") {
+        par = args[1]
+        console.log(par);
+    }
+    if (key && key.name == "e") {
+        par = args[2]
+        console.log(par);
+    }
+    if (key && key.name == "r") {
+        par = args[3]
+        console.log(par);
+    }
 
-        let isStopedPar = false
-        for (let index = 0; index < stopOrdersPares.length; index++) {
-            const stopOrdersPar = stopOrdersPares[index];
-            if (getActiveString(element.parInt, activesMapString).includes(stopOrdersPar)) {
-                isStopedPar = true
-                break
-            }
-        }
+    if (key && arrayTam.includes(key.name)) {
 
-        if (!stopOrders && !isStopedPar && (!doispraum || doispraum && openedOrders.length == 0) && !positionOpenedSoros) {
-            // if (parseInt(currentTimess) < 33) {
-            // if (parseInt(currentTimehh) >= 5 && parseInt(currentTimehh) <= 15)
-            buyBefor(dataSplited[2], parInt, parseInt(dataSplited[3]))
-            // }
-        }
-    } else {
-        console.log(`${currentTimehhmmss} || ${dataSplited}`);
+    } else if (key && key.name == "d") {
+        // buyBefor(dataSplited[2], activesMapString.get(), parseInt(dataSplited[3]))
+    } else if (key && key.name == "e") {
+        empater = true;
+    } else if (key && key.ctrl && key.name == "c") {
+        process.exit()
     }
 });
+
+// process.stdin.setRawMode(true);
+// process.stdin.resume();
 
 var XLSX = require('xlsx');
 var workbook = XLSX.readFile('./Massaniello.xlsx');
@@ -145,8 +150,8 @@ var worksheet = workbook.Sheets['Calculadora']
 // console.log(getCell('F4'));
 
 let countMass = 3
-amount = parseFloat(getCell('D' + countMass))
-console.log(amount);
+// amount = parseFloat(getCell('D' + countMass))
+// console.log(amount);
 
 for (let index = 4; index < 10; index++) {
     // console.log(getCell('F'+index));
@@ -174,9 +179,6 @@ setInterval(() => {
     }
 }, 500);
 
-// tail.on("error", function (error) {
-//     console.log('ERROR: ', error);
-// });
 
 let checkCandle = []
 /*
@@ -673,6 +675,7 @@ let losss = 0
 
 const notifier = require('node-notifier');
 const path = require('path');
+const { parseInt } = require('lodash');
 
 function modifyCell(cellString, value) {
     if (value == undefined) {
@@ -1474,9 +1477,9 @@ function openOrderDigital(direction, parInt, hourmm, timeFrame) {
 
     // hourmm = moment.unix(currentTime / 1000).utcOffset(-3).add(2, 'seconds').add(5, 'm').format(" HH:mm");
 
-    console.log(`${currentTimehhmmss} || ${direction} / ${getActiveString(parInt, activesMapString)} / ${amount} / Digital`);
-    notify('[Order Digital]', `${direction} / ${getActiveString(parInt, activesMapString)} / ${amount}`);
-    buy(amount, parInt, direction, parseInt(moment(moment().format("YYYY-MM-DD ") + hourmm).utcOffset(0).format('X')), 'PT' + timeFrame + 'M');
+    console.log(`${currentTimehhmmss} || ${direction} / ${getActiveString(parInt, activesMapString)} / ${2} / Digital`);
+    notify('[Order Digital]', `${direction} / ${getActiveString(parInt, activesMapString)} / ${2}`);
+    buy(2, parInt, direction, parseInt(moment(moment().format("YYYY-MM-DD ") + hourmm).utcOffset(0).format('X')), 'PT' + timeFrame + 'M');
     totalOrderss++;
     // openedOrders.push(parInt);
 }
@@ -1594,6 +1597,7 @@ function positionChangedStuff(message) {
     // orderopenned.push(message.msg.raw_event.instrument_id)
 
     // console.log(JSON.stringify(message));
+    //console.log('aaaaaa');
     if (orderopenned.includes(message.msg.instrument_id)) {
         if (message.msg.status == 'closed') {
 
@@ -1653,7 +1657,7 @@ function positionChangedStuff(message) {
             }
 
             // if (!positionOpenedSoros)
-            //     buyBefor('put', 1, 1)
+            //  buyBefor('put', 76, 1)
 
         }
     }
@@ -2014,11 +2018,11 @@ let logged = false
 
 let ssidGustavo
 
-axios.post('https://auth.iqoption.com/api/v2/login', {
+axios.post('https://auth.trade.exnova.com/api/v2/login', {
     // identifier: config.login,
     // password: config.password
-    identifier: "davilagustavo996@gmail.com",
-    password: "Ana12boeno#",
+    identifier: "vinipsidonik@gmail.com",
+    password: "Mp19199797@1",
 }).then((response) => {
     ssid = response.data.ssid
     console.log(ssid);
@@ -2036,7 +2040,7 @@ axios.post('https://auth.iqoption.com/api/v2/login', {
         console.log('Erro ao se conectar... Tente novamente')
 })
 
-axios.post('https://auth.iqoption.com/api/v2/login', {
+axios.post('https://auth.trade.exnova.com/api/v2/login', {
     // identifier: "davilagustavo996@gmail.com",
     // password: "Ana12boeno#",
     // identifier: "carol.davila14@outlook.com",

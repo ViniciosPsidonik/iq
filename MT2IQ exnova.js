@@ -2144,8 +2144,8 @@ let ssidGustavo
 
 const start = () => {
     axios.post('https://auth.trade.exnova.com/api/v2/login', {
-        identifier: 'vinipsidonik@gmail.com',
-        password: 'Mp19199797@1'
+        identifier: 'vinipsidonik@hotmail.com',
+        password: 'gc896426'
         // identifier: "carol.davila14@outlook.com",
         // password: "gc896426",
     }).then((response) => {

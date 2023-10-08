@@ -29,8 +29,12 @@ function getCell(cellString) {
         return undefined
     }
 }
-
+// 1, 410679308775642
 function lossMass(winloss) {
+    if (winloss == 'L') {
+        hasloss = true
+    }
+    barrier = 6
     modifyCell('C' + countMass, winloss);
     XLSX_CALC(workbook, { continue_after_error: true, log_error: false });
     // console.log(getCell('I' + countMass))
@@ -38,20 +42,24 @@ function lossMass(winloss) {
     amount = parseFloat(getCell('D' + countMass)) > 0 ? parseFloat(getCell('D' + countMass)) : parseFloat(getCell('D' + countMass)) * -1;
 }
 let bancaAtual = 0
+let hasloss = false
 function winMass() {
     lossMass('W')
 
     if (getCell('F' + (countMass - 1)) > getCell('N12')) {
         console.log(`Takeeee `.green)
+        barrier = 2
         loss = 0
         win = 0
+
+        hasloss = false
         // let bancaAtual = getCell('F' + (countMass - 1))
 
-        console.log(`bancaAtual = ${bancaAtual}`);
-        for (let index = countMass; index >= 3; index--) {
-            modifyCell('C' + countMass, '');
-        }
-        modifyCell('N12', balance.balance.amount.value);
+        // console.log(`bancaAtual = ${bancaAtual}`);
+        // for (let index = countMass; index >= 3; index--) {
+        //     modifyCell('C' + countMass, '');
+        // }
+        // modifyCell('N12', balance.balance.amount.value);
         cicleSession = 0;
         XLSX_CALC(workbook, { continue_after_error: true, log_error: false });
         countMass = 3;
@@ -79,7 +87,7 @@ function modifyCell(cellString, value) {
 }
 
 let start = true
-
+let barrier = 2
 const trade = async () => {
     console.log('=====================');
     const connection = new WebSocket('wss://ws.binaryws.com/websockets/v3?app_id=34942');
@@ -103,7 +111,7 @@ const trade = async () => {
         duration: 1,
         duration_unit: 't',
         currency: 'USD',
-        barrier: 5,
+        barrier,
         proposal: 1,
         basis: 'stake',
         amount: parseFloat(amount).toFixed(2)
@@ -156,103 +164,140 @@ const openDigitDiff = async (api) => {
     // })
 }
 
+buyRec()
+
 let lastDigits = [0, 1, 2]
 
-const tickhes = async () => {
+let ganhaTrade = 0
+let canTrade = false
+let ativaTicks = false
+let veefe = ""
+let counterNine = 0
+async function buyRec() {
+
+
+    // if (loss > 3) {
+    // ativaTicks = true
+    // await esperaPoderEntrar()
+    // setTimeout(async () => {
+    // let contract = await contracts();
+    // startContract(contract, api, connection);
+    // }, 4000);
+    // }
+
     const connection = new WebSocket('wss://ws.binaryws.com/websockets/v3?app_id=34942');
     const api = new DerivAPI({ connection });
 
     balance = await api.account('pbZQyrw6BRt0lu5');
 
-    // a ticks object you can get the ticks from or listen to updates
-    // const ticks = await api.ticks('R_100');
     if (!bancaAtual)
         bancaAtual = balance.balance.amount.value
-
-    // By default the last 1000 ticks
-    // const list_of_ticks = ticks.list;
-    // const list_of_old_ticks = await ticks.history(range);
-
-    // Get the tick updates with a callback
-
     if (start) {
         start = false
-        meta = balance.balance.amount.value + (balance.balance.amount.value * (meta / 100))
+        // meta = balance.balance.amount.value + 50
+
+        // const ticks = await api.ticks('R_100');
+
+        // ticks.onUpdate().subscribe(async tick => {
+        // console.log(parseInt(tick.raw.quote.toString().slice(-1)));
+        // lastDigits[4] = lastDigits[3]
+        // lastDigits[3] = lastDigits[2]
+        // lastDigits[2] = lastDigits[1]
+        // lastDigits[1] = lastDigits[0]
+        // lastDigits[0] = parseInt(tick.raw.quote.toString().slice(-1))
+        // if (lastDigits[1] == lastDigits[2]) {
+        //     console.log(lastDigits);
+        // }
+        // })
+
+        meta = 10200
         console.log(`Meta = ${meta}`);
-        modifyCell('N12', balance.balance.amount.value);
+        // modifyCell('N12', balance.balance.amount.value);
         cicleSession = 0;
-        XLSX_CALC(workbook, { continue_after_error: true, log_error: false });
+        // XLSX_CALC(workbook, { continue_after_error: true, log_error: false });
         amount = parseFloat(getCell('D' + countMass)).toFixed(2)
+        console.log('amount=', amount);
     }
 
-    // ticks.onUpdate(async tick => {
-    //     // console.log(parseInt(tick.raw.quote.toString().slice(-1)));
-    //     lastDigits[2] = lastDigits[1]
-    //     lastDigits[1] = lastDigits[0]
-    //     lastDigits[0] = parseInt(tick.raw.quote.toString().slice(-1))
-    // console.log(lastDigits);
-    // if (lastDigits[0] == 5 && lastDigits[1] != lastDigits[2]) {
-    await buyRec(api, connection);
-    // }
-    // });
+
+    let contract = await contracts();
+    startContract(contract, api, connection);
+
+    async function contracts() {
+        let contract = await api.contract({
+            // contract_type: 'DIGITDIFF',
+            contract_type: 'DIGITEVEN',
+            symbol: 'R_100',
+            duration: 1,
+            duration_unit: 't',
+            currency: 'USD',
+            barrier,
+            proposal: 1,
+            basis: 'stake',
+            amount: parseFloat(amount).toFixed(2)
+        }).catch(err => console.log(err));
+        contract.buy().catch(err => {
+            console.log(err);
+            trade();
+        });
+        return contract;
+    }
 }
-tickhes()
 
-async function buyRec(api, connection) {
+const esperaPoderEntrar = (type) => {
+    return new Promise((resolve, reject) => {
+        const intt = setInterval(() => {
+            // console.log('esperaPoderEntrar');
+            if (canTrade) {
+                canTrade = false
+                clearInterval(intt)
+                return resolve()
+            }
+        }, 100);
+    })
+}
+
+function startContract(contract, api, connection) {
     console.log('=====================');
-    console.log(amount);
-    let contract = await api.contract({
-        // contract_type: 'DIGITDIFF',
-        contract_type: 'DIGITOVER',
-        symbol: 'R_100',
-        duration: 1,
-        duration_unit: 't',
-        currency: 'USD',
-        barrier: 5,
-        proposal: 1,
-        basis: 'stake',
-        amount: parseFloat(amount).toFixed(2)
-    }).catch(err => console.log(err));
-    contract.buy().catch(err => {
-        console.log(err);
-        trade()
-    });
-
-    // contract.buy().catch(err => {
-    //     console.log('err 1');
-    //     console.log(err)
-    //     // trade()
-    // });
+    console.log('amount=', amount);
     contract.onUpdate().subscribe(async (contract) => {
+        // console.log('issold after');
         if (contract.is_sold) {
             const intttt = setInterval(() => {
+                // console.log('issold');
                 if (contract.status == 'won') {
-                    if (balance.balance.amount.value > bancaAtual) {
-                        // console.log(contract.profit);
-                        bancaAtual = balance.balance.amount.value;
-                        // console.log(contract.profit);
-                        // profitSession += contract.profit.value
-                        // bancaAtual += profitSession
-                        console.log('WIIN'.green);
+                    // if (balance.balance.amount.value > bancaAtual) {
+                    // console.log(contract.profit);
+                    bancaAtual = balance.balance.amount.value;
+                    console.log(contract.profit.value);
+                    console.log(bancaAtual);
+                    // profitSession += contract.profit.value
+                    // bancaAtual += profitSession
+                    if (hasloss) {
                         win++;
-                        console.log(`Wins: ${win} || Loss: ${loss}`);
                         winMass();
-
-
-
-                        // resolve()
-                        // contract = undefined;
-                        // connection.terminate();
-                        clearInterval(intttt);
-                        setTimeout(() => {
-                            buyRec(api, connection);
-                        }, 2000);
+                    } else if (!ganhaTrade) {
+                        ganhaTrade = contract.profit.value;
+                        console.log('ganhaTrade=', ganhaTrade);
                     }
+                    if (ganhaTrade) {
+                        let falta = (meta - bancaAtual) / ganhaTrade;
+                        console.log(`WIIN - falta = ${parseInt(falta)}`.green);
+                    }
+                    console.log(`Wins: ${win} || Loss: ${loss}`);
+                    // 9981
+                    // 10137
+                    // resolve()
+                    // contract = undefined;
+                    // connection.terminate();
+                    clearInterval(intttt);
+                    buyRec(api, connection);
+                    // }
                 } else {
                     if (balance.balance.amount.value < bancaAtual) {
-                        // console.log(balance.balance.amount.value)
                         bancaAtual = balance.balance.amount.value;
-                        // console.log(contract.profit);
+                        console.log(contract.profit.value);
+                        console.log(bancaAtual);
                         // profitSession -= contract.profit.value
                         // bancaAtual += profitSession
                         console.log('LOSS'.red);
@@ -264,14 +309,13 @@ async function buyRec(api, connection) {
                         clearInterval(intttt);
                         setTimeout(() => {
                             buyRec(api, connection);
-                        }, 2000);
+                        }, 500);
                     }
                 }
             }, 750);
         }
     });
 }
-
 
 function getRandomValue() {
     return Math.floor(Math.random() * (5000 - 1000 + 1)) + 1000;

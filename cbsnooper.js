@@ -3,12 +3,15 @@ const fs = require('fs')
 const axios = require('axios')
 const _ = require('lodash')
 
+let backList = ['DUOTRIM', 'NEUROSC', 'FIXPAIN', 'WATERLIB', 'THEYAVUE', 'SOUNDHEALR', 'REABIS', '324256']
+// let backList = []
+
 let productsSnooper = fs.readFileSync('productsSnooper.json')
 let productsSnooperjson = JSON.parse(productsSnooper)
 let productsSnooperjsonAux = []
-let getProductss = 0
+let getProductss = 1
 
-let max = 25
+let max = 20
 let maxmax = 200
 let min = 10
 
@@ -25,9 +28,14 @@ let goodProducts = []
 async function logic() {
     let arraySemRepeticao = getProductss ? await getProducts() : productsSnooperjson
     for (let index = 0; index < arraySemRepeticao.length; index++) {
-        
+
         const item = arraySemRepeticao[index];
-        let res = await getsnooperapi(apisnooper + item)
+        let res
+        try {
+            res = await getsnooperapi(apisnooper + item)
+        } catch (error) {
+            console.log(error.data);
+        }
         // console.log(res.data.data.product);
         console.log(index);
         let ghistory = _.get(res.data.data, 'gravity_history').data
@@ -43,11 +51,19 @@ async function logic() {
                 maior = gh.value
             }
         }
-        if (menor <= min && maior >= max && maior < maxmax) {
+        if (menor <= min && maior >= max && maior < maxmax && !backList.includes(res.data.data.product)) {
             goodProducts.push(res.data.data.product)
         }
     }
     console.log(goodProducts);
+    if (typeof browser == "undefined")
+        browser = await puppeteer.launch({ headless: false })
+    for (let index = 0; index < goodProducts.length; index++) {
+        const goodProduct = goodProducts[index];
+        const page = await browser.newPage()
+        await page.goto('https://cbsnooper.com/products/' + goodProduct)
+    }
+
 }
 
 async function getsnooperapi(url) {
@@ -55,12 +71,14 @@ async function getsnooperapi(url) {
         let res = axios.get(url)
         setTimeout(() => {
             resolve(res)
-        }, 1000);
+        }, 1200);
     })
 }
+let browser
 
 async function getProducts() {
-    const browser = await puppeteer.launch({ headless: false })
+    if (typeof browser == "undefined")
+        browser = await puppeteer.launch({ headless: false })
     const page = await browser.newPage()
     await page.setViewport({ width: 1440, height: 5000 })
     for (let index = 0; index < pages.length; index++) {

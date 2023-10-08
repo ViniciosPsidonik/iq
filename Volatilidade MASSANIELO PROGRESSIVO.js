@@ -13,7 +13,7 @@ let openedMap = new Map()
 let openedMapDigital = new Map()
 
 //55099058
-const url = 'wss://iqoption.com/echo/websocket'
+const url = 'wss://ws.trade.exnova.com/echo/websocket'
 let userBalanceId = 0
 let userBalanceIdGustavo = 0
 let userBalanceReal = 0
@@ -34,6 +34,8 @@ let verpar = config.verpar
 let log = config.log
 let logg = config.logg
 let notifyy = config.notifyy
+let lastAmount = config.lastAmount
+let veefe = config.veefe
 let country = config.filtroPorPais
 let topTradersRange = config.topTradersRange
 let copyIds = !isNaN(config.copyIds.split(',')[0]) && !isNaN(config.copyIds.split(',')[1]) ? config.copyIds.split(',') : []
@@ -81,62 +83,13 @@ let toCloseM5 = config.toCloseM5
 let toCloseM15 = config.toCloseM15
 
 let idsArray = []
-
+let parError = []
 let payoutMap = new Map()
 let buysCount = new Map()
 let buyUsersIds = []
 let winsInfinity = 0
 let buyssTimess = []
 let buyssTimessBinary = []
-
-Tail = require('tail').Tail;
-
-tail = new Tail('C:/Users/vinícios.psidonik/AppData/Roaming/MetaQuotes/Terminal/2E8DC23981084565FA3E19C061F586B2/MQL4/Files/' + moment().format("YYYYMMDD") + "_retorno.csv", "\n", {}, true);
-
-// tail = new Tail('C:/Users/vinícios.psidonik/AppData/Roaming/MetaQuotes/Terminal/3294B546D50FEEDA6BF3CFC7CF858DB7/MQL4/Files/' + moment().format("YYYYMMDD") + "_retorno.csv", "\n", {}, true);
-
-// setTimeout(() => {
-// buyBefor('put', 1, 1)
-// }, 5000);
-
-tail.on("line", function (data) {
-    let dataSplited = data.split(",")
-
-    let parInt = activesMapString.get(dataSplited[1])
-    // console.log(dataSplited);
-
-    let achouu = false
-    for (let index = 0; index < checkCandle.length; index++) {
-        const element = checkCandle[index];
-        if (element.parInt == parInt) {
-            achouu = true
-            break
-        }
-    }
-    // && parseInt(currentTimess) <= 5
-    if (!achouu && !openedOrders.includes(parInt)) {
-        // console.log(`${currentTimehhmmss} || GATILHO / ${dataSplited[2]} / ${getActiveString(parInt, activesMapString)}`);
-        // notify('[GATILHO]', `${dataSplited[2]} / ${getActiveString(parInt, activesMapString)}`);
-
-        let isStopedPar = false
-        for (let index = 0; index < stopOrdersPares.length; index++) {
-            const stopOrdersPar = stopOrdersPares[index];
-            if (getActiveString(element.parInt, activesMapString).includes(stopOrdersPar)) {
-                isStopedPar = true
-                break
-            }
-        }
-
-        if (!stopOrders && !isStopedPar && (!doispraum || doispraum && openedOrders.length == 0) && !positionOpenedSoros) {
-            // if (parseInt(currentTimess) < 33) {
-            // if (parseInt(currentTimehh) >= 5 && parseInt(currentTimehh) <= 15)
-            buyBefor(dataSplited[2], parInt, parseInt(dataSplited[3]))
-            // }
-        }
-    } else {
-        console.log(`${currentTimehhmmss} || ${dataSplited}`);
-    }
-});
 
 var XLSX = require('xlsx');
 var workbook = XLSX.readFile('./Massaniello.xlsx');
@@ -145,8 +98,6 @@ var worksheet = workbook.Sheets['Calculadora']
 // console.log(getCell('F4'));
 
 let countMass = 3
-amount = parseFloat(getCell('D' + countMass))
-console.log(amount);
 
 for (let index = 4; index < 10; index++) {
     // console.log(getCell('F'+index));
@@ -160,41 +111,31 @@ for (let index = 4; index < 10; index++) {
 var XLSX_CALC = require('xlsx-calc');
 // XLSX_CALC(workbook, { continue_after_error: true, log_error: false });
 
-for (let index = 4; index < 10; index++) {
-    // console.log(getCell('F' + index));
-}
 
+const getamount = async () => {
 
-setInterval(() => {
-    if (openedOrders.length > 0) {
-        for (let index = 0; index < openedOrders.length; index++) {
-            const element = openedOrders[index];
-            // getCandle(element, 1)
-        }
+    modifyCell('N' + 12, config.lastAmount);
+    for (let index = 0; index < veefe.length; index++) {
+        const element = veefe[index];
+
+        // console.log(element);
+        modifyCell('C' + countMass, element);
+
+        countMass++
+
     }
-}, 500);
+    XLSX_CALC(workbook, { continue_after_error: true, log_error: false });
 
-// tail.on("error", function (error) {
-//     console.log('ERROR: ', error);
-// });
+    amount = parseFloat(getCell('D' + countMass))
+    console.log('Banca=', getCell('N12'));
+    console.log(amount);
 
-let checkCandle = []
-/*
+    // console.log(getCell('I' + 3))
+    // console.log(getCell('F' + 3))
+    // console.log(getCell('N' + 12))
 
-DragonFly Doji
-gravestone doji
-Bullish Marubozu 
-bearish marubozu
-evening doji star
-evening star
-Morning Doji Star 
-morning star
-Three Black Crows
-Three White Soldiers
-Tweezer Top
-tweezer bottom
-
-*/
+}
+getamount()
 
 if (config.pass != 'senhaloka')
     process.exit()
@@ -282,8 +223,6 @@ const getOpenedDigital = () => {
 
 setInterval(async () => {
     intervalGetPayout()
-    openedMap = new Map(await getOpened())
-    openedMapDigital = new Map(await getOpenedDigital())
     // console.log(openedMap);
     // console.log(openedMapDigital)
 }, 10000);
@@ -553,68 +492,6 @@ if (noticias) {
 let stopOrders = false
 let stopOrdersPares = []
 
-const showRunningActives = setInterval(() => {
-    let fsConfig = fs.readFileSync('config.json')
-    let config = JSON.parse(fsConfig)
-    log = config.log
-    logg = config.logg
-    loggg = config.loggg
-    valorMinimo = config.valorMinimo
-    country = config.filtroPorPais
-    topTradersRange = config.topTradersRange
-    soros = config.soros
-    gale = config.gale
-    galeLevel = config.galeLevel
-    galeFactor = config.galeFactor
-    StopLoss = config.StopLoss
-    StopWin = config.StopWin
-    copy100Ids = config.copy100Ids
-    copyBestIdsRange = config.copyBestIdsRange
-    tradesPerActive = config.tradesPerActive
-    bestIdsLog = config.bestIdsLog
-    invertTrades = config.invertTrades
-    verpar = config.verpar
-    binarias = config.binarias
-    binariasTimes = config.binariasTimes
-    digital = config.digital
-    digitalTimes = config.digitalTimes
-    delaySeconds = config.delaySeconds ? config.delaySeconds : 1
-    showSchedules = config.showSchedules
-    taxas = config.taxas
-
-    if (config.cleanUp) {
-        runningActives = []
-        runningActivesBinary = []
-        runningActivesDigital = []
-        runningActivesDigitalFive = []
-        auth()
-        if (soros)
-            // positionOpenedSoros = false
-            if (gale)
-                positionOpenedGale = false
-    }
-
-    if (config.showSchedules) {
-        console.log(schedules);
-    }
-
-    if (config.loggg) {
-        console.log('Turbo: ' + runningActives.length)
-        console.log('Binary: ' + runningActivesBinary.length)
-        console.log('Digital: ' + runningActivesDigital.length)
-        console.log('DigitalFive: ' + runningActivesDigitalFive.length)
-        console.log(`copyIds:  ${copyIds.length > 0 ? copyIds.length : 0}`)
-        console.log(`leadersArray:  ${!!leadersArray ? leadersArray.length : 0}`)
-        // console.log(`positionOpenedSoros: ${positionOpenedSoros}`);
-        console.log(`positionOpenedGale: ${positionOpenedGale}`);
-        console.log('===================')
-    }
-
-    if (bestIdsLog) {
-        console.log(copyIds);
-    }
-
-}, 5000)
 
 setInterval(() => {
     // await subs('live-deal-binary-option-placed' , 'unsubscribeMessage')
@@ -673,6 +550,7 @@ let losss = 0
 
 const notifier = require('node-notifier');
 const path = require('path');
+const { Console } = require('console');
 
 function modifyCell(cellString, value) {
     if (value == undefined) {
@@ -727,9 +605,9 @@ const onMessage = e => {
 
         if (!doispraum) {
             if (sessionBalance > 0 && StopWin <= sessionBalance) {
-                notify('Stop', `Stop Win Alcançado...`);
-                console.log('Stop Win Alcançado...')
-                process.exit()
+                // notify('Stop', `Stop Win Alcançado...`);
+                // console.log('Stop Win Alcançado...')
+                // process.exit()
             }
 
             if (sessionBalance < 0 && StopLoss <= Math.abs(sessionBalance)) {
@@ -740,9 +618,9 @@ const onMessage = e => {
         }
 
         if (sessionBalance >= StopWin) {
-            notify('Stop', `Stop Win Alcançado...`);
-            console.log('Stop Win Alcançado...')
-            process.exit(1)
+            // notify('Stop', `Stop Win Alcançado...`);
+            // console.log('Stop Win Alcançado...')
+            // process.exit(1)
         }
 
         if (message.name == 'option-opened' && message.msg) {
@@ -762,9 +640,9 @@ const onMessage = e => {
         }
 
         if (doispraum && StopWin >= 2) {
-            console.log('Stop Win Alcançado...')
-            notify('Stop', `Stop Win Alcançado...`);
-            process.exit()
+            // console.log('Stop Win Alcançado...')
+            // notify('Stop', `Stop Win Alcançado...`);
+            // process.exit()
         }
 
         if (message.name == 'position-changed') {
@@ -779,6 +657,10 @@ const onMessage = e => {
         if (message.name == 'digital-option-placed' && message.status != 2000) {
             totalOrderss--
             const active = parseInt(message.request_id.split('/')[0])
+            parError.push[active]
+            setTimeout(() => {
+                parError = []
+            }, 3000000);
             let index = openedOrders.indexOf(parseInt(active))
             openedOrders.splice(index, 1)
             buysCount.set(parseInt(active), buysCount.get(parseInt(active)) - 1)
@@ -810,6 +692,15 @@ const onMessage = e => {
             currentTimehhmmss = moment.unix(currentTime / 1000).utcOffset(-3).add(2, 'seconds').format("HH:mm:ss")
             connectedd = true
 
+            let timeIntoo = parseInt(currentTimehhmm.substring(currentTimehhmm.length - 1, currentTimehhmm.length));
+            // console.log(currentTimehhmm.substring(currentTimehhmm.length - 1, currentTimehhmm.length));
+            if (parseInt(currentTimess) > 30 && (timeIntoo == 4 || timeIntoo == 9)) {
+                for (var [key, value] of candleId.entries()) {
+                    candleId.set(key, { ...value, open: false })
+                }
+            }
+
+            // console.log(candleId);
             //noticias...
             if (noticiasObj.length > 0) {
                 for (let index = 0; index < noticiasObj.length; index++) {
@@ -844,112 +735,30 @@ const onMessage = e => {
             }
         }
 
-        // if (message.name == 'candles') {
-        //     let candles = message.msg.candles
-        //     let price = candles[1].close
-        //     let open = candles[1].open
-        //     let active = parseInt(message.request_id.split('/')[0])
-
-        //     pricesMap.set(parseInt(message.request_id.split('/')[0]), price)
-
-        //     // console.log(price);
-
-        //     for (var [key, value] of pricesMap.entries()) {
-        //         if (key == active) {
-        //             if (pricesOpenedMap.has(key)) {
-        //                 let openedPrice = pricesOpenedMap.get(key).priceOpened
-        //                 let direction = pricesOpenedMap.get(key).direction
-        //                 if (parseInt(currentTimess) >= 01 && parseInt(currentTimemm) == parseInt(pricesOpenedMap.get(key).currentTimemm) + 1) {
-        //                     if (direction == 'call') {
-        //                         if (value <= openedPrice) {
-        //                             galePut.push(active)
-        //                             amount *= 1.05
-        //                             buyBefor(direction, active, 1)
-        //                             amount = amountInitial
-        //                             pricesOpenedMap.delete(key)
-        //                             pricesMap.delete(key)
-        //                         } else {
-        //                             pricesOpenedMap.delete(key)
-        //                             pricesMap.delete(key)
-        //                         }
-        //                     } else {
-        //                         if (value >= openedPrice) {
-        //                             galePut.push(active)
-        //                             amount *= 1.05
-        //                             buyBefor(direction, active, 1)
-        //                             amount = amountInitial
-        //                             pricesOpenedMap.delete(key)
-        //                             pricesMap.delete(key)
-        //                         } else {
-        //                             pricesOpenedMap.delete(key)
-        //                             pricesMap.delete(key)
-        //                         }
-        //                     }
-
-        //                     if (openedOrders.includes(active)) {
-        //                         let indexx = openedOrders.indexOf(parseInt(active))
-        //                         openedOrders.splice(indexx, 1)
-        //                     }
-        //                     // console.log(openedOrders);
-        //                 }
-        //             }
-        //         }
-        //     }
-
-        // let openLast = candles[1].open
-        // let closeLast = candles[1].close
-
-
-        // for (let index = 0; index < checkCandle.length; index++) {
-        //     const element = checkCandle[index];
-        //     if (parseInt(message.request_id.split('/')[0]) == element.parInt) {
-        //         let timeInt = parseInt(currentTimehhmm.substring(currentTimehhmm.length - 2, currentTimehhmm.length));
-        //         if (timeInt == element.timeInt + (cincoum ? 1 : timeFramer)) {
-        //             // console.log(openLast);
-        //             // console.log(closeLast);
-        //             if (element.direction == 'call') {
-        //                 if (openLast < closeLast) {
-        //                     let isStopedPar = false
-        //                     for (let index = 0; index < stopOrdersPares.length; index++) {
-        //                         const stopOrdersPar = stopOrdersPares[index];
-        //                         if (getActiveString(element.parInt, activesMapString).includes(stopOrdersPar)) {
-        //                             isStopedPar = true
-        //                             break
-        //                         }
-        //                     }
-
-        //                     if (!stopOrders && !isStopedPar && (!doispraum || doispraum && openedOrders.length == 0)) {
-        //                         buyBefor(element.direction, element.parInt, 5)
-        //                     }
-        //                 }
-        //             } else {
-        //                 if (openLast > closeLast) {
-        //                     let isStopedPar = false
-        //                     for (let index = 0; index < stopOrdersPares.length; index++) {
-        //                         const stopOrdersPar = stopOrdersPares[index];
-        //                         if (getActiveString(element.parInt, activesMapString).includes(stopOrdersPar)) {
-        //                             isStopedPar = true
-        //                             break
-        //                         }
-        //                     }
-
-        //                     if (!stopOrders && !isStopedPar && (!doispraum || doispraum && openedOrders.length == 0)) {
-        //                         buyBefor(element.direction, element.parInt, 5)
-        //                     }
-
-
-        //                 }
-        //             }
-        //             // console.log(`${currentTimehhmmss} || Sinal Retirado / ${element.direction} / ${getActiveString(element.parInt, activesMapString)}`);
-        //             checkCandle.splice(index, 1)
-        //             index--
-        //         }
-        //     }
+        if (message.name == 'candles') {
+            candleStuff(message);
+        }
         // }
 
-        // }
     }
 }
+
+
+
+let porcentagensMap = new Map()
+
+setInterval(() => {
+    var mapAsc = new Map([...porcentagensMap.entries()].sort());
+
+    porcentagensMap[Symbol.iterator] = function* () {
+        yield* [...this.entries()].sort((a, b) => a[1] - b[1]);
+    }
+    // console.log(porcentagensMap);
+    // console.log(los)
+    // console.log(winss)
+    // console.log(veefe);
+}, 2000);
+
 
 const onMessageGustavo = e => {
     // if (ws.readyState === WebSocket.OPEN) {
@@ -965,15 +774,15 @@ const onMessageGustavo = e => {
 
     if (!doispraum) {
         if (sessionBalance > 0 && StopWin <= sessionBalance) {
-            notify('Stop', `Stop Win Alcançado...`);
-            console.log('Stop Win Alcançado...')
-            process.exit()
+            // notify('Stop', `Stop Win Alcançado...`);
+            // console.log('Stop Win Alcançado...')
+            // process.exit()
         }
 
         if (sessionBalance < 0 && StopLoss <= Math.abs(sessionBalance)) {
-            notify('Stop', `Stop Loss Alcançado...`);
-            console.log('Stop Loss Alcançado...')
-            process.exit(1)
+            // notify('Stop', `Stop Loss Alcançado...`);
+            // console.log('Stop Loss Alcançado...')
+            // process.exit(1)
         }
     }
 
@@ -994,9 +803,9 @@ const onMessageGustavo = e => {
     }
 
     if (doispraum && StopWin >= 2) {
-        console.log('Stop Win Alcançado...')
-        notify('Stop', `Stop Win Alcançado...`);
-        process.exit()
+        // console.log('Stop Win Alcançado...')
+        // notify('Stop', `Stop Win Alcançado...`);
+        // process.exit()
     }
 
     if (message.name == 'option-opened' && message.status != 0) {
@@ -1263,7 +1072,204 @@ setInterval(() => {
 
 let totalOrderss = 0
 
+// porcentagensMap.set(getActiveString(parInt, activesDigitalMapString), retraiu);
+function calcularBandasBollinger(precoFechamento, periodo, desvioPadraoMultiplicador) {
+    const bandas = [];
+    for (let i = 0; i < precoFechamento.length; i++) {
+        let price = precoFechamento[i]
+        if (i < periodo - 1) {
+            // Não podemos calcular as bandas até termos dados suficientes
+            bandas.push({ BandaSuperior: null, BandaMedia: null, BandaInferior: null });
+            continue;
+        }
+
+        // Calcular a média móvel simples (SMA)
+        const periodoSMA = precoFechamento.slice(i - periodo + 1, i + 1);
+        const media = periodoSMA.reduce((a, b) => a + b, 0) / periodo;
+
+        // Calcular o desvio padrão
+        const desvioPadrao = calcularDesvioPadrao(periodoSMA);
+
+        // Calcular as Bandas de Bollinger
+        const bandaSuperior = price + desvioPadrao * desvioPadraoMultiplicador;
+        const bandaInferior = price - desvioPadrao * desvioPadraoMultiplicador;
+
+        bandas.push({ BandaSuperior: bandaSuperior, BandaMedia: media, BandaInferior: bandaInferior, price });
+    }
+    return bandas;
+}
+
+// Função para calcular o desvio padrão
+function calcularDesvioPadrao(array) {
+    const media = array.reduce((a, b) => a + b, 0) / array.length;
+    const diferencaQuadrada = array.map(valor => Math.pow(valor - media, 2));
+    const variancia = diferencaQuadrada.reduce((a, b) => a + b, 0) / array.length;
+    const desvioPadrao = Math.sqrt(variancia);
+    return desvioPadrao;
+}
+
 let m15Expires = []
+let candleId = new Map()
+function candleStuff(message) {
+    let candles = message.msg.candles;
+    let porcentagemRetraiuMedia = 0;
+    let desvios = [0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9]
+    if (candles) {
+        // console.log('candles');
+        let parInt = parseInt(message.request_id.split('/')[0]);
+
+        // console.log("=================");
+        // console.log(candles.length);
+        let prices = [];
+
+        if (candleId.has(parInt) && candleId.get(parInt).id != candles[39].id) {
+            candleId.set(parInt, { id: candles[39].id, open: true })
+        }
+
+        // console.log(candleId.get(parInt).id);
+        // console.log(candles[39].id)
+
+        // console.log(candleId);
+
+        for (let index = 0; index < candles.length; index++) {
+            const candle = candles[index];
+            prices.push(candle.open);
+        }
+
+        let porcentagensMapDesvio = new Map()
+        for (let index = 0; index < desvios.length; index++) {
+            const desvio = desvios[index];
+            let { win, loss, porcenagemWin, bandaMaior, bandaMenor, inverso } = calcDesvio(prices, candles, desvio);
+
+            if (porcenagemWin >= 75) {
+                porcentagensMapDesvio.set(desvio, { porcenagemWin, win, loss })
+            }
+
+
+            // console.log(porcenagemWin);
+            // console.log(inverso);
+
+            // console.log('win=', win);
+            // console.log('loss=', loss);
+
+            const close = candles[39].close;
+
+            if (openedOrders.length == 0 && !parError.includes(parInt) && win + loss >= 4) {
+                if (porcenagemWin > 70 && candleId.get(parInt).open) {
+                    if (close >= bandaMaior) {
+                        console.log('bandaMaior=', bandaMaior);
+                        console.log('bandaMenor=', bandaMenor);
+                        buyBefor(inverso ? 'call' : 'put', parInt, 5);
+                    }
+
+                    if (close <= bandaMenor) {
+                        console.log('bandaMaior=', bandaMaior);
+                        console.log('bandaMenor=', bandaMenor);
+                        buyBefor(inverso ? 'put' : 'call', parInt, 5);
+                    }
+                } else {
+                    // console.log('porcenagemWin=', porcenagemWin);
+                    // console.log('candleId.get(parInt).open=', candleId.get(parInt).open);
+                }
+            } else {
+                // console.log('openedOrders.length > 0');
+            }
+
+        }
+
+        porcentagensMap.set(getActiveString(parInt, activesMapString), porcentagensMapDesvio);
+    }
+}
+
+setInterval(() => {
+    console.log(porcentagensMap);
+}, 300000);
+
+setTimeout(() => {
+    console.log(porcentagensMap);
+}, 30000);
+function calcDesvio(prices, candles, desvio) {
+    const period = 20;
+    const stdDevMultiplier = desvio;
+    const bollingerBands = calcularBandasBollinger(prices, period, stdDevMultiplier);
+
+    // console.log(bollingerBands);
+    let win = 0;
+    let loss = 0;
+
+    let bandaMaior = 0;
+    let bandaMenor = 999999;
+
+    let logg = 0;
+
+    for (let index = 0; index < bollingerBands.length; index++) {
+        // console.log(index);
+        const banda = bollingerBands[index];
+        let max = candles[index].max;
+        let min = candles[index].min;
+        let close = candles[index].close;
+
+        if (logg)
+            console.log("==========");
+        // console.log(candles[index]);
+        if (banda.price) {
+            if (logg) {
+                console.log(candles[index].open);
+                console.log(banda.price);
+            }
+        }
+
+        if (index > 19 && index != bollingerBands.length - 1) {
+            if (logg) {
+                console.log(moment.unix(candles[index].from).utcOffset(-3).format("YYYY-MM-DD HH:mm:ss"));
+                console.log('index=', index);
+            }
+            if (max >= banda.BandaSuperior) {
+                if (close <= banda.BandaSuperior) {
+                    if (logg)
+                        console.log('winn');
+                    win++;
+                } else {
+                    if (logg)
+                        console.log('loss');
+                    loss++;
+                }
+            }
+
+            if (min <= banda.BandaInferior) {
+                if (close >= banda.BandaInferior) {
+                    if (logg)
+                        console.log('win');
+                    win++;
+                } else {
+                    if (logg)
+                        console.log('los');
+                    loss++;
+                }
+            }
+        }
+
+        if (index == bollingerBands.length - 1) {
+            bandaMaior = banda.BandaSuperior;
+            bandaMenor = banda.BandaInferior;
+        }
+
+        // console.log(bollingerBands);
+    }
+
+    // console.log('bandaMaior=', bandaMaior);
+    // console.log('bandaMenor=', bandaMenor);
+    // console.log(porcentagensMap);
+    let porcenagemWin = 0;
+    let inverso = 0;
+    if (loss > win) {
+        porcenagemWin = (loss * 100) / (loss + win);
+        inverso = 1;
+    } else {
+        porcenagemWin = (win * 100) / (loss + win);
+    }
+    return { win, loss, porcenagemWin, bandaMaior, bandaMenor, inverso };
+}
 
 function getBreakaa(price, index, parInt, breakaa) {
     if (openOrderNextCandle.length > 0) {
@@ -1343,8 +1349,11 @@ setTimeout(() => {
 }, 3000);
 
 function buyBefor(direction, parInt, type) {
+
     let timeFrameL = null
     let timeFrame = timeFramer
+
+    console.log(porcentagensMap);
 
     // console.log(direction);
     // console.log(parInt);
@@ -1359,25 +1368,27 @@ function buyBefor(direction, parInt, type) {
     } else {
         let resto = timeInt % timeFrame;
         timeFrameL = timeFrame
+        console.log(resto);
         if (resto != 0) {
             timeFrameL = timeFrameL - resto;
         }
-    }
 
+    }
 
     let hourmm
     if (type == 1) {
-        if (parseInt(currentTimess) >= 30) {
+        if (parseInt(currentTimess) >= 29) {
             hourmm = moment.unix(currentTime / 1000).utcOffset(-3).add(2, 'seconds').add(2, 'm').format(" HH:mm");
+            return
         } else {
             hourmm = moment.unix(currentTime / 1000).utcOffset(-3).add(2, 'seconds').add(1, 'm').format(" HH:mm");
         }
     } else if (type == 5) {
-        // if (parseInt(currentTimess) >= 30) {
-        hourmm = moment.unix(currentTime / 1000).utcOffset(-3).add(2, 'seconds').add(timeFrameL, 'm').format(" HH:mm");
-        // } else {
-        //     hourmm = moment.unix(currentTime / 1000).utcOffset(-3).add(2, 'seconds').add(5, 'm').format(" HH:mm");
-        // }
+        if (parseInt(currentTimess) >= 30 && (timeInt == 4 || timeInt == 9)) {
+            hourmm = moment.unix(currentTime / 1000).utcOffset(-3).add(2, 'seconds').add(6, 'm').format("HH:mm");
+        } else {
+            hourmm = moment.unix(currentTime / 1000).utcOffset(-3).add(2, 'seconds').add(timeFrameL, 'm').format("HH:mm");
+        }
     } else {
         hourmm = moment.unix(currentTime / 1000).utcOffset(-3).add(2, 'seconds').add(15, 'm').format(" HH:mm");
     }
@@ -1390,6 +1401,7 @@ function checkOpenedPayoutBeforeBuy(parInt, direction, hourmm, timeFrame) {
     let turboPayout = null;
     let digitalPayout = null;
 
+    openOrderDigital(direction, parInt, hourmm, timeFrame);
     // openOrderBinary(direction, parInt, hourmm);
     // return;
 
@@ -1437,7 +1449,6 @@ function checkOpenedPayoutBeforeBuy(parInt, direction, hourmm, timeFrame) {
     //     openOrderBinary(direction, parInt, hourmm);
     //     console.log(6);
     // } else if (openedMapDigital.has(parInt) && openedMapDigital.get(parInt)) {
-    openOrderDigital(direction, parInt, hourmm, timeFrame);
     // } else {
     //     openOrderBinary(direction, parInt, hourmm);
     //     console.log(8);
@@ -1461,41 +1472,27 @@ function openOrderDigital(direction, parInt, hourmm, timeFrame) {
         timeFrameL = timeFrameL - resto;
     }
 
-    // let timeee = 0
-    // if (parseInt(currentTimemm) < 15) {
-    //     timeee = 15 - parseInt(currentTimemm)
-    // } else if (parseInt(currentTimemm) < 30) {
-    //     timeee = 30 - parseInt(currentTimemm)
-    // } else if (parseInt(currentTimemm) < 45) {
-    //     timeee = 45 - parseInt(currentTimemm)
-    // } else {
-    //     timeee = 60 - parseInt(currentTimemm)
-    // }
-
-    // hourmm = moment.unix(currentTime / 1000).utcOffset(-3).add(2, 'seconds').add(5, 'm').format(" HH:mm");
 
     console.log(`${currentTimehhmmss} || ${direction} / ${getActiveString(parInt, activesMapString)} / ${amount} / Digital`);
     notify('[Order Digital]', `${direction} / ${getActiveString(parInt, activesMapString)} / ${amount}`);
-    buy(amount, parInt, direction, parseInt(moment(moment().format("YYYY-MM-DD ") + hourmm).utcOffset(0).format('X')), 'PT' + timeFrame + 'M');
+    buy(amount, parInt, direction, parseInt(moment(moment().format("YYYY-MM-DD ") + hourmm).utcOffset(0).format('X')), 'PT' + 5 + 'M');
     totalOrderss++;
-    // openedOrders.push(parInt);
+    openedOrders.push(parInt);
 }
 
-function getCandle(active_id, time) {
+function getCandle(active_id, size, count) {
     let data = {
         "name": "get-candles",
         "version": "2.0",
         "body": {
             "active_id": active_id,
-            "size": 5,
+            "size": size,
             "to": currentTime,
-            "count": 2,
+            "count": count,
         }
     };
-    if (ws.readyState === WebSocket.OPEN) {
-        // console.log(JSON.stringify(messageHeader(data, 'sendMessage', active_id + '/' + time)));
-        ws.send(JSON.stringify(messageHeader(data, 'sendMessage', active_id + '/' + time)));
-    }
+    if (ws.readyState === WebSocket.OPEN)
+        ws.send(JSON.stringify(messageHeader(data, 'sendMessage', active_id)))
 }
 
 let galePut = []
@@ -1583,98 +1580,145 @@ function setLoss(amount) {
 }
 
 let amountLast
-let los = 1
+let los = 0
 let uin = 0
+let countResult = 0
 
 let orderopenned = []
 let cicleSession = 0
+
+
+const getCandlee = setInterval(() => {
+    // for (var [key, value] of activesMapString) {
+    for (var [key, value] of activesDigitalMapString) {
+        if (value && !key.includes('OTC'))
+            getCandle(value, 60 * 5, 40)
+        // getCandle(1, 60 * 5, 40)
+        // getCandle(2, 60 * 5, 40)
+        // getCandle(4, 60 * 5, 40)
+
+    }
+}, 500)
 
 function positionChangedStuff(message) {
     // if (!orderopenned.includes(message.msg.raw_event.instrument_id))
     // orderopenned.push(message.msg.raw_event.instrument_id)
 
     // console.log(JSON.stringify(message));
-    if (orderopenned.includes(message.msg.instrument_id)) {
-        if (message.msg.status == 'closed') {
+    //console.log('aaaaaa');
+    if (message.msg.status == 'closed') {
 
-            let id = message.msg.id
-            let direction = message.msg.raw_event.instrument_dir
-            buysCount.set(message.msg.active_id, buysCount.get(message.msg.active_id) - 1)
-            idsArray.push(id)
+        let id = message.msg.id
+        let direction = message.msg.raw_event.instrument_dir
+        buysCount.set(message.msg.active_id, buysCount.get(message.msg.active_id) - 1)
+        idsArray.push(id)
 
-            // console.log(message);
+        // console.log(message);
 
-            if (gale)
-                positionOpenedGale = false
+        if (gale)
+            positionOpenedGale = false
 
-            let profitAmount = message.msg.close_profit ? message.msg.close_profit - amount : amount * -1
-            let active = message.msg.active_id
+        let profitAmount = message.msg.close_profit ? message.msg.close_profit - amount : amount * -1
+        let active = message.msg.active_id
 
-            // console.log('profitAmount', profitAmount);
+        // console.log('profitAmount', profitAmount);
 
-            if (openedOrders.includes(active)) {
-                let index = openedOrders.indexOf(parseInt(active))
-                openedOrders.splice(index, 1);
-            }
-            sessionBalance += profitAmount
-            cicleSession += profitAmount
-
-
-            if (profitAmount < 0) {
-
-                los++
-                // console.log('los=', los);
-
-
-                lossMass('L');
-
-                losss++
-                console.log(`${currentTimehhmmss} || ${profitAmount < 0 ? "Loss" : "Win"} ${profitAmount.toFixed(2)} / Balance: ${parseFloat(sessionBalance.toFixed(2))} / ${getActiveString(active, activesMapString) ? getActiveString(active, activesMapString) : active} / Digital`.red)
-                notify('Loss', `${profitAmount < 0 ? "Loss" : "Win"} ${profitAmount.toFixed(2)} / Balance: ${parseFloat(sessionBalance.toFixed(2))} / ${getActiveString(active, activesMapString) ? getActiveString(active, activesMapString) : active} / Digital`);
-
-                // buyBefor('put', 1, 1)
-
-                positionOpenedSoros = false
-            } else if (profitAmount == 0) {
-                console.log(`${currentTimehhmmss} || ${profitAmount < 0 ? "Loss" : "Win"} ${profitAmount.toFixed(2)} / Balance: ${parseFloat(sessionBalance.toFixed(2))} / ${getActiveString(active, activesMapString) ? getActiveString(active, activesMapString) : active} / Digital`.red)
-                notify('Empate', `Empate ${profitAmount.toFixed(2)} / Balance: ${parseFloat(sessionBalance.toFixed(2))} / ${getActiveString(active, activesMapString) ? getActiveString(active, activesMapString) : active} / Digital`);
-            } else {
-                winss++
-
-                // winMass();
-                lossMass('W')
-
-                console.log(`${currentTimehhmmss} || ${profitAmount < 0 ? "Loss" : "Win"} ${profitAmount.toFixed(2)} / Balance: ${parseFloat(sessionBalance.toFixed(2))} / ${getActiveString(active, activesMapString) ? getActiveString(active, activesMapString) : active} / Digital`.green)
-                notify('Wiiin!!', `${profitAmount < 0 ? "Loss" : "Win"} ${profitAmount.toFixed(2)} / Balance: ${parseFloat(sessionBalance.toFixed(2))} / ${getActiveString(active, activesMapString) ? getActiveString(active, activesMapString) : active} / Digital`);
-
-                // buyBefor('put', 1, 1)
-
-                positionOpenedSoros = false
-            }
-
-            // if (!positionOpenedSoros)
-            //     buyBefor('put', 1, 1)
-
+        if (openedOrders.includes(active)) {
+            let index = openedOrders.indexOf(parseInt(active))
+            openedOrders.splice(index, 1);
         }
+        sessionBalance += profitAmount
+        cicleSession += profitAmount
+
+
+        if (profitAmount < 0) {
+
+            los++
+            // console.log('los=', los);
+            countResult--
+
+            veefe += "L"
+            lossMass('L');
+
+            losss++
+            console.log(`${currentTimehhmmss} || ${profitAmount < 0 ? "Loss" : "Win"} ${profitAmount.toFixed(2)} / Balance: ${parseFloat(sessionBalance.toFixed(2))} / ${getActiveString(active, activesMapString) ? getActiveString(active, activesMapString) : active} / Digital`.red)
+            notify('Loss', `${profitAmount < 0 ? "Loss" : "Win"} ${profitAmount.toFixed(2)} / Balance: ${parseFloat(sessionBalance.toFixed(2))} / ${getActiveString(active, activesMapString) ? getActiveString(active, activesMapString) : active} / Digital`);
+
+            // buyBefor('put', 1, 1)
+
+            positionOpenedSoros = false
+        } else if (profitAmount == 0) {
+            console.log(`${currentTimehhmmss} || ${profitAmount < 0 ? "Loss" : "Win"} ${profitAmount.toFixed(2)} / Balance: ${parseFloat(sessionBalance.toFixed(2))} / ${getActiveString(active, activesMapString) ? getActiveString(active, activesMapString) : active} / Digital`.red)
+            notify('Empate', `Empate ${profitAmount.toFixed(2)} / Balance: ${parseFloat(sessionBalance.toFixed(2))} / ${getActiveString(active, activesMapString) ? getActiveString(active, activesMapString) : active} / Digital`);
+        } else {
+            winss++
+            countResult++
+            // winMass();
+            veefe += "W"
+            winMass()
+            console.log(`${currentTimehhmmss} || ${profitAmount < 0 ? "Loss" : "Win"} ${profitAmount.toFixed(2)} / Balance: ${parseFloat(sessionBalance.toFixed(2))} / ${getActiveString(active, activesMapString) ? getActiveString(active, activesMapString) : active} / Digital`.green)
+            notify('Wiiin!!', `${profitAmount < 0 ? "Loss" : "Win"} ${profitAmount.toFixed(2)} / Balance: ${parseFloat(sessionBalance.toFixed(2))} / ${getActiveString(active, activesMapString) ? getActiveString(active, activesMapString) : active} / Digital`);
+
+            positionOpenedSoros = false
+        }
+
+        console.log('los=', los)
+        console.log('winss=', winss)
+        console.log('countResult=', countResult);
+
+        // if (!positionOpenedSoros)
+        //  buyBefor('put', 76, 1)
+
     }
 }
 
-function winMass() {
-    if (cicleSession >= 0.01) {
+async function winMass() {
+    modifyCell('C' + countMass, 'W');
+    await XLSX_CALC(workbook, { continue_after_error: true, log_error: false });
+    // console.log('bbbb');
+    // console.log(getCell('I' + countMass))
+    // console.log(getCell('F' + countMass))
+    // console.log('bbbbb----');
+
+    let Vee = 0
+    let Efee = 0
+    for (let index = 0; index < veefe.length; index++) {
+        const element = veefe[index];
+        if (element == 'W') {
+            Vee++
+        } else {
+            Efee++
+        }
+    }
+
+    if (getCell('I' + countMass) == '◄◄' || Vee == Efee) {
+
         for (let index = countMass; index >= 0; index--) {
             modifyCell('C' + countMass, '');
         }
+
+        modifyCell('N' + 12, getCell('F' + countMass));
+        await XLSX_CALC(workbook, { continue_after_error: true, log_error: false });
         cicleSession = 0;
-        // modifyCell('C' + countMass, 'W')
-        XLSX_CALC(workbook, { continue_after_error: true, log_error: false });
         countMass = 3;
+        veefe = ""
         amount = parseFloat(getCell('D' + countMass)) > 0 ? parseFloat(getCell('D' + countMass)) : parseFloat(getCell('D' + countMass)) * -1;
+        console.log(`${currentTimehhmmss} || Ciclo com Ganhoo!! `.green)
     } else {
-        modifyCell('C' + countMass, 'W');
-        XLSX_CALC(workbook, { continue_after_error: true, log_error: false });
         countMass++;
         amount = parseFloat(getCell('D' + countMass)) > 0 ? parseFloat(getCell('D' + countMass)) : parseFloat(getCell('D' + countMass)) * -1;
     }
+
+
+    config.veefe = veefe
+    console.log(veefe);
+    config.lastAmount = parseFloat(getCell('N12'))
+    fs.writeFile('config.json', JSON.stringify(config, null, 4), err => {
+        // console.log(err || 'Arquivo salvo');
+    });
+
+    console.log(amount);
+
 }
 
 function lossMass(winloss) {
@@ -1682,6 +1726,13 @@ function lossMass(winloss) {
     XLSX_CALC(workbook, { continue_after_error: true, log_error: false });
     countMass++;
     amount = parseFloat(getCell('D' + countMass)) > 0 ? parseFloat(getCell('D' + countMass)) : parseFloat(getCell('D' + countMass)) * -1;
+    console.log(amount);
+
+    console.log(veefe);
+    config.veefe = veefe
+    fs.writeFile('config.json', JSON.stringify(config, null, 4), err => {
+        // console.log(err || 'Arquivo salvo');
+    });
 }
 
 function profileStufGustavo(message, name) {
@@ -1705,7 +1756,6 @@ function profileStufGustavo(message, name) {
         }
     }
     userBalanceIdGustavo = message.msg.balance_id
-    console.log('loo');
     subscribePortifolio()
 
     if (!getLeadersBool) {
@@ -1863,7 +1913,7 @@ const activesMapString = new Map([
     ['EURCAD', 105],
     ['EURNZD', 212],
     ['AUDCHF', 943],
-    ['AUDJPY', 101],
+    // ['AUDJPY', 101],
     ['AUDNZD', 944],
     ['AUDUSD', 99],
     ['CADCHF', 107],
@@ -1889,36 +1939,19 @@ const activesMapString = new Map([
     ['NZDUSD-OTC', 80],
     ['GBPUSD-OTC', 81],
     ['GBPJPY-OTC', 84],
-    ['USDJPY-OTC', 85],
     ['AUDCAD-OTC', 86]
 ])
 const activesDigitalMapString = new Map([
-    ['AUDCAD', 7],
-    ['CHFJPY', 106],
-    ['EURAUD', 108],
-    ['EURCHF', 946],
-    ['EURCAD', 105],
-    ['EURNZD', 212],
-    ['AUDCHF', 943],
-    ['AUDJPY', 101],
-    ['AUDNZD', 944],
-    ['AUDUSD', 99],
-    ['CADCHF', 107],
+    ['EURUSD', 1],
     ['EURGBP', 2],
     ['EURJPY', 4],
-    ['EURUSD', 1],
-    ['GBPAUD', 104],
-    ['CADJPY', 945],
-    ['GBPCAD', 102],
-    ['GBPCHF', 103],
+    ['AUDUSD', 99],
+    ['AUDCAD', 7],
     ['GBPJPY', 3],
-    ['GBPNZD', 947],
     ['GBPUSD', 5],
-    ['NZDUSD', 8],
     ['USDCAD', 100],
     ['USDCHF', 72],
-    ['USDJPY', 6],
-    ['USDNOK', 168],
+    // ['AUDJPY', 101],
     ['EURUSD-OTC', 76],
     ['EURGBP-OTC', 77],
     ['USDCHF-OTC', 78],
@@ -1926,7 +1959,6 @@ const activesDigitalMapString = new Map([
     ['NZDUSD-OTC', 80],
     ['GBPUSD-OTC', 81],
     ['GBPJPY-OTC', 84],
-    ['USDJPY-OTC', 85],
     ['AUDCAD-OTC', 86]
 ])
 
@@ -1959,7 +1991,11 @@ const doLogin = ssid => {
     })
 }
 
+for (var [key, value] of activesDigitalMapString) {
+    candleId.set(value, { id: '', open: false })
+}
 
+// console.log(candleId);
 const doLoginGustavo = ssid => {
     return new Promise((resolve, reject) => {
         if (wsGustavo && wsGustavo.readyState === WebSocket.OPEN) {
@@ -1995,8 +2031,8 @@ const auth = () => {
     ws.onerror = onError
     ws.onmessage = onMessage
     axios.post('https://auth.iqoption.com/api/v2/login', {
-        identifier: config.login,
-        password: config.password
+        identifier: "vinipsidonik@hotmail.com",
+        password: "gc896426",
     }).then((response) => {
         ssid = response.data.ssid
         const loginn = setInterval(() => {
@@ -2014,11 +2050,11 @@ let logged = false
 
 let ssidGustavo
 
-axios.post('https://auth.iqoption.com/api/v2/login', {
+axios.post('https://auth.trade.exnova.com/api/v2/login', {
     // identifier: config.login,
     // password: config.password
-    identifier: "davilagustavo996@gmail.com",
-    password: "Ana12boeno#",
+    identifier: "vinipsidonik@hotmail.com",
+    password: "gc896426",
 }).then((response) => {
     ssid = response.data.ssid
     console.log(ssid);
@@ -2030,28 +2066,6 @@ axios.post('https://auth.iqoption.com/api/v2/login', {
             clearInterval(loginn)
         }
         loginAsync(ssid)
-    }, 500);
-}).catch(function (err) {
-    if (err)
-        console.log('Erro ao se conectar... Tente novamente')
-})
-
-axios.post('https://auth.iqoption.com/api/v2/login', {
-    // identifier: "davilagustavo996@gmail.com",
-    // password: "Ana12boeno#",
-    // identifier: "carol.davila14@outlook.com",
-    // password: "gc896426",
-}).then((response) => {
-    ssidGustavo = response.data.ssid
-    console.log(ssidGustavo);
-    wsGustavo.onopen = onOpen
-    wsGustavo.onerror = onError
-    wsGustavo.onmessage = onMessageGustavo
-    const loginn = setInterval(() => {
-        if (logged) {
-            clearInterval(loginn)
-        }
-        doLoginGustavo(ssidGustavo)
     }, 500);
 }).catch(function (err) {
     if (err)

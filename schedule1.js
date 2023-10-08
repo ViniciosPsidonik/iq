@@ -1,15 +1,15 @@
 const { MTProto, getSRPParams } = require('@mtproto/core');
 const prompts = require('prompts');
 
-const api_id = 1537314 // insert api_id here
+const api_id = 5714815 // insert api_id here
 const api_hash = '1855b411a187811b71f333d904d725d9'; // insert api_hash here
 
 async function getPhone() {
-    return (await prompts({
+    return ({
         type: 'text',
         name: 'phone',
         message: 'Enter your phone number:'
-    })).phone
+    })
 }
 
 async function getCode() {
@@ -37,13 +37,41 @@ const mtproto = new MTProto({
 
 function startListener() {
     console.log('[+] starting listener')
-    mtproto.updates.on('updates', ({ updates }) => {
-        const newChannelMessages = updates.filter((update) => update._ === 'updateNewChannelMessage').map(({ message }) => message) // filter `updateNewChannelMessage` types only and extract the 'message' object
+    // mtproto.updates.on('updates', ({ updates }) => {
+    //     const newChannelMessages = updates.filter((update) => update._ === 'updateNewChannelMessage').map(({ message }) => message) // filter `updateNewChannelMessage` types only and extract the 'message' object
 
-        for (const message of newChannelMessages) {
-            // printing new channel messages
-            console.log(`[${message.to_id.channel_id}] ${message.message}`)
-        }
+    //     for (const message of newChannelMessages) {
+    //         // printing new channel messages
+    //         console.log(`[${message.to_id.channel_id}] ${message.message}`)
+    //     }
+    // });
+
+    mtproto.updates.on('updatesTooLong', (updateInfo) => {
+        console.log('updatesTooLong:', updateInfo);
+    });
+
+    mtproto.updates.on('updateShortMessage', (updateInfo) => {
+        console.log('updateShortMessage:', updateInfo);
+    });
+
+    mtproto.updates.on('updateShortChatMessage', (updateInfo) => {
+        console.log('updateShortChatMessage:', updateInfo);
+    });
+
+    mtproto.updates.on('updateShort', (updateInfo) => {
+        console.log('updateShort:', updateInfo);
+    });
+
+    mtproto.updates.on('updatesCombined', (updateInfo) => {
+        console.log('updatesCombined:', updateInfo);
+    });
+
+    mtproto.updates.on('updates', (updateInfo) => {
+        console.log('updates:', updateInfo);
+    });
+
+    mtproto.updates.on('updateShortSentMessage', (updateInfo) => {
+        console.log('updateShortSentMessage:', updateInfo);
     });
 }
 
@@ -61,7 +89,7 @@ mtproto
 
         // The user is not logged in
         console.log('[+] You must log in')
-        const phone_number = await getPhone()
+        const phone_number = '+5554992563317'
 
         mtproto.call('auth.sendCode', {
             phone_number: phone_number,

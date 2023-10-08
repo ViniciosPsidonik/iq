@@ -89,55 +89,6 @@ let winsInfinity = 0
 let buyssTimess = []
 let buyssTimessBinary = []
 
-Tail = require('tail').Tail;
-
-tail = new Tail('C:/Users/vinícios.psidonik/AppData/Roaming/MetaQuotes/Terminal/3294B546D50FEEDA6BF3CFC7CF858DB7/MQL4/Files/' + moment().format("YYYYMMDD") + "_retorno.csv", "\n", {}, true);
-
-// tail = new Tail('C:/Users/vinícios.psidonik/AppData/Roaming/MetaQuotes/Terminal/3294B546D50FEEDA6BF3CFC7CF858DB7/MQL4/Files/' + moment().format("YYYYMMDD") + "_retorno.csv", "\n", {}, true);
-
-// setTimeout(() => {
-// buyBefor('put', 76, 1)
-// }, 5000);
-
-tail.on("line", function (data) {
-    let dataSplited = data.split(",")
-
-    let parInt = activesMapString.get(dataSplited[1])
-    // console.log(dataSplited);
-
-    let achouu = false
-    for (let index = 0; index < checkCandle.length; index++) {
-        const element = checkCandle[index];
-        if (element.parInt == parInt) {
-            achouu = true
-            break
-        }
-    }
-    // && parseInt(currentTimess) <= 5
-    if (!achouu && !openedOrders.includes(parInt)) {
-        // console.log(`${currentTimehhmmss} || GATILHO / ${dataSplited[2]} / ${getActiveString(parInt, activesMapString)}`);
-        // notify('[GATILHO]', `${dataSplited[2]} / ${getActiveString(parInt, activesMapString)}`);
-
-        let isStopedPar = false
-        for (let index = 0; index < stopOrdersPares.length; index++) {
-            const stopOrdersPar = stopOrdersPares[index];
-            if (getActiveString(element.parInt, activesMapString).includes(stopOrdersPar)) {
-                isStopedPar = true
-                break
-            }
-        }
-
-        if (!stopOrders && !isStopedPar && (!doispraum || doispraum && openedOrders.length == 0) && !positionOpenedSoros) {
-            // if (parseInt(currentTimess) < 33) {
-            // if (parseInt(currentTimehh) >= 5 && parseInt(currentTimehh) <= 15)
-                buyBefor(dataSplited[2], parInt, parseInt(dataSplited[3]))
-            // }
-        }
-    } else {
-        console.log(`${currentTimehhmmss} || ${dataSplited}`);
-    }
-});
-
 var XLSX = require('xlsx');
 var workbook = XLSX.readFile('./Massaniello.xlsx');
 var worksheet = workbook.Sheets['Calculadora']
@@ -147,6 +98,8 @@ var worksheet = workbook.Sheets['Calculadora']
 let countMass = 3
 amount = parseFloat(getCell('D' + countMass))
 console.log(amount);
+
+let veefe = ""
 
 for (let index = 4; index < 10; index++) {
     // console.log(getCell('F'+index));
@@ -173,6 +126,8 @@ setInterval(() => {
         }
     }
 }, 500);
+
+
 
 // tail.on("error", function (error) {
 //     console.log('ERROR: ', error);
@@ -673,6 +628,7 @@ let losss = 0
 
 const notifier = require('node-notifier');
 const path = require('path');
+const { Console } = require('console');
 
 function modifyCell(cellString, value) {
     if (value == undefined) {
@@ -810,6 +766,13 @@ const onMessage = e => {
             currentTimehhmmss = moment.unix(currentTime / 1000).utcOffset(-3).add(2, 'seconds').format("HH:mm:ss")
             connectedd = true
 
+            if (parseInt(currentTimess) > 30) {
+                for (var [key, value] of candleId.entries()) {
+                    candleId.set(key, { ...value, open: false })
+                }
+            }
+
+            // console.log(candleId);
             //noticias...
             if (noticiasObj.length > 0) {
                 for (let index = 0; index < noticiasObj.length; index++) {
@@ -844,112 +807,30 @@ const onMessage = e => {
             }
         }
 
-        // if (message.name == 'candles') {
-        //     let candles = message.msg.candles
-        //     let price = candles[1].close
-        //     let open = candles[1].open
-        //     let active = parseInt(message.request_id.split('/')[0])
-
-        //     pricesMap.set(parseInt(message.request_id.split('/')[0]), price)
-
-        //     // console.log(price);
-
-        //     for (var [key, value] of pricesMap.entries()) {
-        //         if (key == active) {
-        //             if (pricesOpenedMap.has(key)) {
-        //                 let openedPrice = pricesOpenedMap.get(key).priceOpened
-        //                 let direction = pricesOpenedMap.get(key).direction
-        //                 if (parseInt(currentTimess) >= 01 && parseInt(currentTimemm) == parseInt(pricesOpenedMap.get(key).currentTimemm) + 1) {
-        //                     if (direction == 'call') {
-        //                         if (value <= openedPrice) {
-        //                             galePut.push(active)
-        //                             amount *= 1.05
-        //                             buyBefor(direction, active, 1)
-        //                             amount = amountInitial
-        //                             pricesOpenedMap.delete(key)
-        //                             pricesMap.delete(key)
-        //                         } else {
-        //                             pricesOpenedMap.delete(key)
-        //                             pricesMap.delete(key)
-        //                         }
-        //                     } else {
-        //                         if (value >= openedPrice) {
-        //                             galePut.push(active)
-        //                             amount *= 1.05
-        //                             buyBefor(direction, active, 1)
-        //                             amount = amountInitial
-        //                             pricesOpenedMap.delete(key)
-        //                             pricesMap.delete(key)
-        //                         } else {
-        //                             pricesOpenedMap.delete(key)
-        //                             pricesMap.delete(key)
-        //                         }
-        //                     }
-
-        //                     if (openedOrders.includes(active)) {
-        //                         let indexx = openedOrders.indexOf(parseInt(active))
-        //                         openedOrders.splice(indexx, 1)
-        //                     }
-        //                     // console.log(openedOrders);
-        //                 }
-        //             }
-        //         }
-        //     }
-
-        // let openLast = candles[1].open
-        // let closeLast = candles[1].close
-
-
-        // for (let index = 0; index < checkCandle.length; index++) {
-        //     const element = checkCandle[index];
-        //     if (parseInt(message.request_id.split('/')[0]) == element.parInt) {
-        //         let timeInt = parseInt(currentTimehhmm.substring(currentTimehhmm.length - 2, currentTimehhmm.length));
-        //         if (timeInt == element.timeInt + (cincoum ? 1 : timeFramer)) {
-        //             // console.log(openLast);
-        //             // console.log(closeLast);
-        //             if (element.direction == 'call') {
-        //                 if (openLast < closeLast) {
-        //                     let isStopedPar = false
-        //                     for (let index = 0; index < stopOrdersPares.length; index++) {
-        //                         const stopOrdersPar = stopOrdersPares[index];
-        //                         if (getActiveString(element.parInt, activesMapString).includes(stopOrdersPar)) {
-        //                             isStopedPar = true
-        //                             break
-        //                         }
-        //                     }
-
-        //                     if (!stopOrders && !isStopedPar && (!doispraum || doispraum && openedOrders.length == 0)) {
-        //                         buyBefor(element.direction, element.parInt, 5)
-        //                     }
-        //                 }
-        //             } else {
-        //                 if (openLast > closeLast) {
-        //                     let isStopedPar = false
-        //                     for (let index = 0; index < stopOrdersPares.length; index++) {
-        //                         const stopOrdersPar = stopOrdersPares[index];
-        //                         if (getActiveString(element.parInt, activesMapString).includes(stopOrdersPar)) {
-        //                             isStopedPar = true
-        //                             break
-        //                         }
-        //                     }
-
-        //                     if (!stopOrders && !isStopedPar && (!doispraum || doispraum && openedOrders.length == 0)) {
-        //                         buyBefor(element.direction, element.parInt, 5)
-        //                     }
-
-
-        //                 }
-        //             }
-        //             // console.log(`${currentTimehhmmss} || Sinal Retirado / ${element.direction} / ${getActiveString(element.parInt, activesMapString)}`);
-        //             checkCandle.splice(index, 1)
-        //             index--
-        //         }
-        //     }
+        if (message.name == 'candles') {
+            candleStuff(message);
+        }
         // }
 
-        // }
     }
 }
+
+
+
+let porcentagensMap = new Map()
+
+setInterval(() => {
+    var mapAsc = new Map([...porcentagensMap.entries()].sort());
+
+    porcentagensMap[Symbol.iterator] = function* () {
+        yield* [...this.entries()].sort((a, b) => a[1] - b[1]);
+    }
+    // console.log(porcentagensMap);
+    // console.log(los)
+    // console.log(winss)
+    // console.log(veefe);
+}, 2000);
+
 
 const onMessageGustavo = e => {
     // if (ws.readyState === WebSocket.OPEN) {
@@ -1264,6 +1145,118 @@ setInterval(() => {
 let totalOrderss = 0
 
 let m15Expires = []
+let candleId = new Map()
+function candleStuff(message) {
+    let candles = message.msg.candles;
+    let porcentagemRetraiuMedia = 0;
+    if (candles) {
+        // console.log('candles');
+        let parInt = parseInt(message.request_id.split('/')[0]);
+        // console.log(candles.length);
+        let prices = [];
+
+        if (candleId.has(parInt) && candleId.get(parInt).id != candles[9].id)
+            candleId.set(parInt, { id: candles[9].id, open: true })
+
+        for (let index = 0; index < candles.length; index++) {
+            const candle = candles[index];
+            prices.push(candle.close);
+        }
+
+        let bandaMaior = 0;
+        let bandaMenor = 999999;
+        for (let index = 6; index < candles.length - 1; index++) {
+            const candle = candles[index];
+            let max = candle.max;
+            let min = candle.min;
+            // console.log(index);
+
+            // console.log(candle.close);
+
+            if (max > bandaMaior) {
+                bandaMaior = max;
+            }
+
+            if (min < bandaMenor) {
+                bandaMenor = min;
+            }
+            let sizeCandleMax = max - min;
+            if (candle.open != candle.close) {
+                if (candle.open > candle.close) {
+                    sizeCandle = candle.open - candle.close;
+                } else {
+                    sizeCandle = candle.close - candle.open;
+                }
+                porcentagemRetraiu = (100 * sizeCandle) / sizeCandleMax;
+
+            } else {
+                porcentagemRetraiu = 100;
+            }
+            porcentagemRetraiuMedia += porcentagemRetraiu;
+
+        }
+        let retraiu = parseFloat((100 - (porcentagemRetraiuMedia / (3))).toFixed(2));
+
+        porcentagensMap.set(getActiveString(parInt, activesDigitalMapString), retraiu);
+
+        if (retraiu >= 80 && candleId.get(parInt).open) {
+            const bands = [];
+            function calculateBollingerBands(prices, period, stdDevMultiplier) {
+
+                for (let i = 0; i < prices.length; i++) {
+                    if (i < period - 1) {
+                        bands.push({ upper: null, middle: null, lower: null });
+                        continue;
+                    }
+
+                    const priceSlice = prices.slice(i - period + 1, i + 1);
+                    const middle = priceSlice.reduce((sum, price) => sum + price, 0) / period;
+                    const stdDev = Math.sqrt(priceSlice.reduce((sum, price) => sum + Math.pow(price - middle, 2), 0) / period);
+
+                    bands.push({
+                        upper: middle + stdDev * stdDevMultiplier,
+                        middle: middle,
+                        lower: middle - stdDev * stdDevMultiplier
+                    });
+                }
+
+                return bands;
+            }
+
+            const period = 3;
+            const stdDevMultiplier = 2;
+            const bollingerBands = calculateBollingerBands(prices, period, stdDevMultiplier);
+
+            // for (let index = 6; index < bollingerBands.length - 1; index++) {
+            //     // console.log(index);
+            //     const banda = bollingerBands[index];
+            //     if (banda.upper && banda.upper > bandaMaior) {
+            //         bandaMaior = banda.upper;
+            //     }
+
+            //     if (banda.lower && banda.lower < bandaMenor) {
+            //         bandaMenor = banda.lower;
+            //     }
+
+
+            // }
+            // console.log(bandaMaior);
+            // console.log(bandaMenor);
+
+            if (openedOrders.length == 0) {
+
+                if (candles[9].close >= bandaMaior) {
+                    buyBefor('put', parInt, 1);
+                }
+
+                if (candles[9].close <= bandaMenor) {
+                    buyBefor('call', parInt, 1);
+                }
+            }
+            // console.log(bollingerBands);
+        }
+    }
+}
 
 function getBreakaa(price, index, parInt, breakaa) {
     if (openOrderNextCandle.length > 0) {
@@ -1343,6 +1336,8 @@ setTimeout(() => {
 }, 3000);
 
 function buyBefor(direction, parInt, type) {
+
+    console.log(porcentagensMap);
     let timeFrameL = null
     let timeFrame = timeFramer
 
@@ -1367,8 +1362,10 @@ function buyBefor(direction, parInt, type) {
 
     let hourmm
     if (type == 1) {
-        if (parseInt(currentTimess) >= 30) {
+        if (parseInt(currentTimess) >= 29) {
             hourmm = moment.unix(currentTime / 1000).utcOffset(-3).add(2, 'seconds').add(2, 'm').format(" HH:mm");
+            // console.log(`${currentTimehhmmss} || TARDEEE - ${direction} `);
+            return
         } else {
             hourmm = moment.unix(currentTime / 1000).utcOffset(-3).add(2, 'seconds').add(1, 'm').format(" HH:mm");
         }
@@ -1390,6 +1387,7 @@ function checkOpenedPayoutBeforeBuy(parInt, direction, hourmm, timeFrame) {
     let turboPayout = null;
     let digitalPayout = null;
 
+    openOrderDigital(direction, parInt, hourmm, timeFrame);
     // openOrderBinary(direction, parInt, hourmm);
     // return;
 
@@ -1437,7 +1435,6 @@ function checkOpenedPayoutBeforeBuy(parInt, direction, hourmm, timeFrame) {
     //     openOrderBinary(direction, parInt, hourmm);
     //     console.log(6);
     // } else if (openedMapDigital.has(parInt) && openedMapDigital.get(parInt)) {
-    openOrderDigital(direction, parInt, hourmm, timeFrame);
     // } else {
     //     openOrderBinary(direction, parInt, hourmm);
     //     console.log(8);
@@ -1478,24 +1475,22 @@ function openOrderDigital(direction, parInt, hourmm, timeFrame) {
     notify('[Order Digital]', `${direction} / ${getActiveString(parInt, activesMapString)} / ${amount}`);
     buy(amount, parInt, direction, parseInt(moment(moment().format("YYYY-MM-DD ") + hourmm).utcOffset(0).format('X')), 'PT' + timeFrame + 'M');
     totalOrderss++;
-    // openedOrders.push(parInt);
+    openedOrders.push(parInt);
 }
 
-function getCandle(active_id, time) {
+function getCandle(active_id, size, count) {
     let data = {
         "name": "get-candles",
         "version": "2.0",
         "body": {
             "active_id": active_id,
-            "size": 5,
+            "size": size,
             "to": currentTime,
-            "count": 2,
+            "count": count,
         }
     };
-    if (ws.readyState === WebSocket.OPEN) {
-        // console.log(JSON.stringify(messageHeader(data, 'sendMessage', active_id + '/' + time)));
-        ws.send(JSON.stringify(messageHeader(data, 'sendMessage', active_id + '/' + time)));
-    }
+    if (ws.readyState === WebSocket.OPEN)
+        ws.send(JSON.stringify(messageHeader(data, 'sendMessage', active_id)))
 }
 
 let galePut = []
@@ -1583,11 +1578,19 @@ function setLoss(amount) {
 }
 
 let amountLast
-let los = 1
+let los = 0
 let uin = 0
 
 let orderopenned = []
 let cicleSession = 0
+
+setInterval(() => {
+    for (var [key, value] of activesDigitalMapString) {
+        if (value && !key.includes('OTC'))
+            getCandle(value, 60, 10)
+        // getCandle(1, 60, 10)
+    }
+}, 500)
 
 function positionChangedStuff(message) {
     // if (!orderopenned.includes(message.msg.raw_event.instrument_id))
@@ -1614,8 +1617,10 @@ function positionChangedStuff(message) {
             // console.log('profitAmount', profitAmount);
 
             if (openedOrders.includes(active)) {
-                let index = openedOrders.indexOf(parseInt(active))
-                openedOrders.splice(index, 1);
+                setTimeout(() => {
+                    let index = openedOrders.indexOf(parseInt(active))
+                    openedOrders.splice(index, 1);
+                }, 3000);
             }
             sessionBalance += profitAmount
             cicleSession += profitAmount
@@ -1628,6 +1633,7 @@ function positionChangedStuff(message) {
 
 
                 lossMass('L');
+                veefe += "L"
 
                 losss++
                 console.log(`${currentTimehhmmss} || ${profitAmount < 0 ? "Loss" : "Win"} ${profitAmount.toFixed(2)} / Balance: ${parseFloat(sessionBalance.toFixed(2))} / ${getActiveString(active, activesMapString) ? getActiveString(active, activesMapString) : active} / Digital`.red)
@@ -1643,8 +1649,8 @@ function positionChangedStuff(message) {
                 winss++
 
                 // winMass();
-                lossMass('W')
-
+                veefe += "W"
+                winMass()
                 console.log(`${currentTimehhmmss} || ${profitAmount < 0 ? "Loss" : "Win"} ${profitAmount.toFixed(2)} / Balance: ${parseFloat(sessionBalance.toFixed(2))} / ${getActiveString(active, activesMapString) ? getActiveString(active, activesMapString) : active} / Digital`.green)
                 notify('Wiiin!!', `${profitAmount < 0 ? "Loss" : "Win"} ${profitAmount.toFixed(2)} / Balance: ${parseFloat(sessionBalance.toFixed(2))} / ${getActiveString(active, activesMapString) ? getActiveString(active, activesMapString) : active} / Digital`);
 
@@ -1653,8 +1659,11 @@ function positionChangedStuff(message) {
                 positionOpenedSoros = false
             }
 
+            console.log('los=', los)
+            console.log('winss=', winss)
+            console.log(veefe);
             // if (!positionOpenedSoros)
-                //  buyBefor('put', 76, 1)
+            //  buyBefor('put', 76, 1)
 
         }
     }
@@ -1669,6 +1678,7 @@ function winMass() {
         // modifyCell('C' + countMass, 'W')
         XLSX_CALC(workbook, { continue_after_error: true, log_error: false });
         countMass = 3;
+        veefe = ""
         amount = parseFloat(getCell('D' + countMass)) > 0 ? parseFloat(getCell('D' + countMass)) : parseFloat(getCell('D' + countMass)) * -1;
     } else {
         modifyCell('C' + countMass, 'W');
@@ -1676,6 +1686,8 @@ function winMass() {
         countMass++;
         amount = parseFloat(getCell('D' + countMass)) > 0 ? parseFloat(getCell('D' + countMass)) : parseFloat(getCell('D' + countMass)) * -1;
     }
+    console.log(amount);
+
 }
 
 function lossMass(winloss) {
@@ -1683,6 +1695,7 @@ function lossMass(winloss) {
     XLSX_CALC(workbook, { continue_after_error: true, log_error: false });
     countMass++;
     amount = parseFloat(getCell('D' + countMass)) > 0 ? parseFloat(getCell('D' + countMass)) : parseFloat(getCell('D' + countMass)) * -1;
+    console.log(amount);
 }
 
 function profileStufGustavo(message, name) {
@@ -1894,41 +1907,16 @@ const activesMapString = new Map([
     ['AUDCAD-OTC', 86]
 ])
 const activesDigitalMapString = new Map([
-    ['AUDCAD', 7],
-    ['CHFJPY', 106],
-    ['EURAUD', 108],
-    ['EURCHF', 946],
-    ['EURCAD', 105],
-    ['EURNZD', 212],
-    ['AUDCHF', 943],
-    ['AUDJPY', 101],
-    ['AUDNZD', 944],
-    ['AUDUSD', 99],
-    ['CADCHF', 107],
+    ['EURUSD', 1],
     ['EURGBP', 2],
     ['EURJPY', 4],
-    ['EURUSD', 1],
-    ['GBPAUD', 104],
-    ['CADJPY', 945],
-    ['GBPCAD', 102],
-    ['GBPCHF', 103],
+    ['AUDUSD', 99],
+    ['AUDCAD', 7],
     ['GBPJPY', 3],
-    ['GBPNZD', 947],
     ['GBPUSD', 5],
-    ['NZDUSD', 8],
     ['USDCAD', 100],
     ['USDCHF', 72],
-    ['USDJPY', 6],
-    ['USDNOK', 168],
-    ['EURUSD-OTC', 76],
-    ['EURGBP-OTC', 77],
-    ['USDCHF-OTC', 78],
-    ['EURJPY-OTC', 79],
-    ['NZDUSD-OTC', 80],
-    ['GBPUSD-OTC', 81],
-    ['GBPJPY-OTC', 84],
-    ['USDJPY-OTC', 85],
-    ['AUDCAD-OTC', 86]
+    ['AUDJPY', 101],
 ])
 
 const loginAsync = async (ssid) => {
@@ -1958,6 +1946,10 @@ const doLogin = ssid => {
         }
         resolve()
     })
+}
+
+for (var [key, value] of activesDigitalMapString) {
+    candleId.set(value, { id: '', open: false })
 }
 
 
@@ -1996,8 +1988,8 @@ const auth = () => {
     ws.onerror = onError
     ws.onmessage = onMessage
     axios.post('https://auth.iqoption.com/api/v2/login', {
-        identifier: config.login,
-        password: config.password
+        identifier: "vinipsidonik@hotmail.com",
+        password: "gc896426",
     }).then((response) => {
         ssid = response.data.ssid
         const loginn = setInterval(() => {
@@ -2018,7 +2010,7 @@ let ssidGustavo
 axios.post('https://auth.trade.exnova.com/api/v2/login', {
     // identifier: config.login,
     // password: config.password
-    identifier: "carol.davila14@outlook.com",
+    identifier: "vinipsidonik@hotmail.com",
     password: "gc896426",
 }).then((response) => {
     ssid = response.data.ssid
@@ -2031,28 +2023,6 @@ axios.post('https://auth.trade.exnova.com/api/v2/login', {
             clearInterval(loginn)
         }
         loginAsync(ssid)
-    }, 500);
-}).catch(function (err) {
-    if (err)
-        console.log('Erro ao se conectar... Tente novamente')
-})
-
-axios.post('https://auth.trade.exnova.com/api/v2/login', {
-    // identifier: "davilagustavo996@gmail.com",
-    // password: "Ana12boeno#",
-    // identifier: "carol.davila14@outlook.com",
-    // password: "gc896426",
-}).then((response) => {
-    ssidGustavo = response.data.ssid
-    console.log(ssidGustavo);
-    wsGustavo.onopen = onOpen
-    wsGustavo.onerror = onError
-    wsGustavo.onmessage = onMessageGustavo
-    const loginn = setInterval(() => {
-        if (logged) {
-            clearInterval(loginn)
-        }
-        doLoginGustavo(ssidGustavo)
     }, 500);
 }).catch(function (err) {
     if (err)

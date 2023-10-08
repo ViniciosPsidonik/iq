@@ -31,17 +31,39 @@ app.use(bodyParser.urlencoded({     // to support URL-encoded bodies
 app.use(express.json());       // to support JSON-encoded bodies
 app.use(express.urlencoded());
 
+let returnEnter = new Map()
+
 let candlesticksMap = new Map()
+
+// returnEnter.set('EURUSD', { direction: 'put' })
 
 app.get('/candlestick/:actives', function (req, res) {
     let actives = req.params.actives
-    getCandleTime(activesMapString.get(actives), 5, 500)
+    getCandleTime(activesMapString.get(actives), 1, 500)
     const getActives = setInterval(() => {
         if (candlesticksMap.has(actives)) {
             clearInterval(getActives)
-            res.send(candlesticksMap.get(actives))
+            if (returnEnter.has(actives)) {
+                res.send([...candlesticksMap.get(actives), { actives, ...returnEnter.get(actives) }])
+                returnEnter.delete(actives)
+            } else {
+                res.send(candlesticksMap.get(actives))
+            }
         }
-    }, 1000)
+    }, 500)
+})
+
+let candlesticksLastCandleMap = new Map()
+app.get('/candlesticklast/:actives', function (req, res) {
+    let actives = req.params.actives
+    getCandleTime(activesMapString.get(actives), 5, 1)
+    const getActives = setInterval(() => {
+        if (candlesticksLastCandleMap.has(actives)) {
+            clearInterval(getActives)
+            res.send(candlesticksMap.get(actives))
+            candlesticksLastCandleMap.delete(actives)
+        }
+    }, 500)
 })
 
 app.get('/clear', function (req, res) {
@@ -71,7 +93,7 @@ app.post('/taxas', function (req, resp) {
     let sup = req.body.taxa.sup
     let supd = req.body.taxa.supd
 
-    console.log(req.body);
+    // console.log(req.body);
 
     if (res) {
         taxasM5 += par + ' ' + 'PUT' + ' ' + res + ';'
@@ -89,8 +111,8 @@ app.post('/taxas', function (req, resp) {
         toCloseM5 += ';'
     }
 
-    console.log(taxasM5);
-    console.log(toCloseM5);
+    // console.log(taxasM5);
+    // console.log(toCloseM5);
 
     stasttaxasm5()
     stasttoclosem5()
@@ -98,12 +120,12 @@ app.post('/taxas', function (req, resp) {
 
     for (let index = 0; index < pricesToSendObj.length; index++) {
         const element = pricesToSendObj[index];
-        if(element.moeda == par){
+        if (element.moeda == par) {
             pricesToSendObj.splice(index, 1)
         }
     }
     pricesToSendObj.push({ moeda: par, taxa: { res, resd, sup, supd } })
-    console.log(pricesToSendObj);
+    // console.log(pricesToSendObj);
     fs.writeFile('pricesToSend.json', JSON.stringify(pricesToSendObj, null, 4), err => {
     });
 })
@@ -184,6 +206,35 @@ let buyUsersIds = []
 
 */
 
+var XLSX = require('xlsx');
+var workbook = XLSX.readFile('./Massaniello.xlsx');
+var XLSX_CALC = require('xlsx-calc');
+var worksheet = workbook.Sheets['Calculadora']
+// change some cell value
+// console.log(getCell('F4'));
+
+let countMass = 15
+amount = parseFloat(getCell('D' + countMass))
+console.log(amount);
+
+function modifyCell(cellString, value) {
+    if (value == undefined) {
+        worksheet[cellString] = value;
+    } else if (typeof worksheet[cellString] != "undefined") {
+        worksheet[cellString].v = value;
+    } else {
+        XLSX.utils.sheet_add_aoa(worksheet, [[value]], { origin: cellString });
+    }
+}
+
+function getCell(cellString) {
+    if (typeof worksheet[cellString] != "undefined") {
+        return worksheet[cellString].v
+    } else {
+        return undefined
+    }
+}
+
 if (config.pass != 'senhaloka')
     process.exit()
 
@@ -240,30 +291,6 @@ const getPayout = (type) => {
             return resolve(res.data)
         }).catch((err) => {
             return resolve(0)
-        })
-    })
-}
-
-const getOpened = () => {
-    return new Promise((resolve, reject) => {
-        axios.get(`http://localhost:3000/opened/turbo`).then((res) => {
-            return resolve(res.data)
-        }).catch((err) => {
-            // console.log('getOpened');
-            // console.log(err);
-            return resolve([[]])
-        })
-    })
-}
-
-const getOpenedDigital = () => {
-    return new Promise((resolve, reject) => {
-        axios.get(`http://localhost:3000/opened/digital`).then((res) => {
-            return resolve(res.data)
-        }).catch((err) => {
-            // console.log('getOpenedDigital');
-            // console.log(err);
-            return resolve([[]])
         })
     })
 }
@@ -384,7 +411,7 @@ setInterval(() => {
         for (let index = 0; index < taxasObj.length; index++) {
             const element = taxasObj[index];
             let parInt = activesMapString.get(element.par)
-            getCandle(parInt, 5)
+            getCandle(parInt, 1)
         }
     }
 }, 500);
@@ -468,7 +495,7 @@ function stasttoclosem5() {
             })
         }
     }
-    console.log(toCloseM5Obj);
+    // console.log(toCloseM5Obj);
 }
 
 
@@ -526,7 +553,7 @@ function stasttaxasm5() {
             }
         }
     }
-    console.log(taxasObj);
+    // console.log(taxasObj);
 }
 
 let taxasArray15 = taxasM15.split(';')
@@ -582,7 +609,7 @@ for (let index = 0; index < taxasArray15.length; index++) {
 
 }
 
-console.log(taxasObj15);
+// console.log(taxasObj15);
 
 let noticiasObj = []
 
@@ -601,84 +628,6 @@ if (noticias) {
 let stopOrders = false
 let stopOrdersPares = []
 
-const showRunningActives = setInterval(() => {
-    let fsConfig = fs.readFileSync('config.json')
-    let config = JSON.parse(fsConfig)
-    log = config.log
-    logg = config.logg
-    loggg = config.loggg
-    valorMinimo = config.valorMinimo
-    country = config.filtroPorPais
-    topTradersRange = config.topTradersRange
-    soros = config.soros
-    gale = config.gale
-    galeLevel = config.galeLevel
-    galeFactor = config.galeFactor
-    StopLoss = config.StopLoss
-    StopWin = config.StopWin
-    copy100Ids = config.copy100Ids
-    copyBestIdsRange = config.copyBestIdsRange
-    tradesPerActive = config.tradesPerActive
-    bestIdsLog = config.bestIdsLog
-    invertTrades = config.invertTrades
-    verpar = config.verpar
-    binarias = config.binarias
-    binariasTimes = config.binariasTimes
-    digital = config.digital
-    digitalTimes = config.digitalTimes
-    delaySeconds = config.delaySeconds ? config.delaySeconds : 1
-    showSchedules = config.showSchedules
-    taxas = config.taxas
-
-    if (config.cleanUp) {
-        runningActives = []
-        runningActivesBinary = []
-        runningActivesDigital = []
-        runningActivesDigitalFive = []
-        auth()
-        if (soros)
-            positionOpenedSoros = false
-        if (gale)
-            positionOpenedGale = false
-    }
-
-    if (config.showSchedules) {
-        console.log(schedules);
-    }
-
-    if (config.loggg) {
-        console.log('Turbo: ' + runningActives.length)
-        console.log('Binary: ' + runningActivesBinary.length)
-        console.log('Digital: ' + runningActivesDigital.length)
-        console.log('DigitalFive: ' + runningActivesDigitalFive.length)
-        console.log(`copyIds:  ${copyIds.length > 0 ? copyIds.length : 0}`)
-        console.log(`leadersArray:  ${!!leadersArray ? leadersArray.length : 0}`)
-        console.log(`positionOpenedSoros: ${positionOpenedSoros}`);
-        console.log(`positionOpenedGale: ${positionOpenedGale}`);
-        console.log('===================')
-    }
-
-    if (bestIdsLog) {
-        console.log(copyIds);
-    }
-
-}, 5000)
-
-setInterval(() => {
-    // await subs('live-deal-binary-option-placed' , 'unsubscribeMessage')
-    // console.log('unsubscribeMessage');
-    if (!soros && !gale) {
-        runningActives = []
-        runningActivesBinary = []
-        runningActivesDigital = []
-        runningActivesDigitalFive = []
-        // auth()
-        if (soros)
-            positionOpenedSoros = false
-        if (gale)
-            positionOpenedGale = false
-    }
-}, 300000);
 
 const getActiveString = (active, map) => {
     for (var [key, value] of map) {
@@ -767,35 +716,11 @@ const onMessage = e => {
     }
 
     if (message.name == 'option' && message.status != 0) {
-        totalOrderss--
-        const active = parseInt(message.request_id)
-        let index = openedOrders.indexOf(parseInt(active))
-        openedOrders.splice(index, 1)
-        buysCount.set(parseInt(active), buysCount.get(parseInt(active)) - 1)
-        console.log(`${currentTimehhmmss} || Erro ao comprar -> ${getActiveString(`${active}`, activesMapString)}`.red)
-        console.log('RES = ' + e.data)
-        notify('Error', `Erro ao comprar -> ${getActiveString(`${active}`, activesMapString)}`);
-        if (soros)
-            positionOpenedSoros = false
-        if (gale)
-            positionOpenedGale = false
-        buysss = []
+        errorOption(message, e);
     }
 
     if (message.name == 'digital-option-placed' && message.status != 2000) {
-        totalOrderss--
-        const active = parseInt(message.request_id)
-        let index = openedOrders.indexOf(parseInt(active))
-        openedOrders.splice(index, 1)
-        buysCount.set(parseInt(active), buysCount.get(parseInt(active)) - 1)
-        console.log(`${currentTimehhmmss} || Erro ao comprar -> ${getActiveString(`${active}`, activesMapString)}`.red)
-        console.log('RES = ' + e.data)
-        notify('Error', `Erro ao comprar -> ${getActiveString(`${active}`, activesMapString)}`);
-        if (soros)
-            positionOpenedSoros = false
-        if (gale)
-            positionOpenedGale = false
-        buysss = []
+        errorDigital(message, e);
     }
 
     if (message.name == 'option-closed') {
@@ -809,301 +734,14 @@ const onMessage = e => {
     }
 
     if (message.name == 'heartbeat' || message.name == 'timesync') {
-        currentTime = message.msg
-        currentTimehhmm = moment.unix(currentTime / 1000).utcOffset(-3).format("HH:mm")
-        currentTimemm = moment.unix(currentTime / 1000).utcOffset(-3).format("mm")
-        currentTimemmssDate = moment.unix(currentTime / 1000).utcOffset(-3).format("YYYY-MM-DD HH:mm:ss")
-        currentTimehhmmss = moment.unix(currentTime / 1000).utcOffset(-3).format("HH:mm:ss")
-        currentTimess = moment.unix(currentTime / 1000).utcOffset(-3).format("ss")
+        heartbeat(message);
 
         //noticias...
-        if (noticiasObj.length > 0) {
-            for (let index = 0; index < noticiasObj.length; index++) {
-                const noticia = noticiasObj[index];
-
-
-                let beforeTime = moment(moment().format("YYYY-MM-DD ") + noticia.time).subtract(5, 'minutes')
-                let afterTime = moment(moment().format("YYYY-MM-DD ") + noticia.time).add(5, 'minutes')
-
-                let isBettween = moment(moment().format("YYYY-MM-DD ") + currentTimehhmmss).isBetween(beforeTime, afterTime)
-                // console.log(isBettween);
-                if (isBettween && (noticia.par == 'EUR' || noticia.par == 'USD')) {
-                    stopOrders = true
-                    break;
-                } else if (stopOrders && (noticia.par == 'EUR' || noticia.par == 'USD') && moment(moment().format("YYYY-MM-DD ") + currentTimehhmmss).isAfter(afterTime)) {
-                    console.log(`${currentTimehhmmss} || is after`);
-                    stopOrders = false
-                    noticiasObj.splice(index, 1)
-                    index--
-                } else
-                    if (isBettween && !stopOrdersPares.includes(noticia.par)) {
-                        console.log('par betwenn');
-                        stopOrdersPares.push(noticia.par)
-                    } else if (stopOrdersPares.includes(noticia.par) && moment(moment().format("YYYY-MM-DD ") + currentTimehhmmss).isAfter(afterTime)) {
-                        console.log('par end');
-                        let indexx = stopOrdersPares.indexOf(noticia.par)
-                        stopOrdersPares.splice(indexx, 1)
-                        noticiasObj.splice(index, 1)
-                        index--
-                    }
-            }
-        }
+        noticiasStuff();
     }
 
     if (message.name == 'candles') {
-        try {
-            if (message.msg.candles.length > 10) {
-
-                candlesticksMap.set(getActiveString(parseInt(message.request_id.split('/')[0]), activesDigitalMapString), message.msg.candles)
-            } else if (message.request_id.includes('/5')) {
-                let candles = message.msg.candles
-                let price = candles[1].close
-                let open = candles[1].open
-                let thisCandlePar = parseInt(message.request_id.split('/')[0])
-
-                let closeLast = candles[0].close
-                let minLast = candles[0].min
-                let maxLast = candles[0].max
-
-                for (let index = 0; index < taxasObj.length; index++) {
-                    const element = taxasObj[index];
-                    let parInt = activesMapString.get(element.par)
-                    let max = parseFloat(element.max)
-                    let min = parseFloat(element.min)
-
-                    if (verpar && parseInt(message.request_id) == activesMapString.get(verpar)) {
-                        console.log(price);
-                    }
-
-                    let direction
-
-                    if (thisCandlePar == parInt && !openedOrders.includes(parInt) && !notOrder.includes(parInt)) {
-
-                        let breakaa = false
-                        breakaa = getBreakaa(price, index, parInt, breakaa);
-                        if (breakaa)
-                            break
-
-                        if (max != 0 && price >= max) {
-                            // let minVela = parseInt(currentTimemm.substring(currentTimemm.length, currentTimemm.length - 1))
-
-                            // let achouOpenOrder = false
-                            // for (let index = 0; index < openOrderNextCandle.length; index++) {
-                            //     const element = openOrderNextCandle[index];
-                            //     if (element.par == parInt) {
-                            //         achouOpenOrder = true
-                            //         break
-                            //     }
-                            // }
-
-                            // if (!achouOpenOrder && (minVela == 0 || minVela == 5 || minVela == 4 || minVela == 9)) {
-                            //     console.log(`${currentTimehhmmss} || Rompeu 1 Vela -> ${getActiveString(parInt, activesMapString)} - put`);
-                            //     notify('Vish', `Rompeu 1 Vela -> ${getActiveString(parInt, activesMapString)} - put`);
-                            //     openOrderNextCandle.push({
-                            //         par: parInt,
-                            //         max,
-                            //         min: 0,
-                            //         minute: parseInt(currentTimemm) + 5
-                            //     })
-                            // } else if (!achouOpenOrder) {
-
-                            taxasObj[index].max = 0
-                            direction = 'put'
-
-                            let isStopedPar = false
-                            for (let index = 0; index < stopOrdersPares.length; index++) {
-                                const stopOrdersPar = stopOrdersPares[index];
-                                if (getActiveString(parInt, activesMapString).includes(stopOrdersPar)) {
-                                    isStopedPar = true
-                                    break
-                                }
-                            }
-
-                            let toClose = false
-                            let max
-                            if (toCloseM5Obj.has(getActiveString(parInt, activesMapString))) {
-                                if (toCloseM5Obj.get(getActiveString(parInt, activesMapString)).max != 0 && open > parseFloat(toCloseM5Obj.get(getActiveString(parInt, activesMapString)).max)) {
-                                    toClose = true
-                                    max = toCloseM5Obj.get(getActiveString(parInt, activesMapString)).max
-                                }
-                            }
-
-                            if (!stopOrders && !isStopedPar && !toClose && openedOrders.length == 0) {
-
-                                buyBeforOne(direction, parInt, 1);
-
-                            } else if (toClose) {
-                                console.log(`${currentTimehhmmss} || Vela iniciou muito proximo do preço -> ${getActiveString(parInt, activesMapString)} - ${direction}`);
-                                notify('To Close', `Vela iniciou muito proximo do preço -> ${getActiveString(parInt, activesMapString)} - ${direction}`);
-                            } else if (openedOrders.length != 0) {
-                                console.log(`${currentTimehhmmss} || Já possui ordens abertas. -> ${getActiveString(parInt, activesMapString)} - ${direction}`);
-                                notify('OpenedOrder', `Já possui ordens abertas. -> ${getActiveString(parInt, activesMapString)} - ${direction}`);
-                            } else {
-                                console.log(`${currentTimehhmmss} || Rompeu Noticia -> ${getActiveString(parInt, activesMapString)} - ${direction} / stopOrders = ${stopOrders} / isStopedPar = ${isStopedPar}`);
-                                notify('Noticia', `Rompeu -> ${getActiveString(parInt, activesMapString)} - ${direction} / stopOrders = ${stopOrders} / isStopedPar = ${isStopedPar}`);
-                            }
-
-                            setConfig(element, direction, 5);
-                            // }
-                        } else if (min != 0 && price <= min) {
-                            // let minVela = parseInt(currentTimemm.substring(currentTimemm.length, currentTimemm.length - 1))
-
-                            // let achouOpenOrder = false
-                            // for (let index = 0; index < openOrderNextCandle.length; index++) {
-                            //     const element = openOrderNextCandle[index];
-                            //     if (element.par == parInt) {
-                            //         achouOpenOrder = true
-                            //         break
-                            //     }
-                            // }
-
-                            // if (!achouOpenOrder && (minVela == 0 || minVela == 5 || minVela == 4 || minVela == 9)) {
-                            //     console.log(`${currentTimehhmmss} || Rompeu 1 Vela -> ${getActiveString(parInt, activesMapString)} - call`);
-                            //     notify('Vish', `Rompeu 1 Vela -> ${getActiveString(parInt, activesMapString)} - call`);
-                            //     openOrderNextCandle.push({
-                            //         par: parInt,
-                            //         max: 0,
-                            //         min,
-                            //         minute: parseInt(currentTimemm) + 5,
-                            //     })
-                            // } else if (!achouOpenOrder) {
-
-                            taxasObj[index].min = 0
-                            direction = 'call'
-
-                            let isStopedPar = false
-                            for (let index = 0; index < stopOrdersPares.length; index++) {
-                                const stopOrdersPar = stopOrdersPares[index];
-                                if (getActiveString(parInt, activesMapString).includes(stopOrdersPar)) {
-                                    isStopedPar = true
-                                    break
-                                }
-                            }
-
-                            let toClose = false
-                            let min
-                            if (toCloseM5Obj.has(getActiveString(parInt, activesMapString))) {
-                                if (toCloseM5Obj.get(getActiveString(parInt, activesMapString)).min != 0 && open < parseFloat(toCloseM5Obj.get(getActiveString(parInt, activesMapString)).min)) {
-                                    toClose = true
-                                    min = toCloseM5Obj.get(getActiveString(parInt, activesMapString)).min
-                                }
-                            }
-
-                            if (!stopOrders && !isStopedPar && !toClose && openedOrders.length == 0) {
-                                buyBeforOne(direction, parInt, 1);
-                            } else if (toClose) {
-                                console.log(`${currentTimehhmmss} || Vela iniciou muito proximo do preço -> ${getActiveString(parInt, activesMapString)} - ${direction}`);
-                                notify('To Close', `Vela iniciou muito proximo do preço -> ${getActiveString(parInt, activesMapString)} - ${direction}`);
-                            } else if (openedOrders.length != 0) {
-                                console.log(`${currentTimehhmmss} || Já possui ordens abertas. -> ${getActiveString(parInt, activesMapString)} - ${direction}`);
-                                notify('OpenedOrder', `Já possui ordens abertas. -> ${getActiveString(parInt, activesMapString)} - ${direction}`);
-                            } else {
-                                console.log(`${currentTimehhmmss} || Rompeu Noticia -> ${getActiveString(parInt, activesMapString)} - ${direction} / stopOrders = ${stopOrders} / isStopedPar = ${isStopedPar}`);
-                                notify('Noticia', `Rompeu -> ${getActiveString(parInt, activesMapString)} - ${direction} / stopOrders = ${stopOrders} / isStopedPar = ${isStopedPar}`);
-                            }
-                            // }
-                            setConfig(element, 'call', 5);
-                        }
-                        break
-                    }
-
-                }
-
-                lastTickCandles.set(thisCandlePar, price)
-                // console.log(lastTickCandles);
-            }
-        } catch (error) {
-
-        }
-        /*else {
-            let candles = message.msg.candles
-            let price = candles[1].close
-            let open = candles[1].open
-
-            for (let index = 0; index < taxasObj15.length; index++) {
-                const element = taxasObj15[index];
-                let parInt = activesMapString.get(element.par)
-                let max = parseFloat(element.max)
-                let min = parseFloat(element.min)
-
-                if (verpar && parseInt(message.request_id) == activesMapString.get(verpar)) {
-                    // console.log(price);
-                    process.stdout.write(price);
-                }
-
-                let direction
-
-                if (parseInt(message.request_id.split('/')[0]) == parInt && !openedOrders.includes(parInt) && !notOrder.includes(parInt)) {
-                    let close = candles[0].close
-                    if (max != 0 && price >= max) {
-
-                        taxasObj15[index].max = 0
-                        direction = 'put'
-
-                        let isStopedPar = false
-                        for (let index = 0; index < stopOrdersPares.length; index++) {
-                            const stopOrdersPar = stopOrdersPares[index];
-                            if (getActiveString(parInt, activesMapString).includes(stopOrdersPar)) {
-                                isStopedPar = true
-                                break
-                            }
-                        }
-
-                        let toClose = false
-                        if (toCloseM15Obj.has(getActiveString(parInt, activesMapString))) {
-                            if (open > toCloseM15Obj.get(getActiveString(parInt, activesMapString)).min) {
-                                toClose = true
-                            }
-                        }
-
-                        if (!stopOrders && !isStopedPar && !toClose) {
-                            buyBefor(direction, parInt, 15);
-                        } else if (toClose) {
-                            console.log(`${currentTimehhmmss} || Vela iniciou muito proximo do preço -> ${getActiveString(parInt, activesMapString)} - ${direction}`);
-                            notify('To Close', `Vela iniciou muito proximo do preço -> ${getActiveString(parInt, activesMapString)} - ${direction}`);
-                        } else {
-                            console.log(`${currentTimehhmmss} || Rompeu Noticia -> ${getActiveString(parInt, activesMapString)} - ${direction} / stopOrders = ${stopOrders} / isStopedPar = ${isStopedPar}`);
-                            notify('Noticia', `Rompeu -> ${getActiveString(parInt, activesMapString)} - ${direction} / stopOrders = ${stopOrders} / isStopedPar = ${isStopedPar}`);
-                        }
-
-                        setConfig(element, 'put', 15);
-                    } else if (min != 0 && price <= min) {
-
-                        taxasObj15[index].min = 0
-                        direction = 'call'
-
-                        let isStopedPar = false
-                        for (let index = 0; index < stopOrdersPares.length; index++) {
-                            const stopOrdersPar = stopOrdersPares[index];
-                            if (getActiveString(parInt, activesMapString).includes(stopOrdersPar)) {
-                                isStopedPar = true
-                                break
-                            }
-                        }
-
-                        let toClose = false
-                        if (toCloseM15Obj.has(getActiveString(parInt, activesMapString))) {
-                            if (open > toCloseM15Obj.get(getActiveString(parInt, activesMapString)).min) {
-                                toClose = true
-                            }
-                        }
-
-                        if (!stopOrders && !isStopedPar && !toClose) {
-                            buyBefor(direction, parInt, 15);
-                        } else if (toClose) {
-                            console.log(`${currentTimehhmmss} || Vela iniciou muito proximo do preço -> ${getActiveString(parInt, activesMapString)} - ${direction}`);
-                            notify('To Close', `Vela iniciou muito proximo do preço -> ${getActiveString(parInt, activesMapString)} - ${direction}`);
-                        } else {
-                            console.log(`${currentTimehhmmss} || Rompeu Noticia -> ${getActiveString(parInt, activesMapString)} - ${direction} / stopOrders = ${stopOrders} / isStopedPar = ${isStopedPar}`);
-                            notify('Noticia', `Rompeu -> ${getActiveString(parInt, activesMapString)} - ${direction} / stopOrders = ${stopOrders} / isStopedPar = ${isStopedPar}`);
-                        }
-                        setConfig(element, 'call', 15);
-                    }
-                    break
-                }
-
-            }
-        }*/
+        candleStuff(message);
     }
 }
 
@@ -1116,6 +754,270 @@ setInterval(() => {
 let totalOrderss = 0
 
 let m15Expires = []
+
+function candleStuff(message) {
+    try {
+        if (message.msg.candles.length > 10) {
+            candlesticksMap.set(getActiveString(parseInt(message.request_id.split('/')[0]), activesDigitalMapString), message.msg.candles);
+        } else if (message.request_id.includes('/1')) {
+            candlesticksLastCandleMap.set(getActiveString(parseInt(message.request_id.split('/')[0]), activesDigitalMapString), message.msg.candles);
+            let candles = message.msg.candles;
+            let price = candles[1].close;
+            let open = candles[1].open;
+            let thisCandlePar = parseInt(message.request_id.split('/')[0]);
+
+            let closeLast = candles[0].close;
+            let minLast = candles[0].min;
+            let maxLast = candles[0].max;
+
+            for (let index = 0; index < taxasObj.length; index++) {
+                const element = taxasObj[index];
+                let parInt = activesMapString.get(element.par);
+                let max = parseFloat(element.max);
+                let min = parseFloat(element.min);
+                let activeString = getActiveString(parInt, activesMapString)
+
+                if (verpar && parseInt(message.request_id) == activesMapString.get(verpar)) {
+                    console.log(price);
+                }
+
+                let direction;
+
+                if (thisCandlePar == parInt && !openedOrders.includes(parInt) && !notOrder.includes(parInt)) {
+
+                    let breakaa = false;
+                    breakaa = getBreakaa(price, index, parInt, breakaa);
+                    if (breakaa)
+                        break;
+
+                    if (max != 0 && price >= max) {
+                        // let minVela = parseInt(currentTimemm.substring(currentTimemm.length, currentTimemm.length - 1))
+                        // let achouOpenOrder = false
+                        // for (let index = 0; index < openOrderNextCandle.length; index++) {
+                        //     const element = openOrderNextCandle[index];
+                        //     if (element.par == parInt) {
+                        //         achouOpenOrder = true
+                        //         break
+                        //     }
+                        // }
+                        // if (!achouOpenOrder && (minVela == 0 || minVela == 5 || minVela == 4 || minVela == 9)) {
+                        //     console.log(`${currentTimehhmmss} || Rompeu 1 Vela -> ${getActiveString(parInt, activesMapString)} - put`);
+                        //     notify('Vish', `Rompeu 1 Vela -> ${getActiveString(parInt, activesMapString)} - put`);
+                        //     openOrderNextCandle.push({
+                        //         par: parInt,
+                        //         max,
+                        //         min: 0,
+                        //         minute: parseInt(currentTimemm) + 5
+                        //     })
+                        // } else if (!achouOpenOrder) {
+                        taxasObj[index].max = 0;
+                        direction = 'put';
+
+                        let isStopedPar = false;
+                        for (let index = 0; index < stopOrdersPares.length; index++) {
+                            const stopOrdersPar = stopOrdersPares[index];
+                            if (activeString.includes(stopOrdersPar)) {
+                                isStopedPar = true;
+                                break;
+                            }
+                        }
+
+                        let toClose = false;
+                        let max;
+                        if (toCloseM5Obj.has(activeString)) {
+                            if (toCloseM5Obj.get(activeString).max != 0 && open > parseFloat(toCloseM5Obj.get(activeString).max)) {
+                                toClose = true;
+                                max = toCloseM5Obj.get(activeString).max;
+                            }
+                        }
+
+                        if (!stopOrders && !isStopedPar && !toClose && openedOrders.length == 0) {
+                            buyBeforOne(direction, parInt, 1);
+                            clearSupres(parInt, direction);
+                        } else if (toClose) {
+                            console.log(`${currentTimehhmmss} || Vela iniciou muito proximo do preço -> ${activeString} - ${direction}`);
+                            notify('To Close', `Vela iniciou muito proximo do preço -> ${activeString} - ${direction}`);
+                            clearSupres(parInt, direction);
+                        } else if (openedOrders.length != 0) {
+                            console.log(`${currentTimehhmmss} || Já possui ordens abertas. -> ${activeString} - ${direction}`);
+                            notify('OpenedOrder', `Já possui ordens abertas. -> ${activeString} - ${direction}`);
+                            clearSupres(parInt, direction);
+                        } else {
+                            console.log(`${currentTimehhmmss} || Rompeu Noticia -> ${activeString} - ${direction} / stopOrders = ${stopOrders} / isStopedPar = ${isStopedPar}`);
+                            notify('Noticia', `Rompeu -> ${activeString} - ${direction} / stopOrders = ${stopOrders} / isStopedPar = ${isStopedPar}`);
+                            clearSupres(parInt, direction);
+                        }
+
+                        setConfig(element, direction, 5);
+                        // }
+                    } else if (min != 0 && price <= min) {
+                        // let minVela = parseInt(currentTimemm.substring(currentTimemm.length, currentTimemm.length - 1))
+                        // let achouOpenOrder = false
+                        // for (let index = 0; index < openOrderNextCandle.length; index++) {
+                        //     const element = openOrderNextCandle[index];
+                        //     if (element.par == parInt) {
+                        //         achouOpenOrder = true
+                        //         break
+                        //     }
+                        // }
+                        // if (!achouOpenOrder && (minVela == 0 || minVela == 5 || minVela == 4 || minVela == 9)) {
+                        //     console.log(`${currentTimehhmmss} || Rompeu 1 Vela -> ${getActiveString(parInt, activesMapString)} - call`);
+                        //     notify('Vish', `Rompeu 1 Vela -> ${getActiveString(parInt, activesMapString)} - call`);
+                        //     openOrderNextCandle.push({
+                        //         par: parInt,
+                        //         max: 0,
+                        //         min,
+                        //         minute: parseInt(currentTimemm) + 5,
+                        //     })
+                        // } else if (!achouOpenOrder) {
+                        taxasObj[index].min = 0;
+                        direction = 'call';
+
+                        let isStopedPar = false;
+                        for (let index = 0; index < stopOrdersPares.length; index++) {
+                            const stopOrdersPar = stopOrdersPares[index];
+                            if (activeString.includes(stopOrdersPar)) {
+                                isStopedPar = true;
+                                break;
+                            }
+                        }
+
+                        let toClose = false;
+                        let min;
+                        if (toCloseM5Obj.has(activeString)) {
+                            if (toCloseM5Obj.get(activeString).min != 0 && open < parseFloat(toCloseM5Obj.get(activeString).min)) {
+                                toClose = true;
+                                min = toCloseM5Obj.get(activeString).min;
+                            }
+                        }
+
+                        if (!stopOrders && !isStopedPar && !toClose && openedOrders.length == 0) {
+                            buyBeforOne(direction, parInt, 1);
+                            clearSupres(parInt, direction);
+                        } else if (toClose) {
+                            console.log(`${currentTimehhmmss} || Vela iniciou muito proximo do preço -> ${activeString} - ${direction}`);
+                            notify('To Close', `Vela iniciou muito proximo do preço -> ${activeString} - ${direction}`);
+                            clearSupres(parInt, direction);
+                        } else if (openedOrders.length != 0) {
+                            console.log(`${currentTimehhmmss} || Já possui ordens abertas. -> ${activeString} - ${direction}`);
+                            notify('OpenedOrder', `Já possui ordens abertas. -> ${activeString} - ${direction}`);
+                            clearSupres(parInt, direction);
+                        } else {
+                            console.log(`${currentTimehhmmss} || Rompeu Noticia -> ${activeString} - ${direction} / stopOrders = ${stopOrders} / isStopedPar = ${isStopedPar}`);
+                            notify('Noticia', `Rompeu -> ${activeString} - ${direction} / stopOrders = ${stopOrders} / isStopedPar = ${isStopedPar}`);
+                            clearSupres(parInt, direction);
+                        }
+                        // }
+                        setConfig(element, 'call', 5);
+                    }
+                    break;
+                }
+
+            }
+
+            lastTickCandles.set(thisCandlePar, price);
+            // console.log(lastTickCandles);
+        }
+    } catch (error) {
+    }
+}
+
+function clearSupres(parInt, direction) {
+    returnEnter.set(getActiveString(parInt, activesMapString), { direction });
+
+    for (let i = 0; i < pricesToSendObj.length; i++) {
+        const pobj = pricesToSendObj[i];
+        if (pobj.moeda === getActiveString(parInt, activesMapString)) {
+            if (direction == "call") {
+                pricesToSendObj[i].taxa.sup = undefined;
+                pricesToSendObj[i].taxa.supd = undefined;
+            } else {
+                pricesToSendObj[i].taxa.res = undefined;
+                pricesToSendObj[i].taxa.resd = undefined;
+            }
+        }
+    }
+    fs.writeFile('pricesToSend.json', JSON.stringify(pricesToSendObj, null, 4), err => {
+    });
+}
+
+function noticiasStuff() {
+    if (noticiasObj.length > 0) {
+        for (let index = 0; index < noticiasObj.length; index++) {
+            const noticia = noticiasObj[index];
+
+
+            let beforeTime = moment(moment().format("YYYY-MM-DD ") + noticia.time).subtract(5, 'minutes');
+            let afterTime = moment(moment().format("YYYY-MM-DD ") + noticia.time).add(5, 'minutes');
+
+            // console.log(beforeTime);
+            // console.log(afterTime);
+            // console.log(moment(moment().format("YYYY-MM-DD ") + currentTimehhmmss))
+
+            let isBettween = moment(moment().format("YYYY-MM-DD ") + currentTimehhmmss).isBetween(beforeTime, afterTime);
+            // console.log(isBettween);
+            if (isBettween && (noticia.par == 'EUR' || noticia.par == 'USD')) {
+                stopOrders = true;
+                break;
+            } else if (stopOrders && (noticia.par == 'EUR' || noticia.par == 'USD') && moment(moment().format("YYYY-MM-DD ") + currentTimehhmmss).isAfter(afterTime)) {
+                console.log(`${currentTimehhmmss} || is after`);
+                stopOrders = false;
+                noticiasObj.splice(index, 1);
+                index--;
+            } else if (isBettween && !stopOrdersPares.includes(noticia.par)) {
+                console.log('par betwenn');
+                stopOrdersPares.push(noticia.par);
+            } else if (stopOrdersPares.includes(noticia.par) && moment(moment().format("YYYY-MM-DD ") + currentTimehhmmss).isAfter(afterTime)) {
+                console.log('par end');
+                let indexx = stopOrdersPares.indexOf(noticia.par);
+                stopOrdersPares.splice(indexx, 1);
+                noticiasObj.splice(index, 1);
+                index--;
+            }
+        }
+    }
+}
+
+function heartbeat(message) {
+    currentTime = message.msg;
+    currentTimehhmm = moment.unix(currentTime / 1000).utcOffset(-3).format("HH:mm");
+    currentTimemm = moment.unix(currentTime / 1000).utcOffset(-3).format("mm");
+    currentTimemmssDate = moment.unix(currentTime / 1000).utcOffset(-3).format("YYYY-MM-DD HH:mm:ss");
+    currentTimehhmmss = moment.unix(currentTime / 1000).utcOffset(-3).format("HH:mm:ss");
+    currentTimess = moment.unix(currentTime / 1000).utcOffset(-3).format("ss");
+}
+
+function errorDigital(message, e) {
+    totalOrderss--;
+    const active = parseInt(message.request_id);
+    let index = openedOrders.indexOf(parseInt(active));
+    openedOrders.splice(index, 1);
+    buysCount.set(parseInt(active), buysCount.get(parseInt(active)) - 1);
+    console.log(`${currentTimehhmmss} || Erro ao comprar -> ${getActiveString(`${active}`, activesMapString)}`.red);
+    console.log('RES = ' + e.data);
+    notify('Error', `Erro ao comprar -> ${getActiveString(`${active}`, activesMapString)}`);
+    if (soros)
+        positionOpenedSoros = false;
+    if (gale)
+        positionOpenedGale = false;
+    buysss = [];
+}
+
+function errorOption(message, e) {
+    totalOrderss--;
+    const active = parseInt(message.request_id);
+    let index = openedOrders.indexOf(parseInt(active));
+    openedOrders.splice(index, 1);
+    buysCount.set(parseInt(active), buysCount.get(parseInt(active)) - 1);
+    console.log(`${currentTimehhmmss} || Erro ao comprar -> ${getActiveString(`${active}`, activesMapString)}`.red);
+    console.log('RES = ' + e.data);
+    notify('Error', `Erro ao comprar -> ${getActiveString(`${active}`, activesMapString)}`);
+    if (soros)
+        positionOpenedSoros = false;
+    if (gale)
+        positionOpenedGale = false;
+    buysss = [];
+}
 
 function getBreakaa(price, index, parInt, breakaa) {
     if (openOrderNextCandle.length > 0) {
@@ -1236,11 +1138,11 @@ function buyBeforOne(direction, parInt, type) {
             hourmm = moment.unix(currentTime / 1000).utcOffset(-3).add(1, 'm').format(" HH:mm");
         }
     } else if (type == 5) {
-        if (parseInt(currentTimess) >= 30) {
-            hourmm = moment.unix(currentTime / 1000).utcOffset(-3).add(6, 'm').format(" HH:mm");
-        } else {
-            hourmm = moment.unix(currentTime / 1000).utcOffset(-3).add(5, 'm').format(" HH:mm");
-        }
+        // if (parseInt(currentTimess) >= 30) {
+        //     hourmm = moment.unix(currentTime / 1000).utcOffset(-3).add(6, 'm').format(" HH:mm");
+        // } else {
+        hourmm = moment.unix(currentTime / 1000).utcOffset(-3).add(5, 'm').format(" HH:mm");
+        // }
     } else {
         hourmm = moment.unix(currentTime / 1000).utcOffset(-3).add(2, 'seconds').add(15, 'm').format(" HH:mm");
     }
@@ -1301,11 +1203,11 @@ function buyBefor(direction, parInt, type) {
 
 let notOrder = []
 
-function checkOpenedPayoutBeforeBuy(parInt, direction, hourmm) {
+function checkOpenedPayoutBeforeBuy(parInt, direction, hourmm, type) {
     let turboPayout = null;
     let digitalPayout = null;
 
-    openOrderDigital(direction, parInt, hourmm);
+    openOrderDigital(direction, parInt, hourmm, type);
     return
 
     if (payoutMap.has('turbo')) {
@@ -1346,10 +1248,10 @@ function openOrderBinary(direction, parInt, hourmm) {
     openedOrders.push(parInt);
 }
 
-function openOrderDigital(direction, parInt, hourmm) {
+function openOrderDigital(direction, parInt, hourmm, type) {
     console.log(`${currentTimehhmmss} || ${direction} / ${getActiveString(parInt, activesMapString)} / ${amount} / Digital`);
     notify('[Order Digital]', `${direction} / ${getActiveString(parInt, activesMapString)} / ${amount}`);
-    buy(amount, parInt, direction, parseInt(moment(moment().format("YYYY-MM-DD ") + hourmm).utcOffset(0).format('X')), 'PT1M');
+    buy(amount, parInt, direction, parseInt(moment(moment().format("YYYY-MM-DD ") + hourmm).utcOffset(0).format('X')), 'PT' + type + 'M');
     totalOrderss++;
     openedOrders.push(parInt);
 }
@@ -1461,6 +1363,7 @@ function positionChangedStuff(message) {
         let index = openedOrders.indexOf(parseInt(active))
         openedOrders.splice(index, 1);
         sessionBalance += profitAmount
+        cicleSession += profitAmount
 
         if (profitAmount < 0) {
             // amount = amountInitial
@@ -1475,6 +1378,7 @@ function positionChangedStuff(message) {
             //     }
             // }
 
+            lossMass('L');
             losss++
             console.log(`${currentTimehhmmss} || ${profitAmount < 0 ? "Loss" : "Win"} ${profitAmount.toFixed(2)} / Balance: ${parseFloat(sessionBalance.toFixed(2))} / ${getActiveString(active, activesMapString) ? getActiveString(active, activesMapString) : active} / Digital`.red)
             notify('Loss', `${profitAmount < 0 ? "Loss" : "Win"} ${profitAmount.toFixed(2)} / Balance: ${parseFloat(sessionBalance.toFixed(2))} / ${getActiveString(active, activesMapString) ? getActiveString(active, activesMapString) : active} / Digital`);
@@ -1488,6 +1392,8 @@ function positionChangedStuff(message) {
             StopWin++
             if (doispraum)
                 amount += profitAmount
+
+            winMass()
             console.log(`${currentTimehhmmss} || ${profitAmount < 0 ? "Loss" : "Win"} ${profitAmount.toFixed(2)} / Balance: ${parseFloat(sessionBalance.toFixed(2))} / ${getActiveString(active, activesMapString) ? getActiveString(active, activesMapString) : active} / Digital`.green)
             notify('Wiiin!!', `${profitAmount < 0 ? "Loss" : "Win"} ${profitAmount.toFixed(2)} / Balance: ${parseFloat(sessionBalance.toFixed(2))} / ${getActiveString(active, activesMapString) ? getActiveString(active, activesMapString) : active} / Digital`);
             setWinss(amount)
@@ -1495,6 +1401,34 @@ function positionChangedStuff(message) {
         positionOpenedSoros = false
     } else {
 
+    }
+}
+
+let cicleSession = 0
+
+function lossMass(winloss) {
+    modifyCell('C' + countMass, winloss);
+    XLSX_CALC(workbook, { continue_after_error: true, log_error: false });
+    // console.log(getCell('I' + countMass))
+    countMass++;
+    amount = parseFloat(getCell('D' + countMass)) > 0 ? parseFloat(getCell('D' + countMass)) : parseFloat(getCell('D' + countMass)) * -1;
+}
+
+function winMass() {
+    if (cicleSession >= 0.01) {
+        for (let index = countMass; index >= 0; index--) {
+            modifyCell('C' + countMass, '');
+        }
+        cicleSession = 0;
+        // modifyCell('C' + countMass, 'W')
+        XLSX_CALC(workbook, { continue_after_error: true, log_error: false });
+        countMass = 3;
+        amount = parseFloat(getCell('D' + countMass)) > 0 ? parseFloat(getCell('D' + countMass)) : parseFloat(getCell('D' + countMass)) * -1;
+    } else {
+        modifyCell('C' + countMass, 'W');
+        XLSX_CALC(workbook, { continue_after_error: true, log_error: false });
+        countMass++;
+        amount = parseFloat(getCell('D' + countMass)) > 0 ? parseFloat(getCell('D' + countMass)) : parseFloat(getCell('D' + countMass)) * -1;
     }
 }
 
@@ -1739,8 +1673,8 @@ const auth = () => {
     ws.onerror = onError
     ws.onmessage = onMessage
     axios.post('https://auth.iqoption.com/api/v2/login', {
-        identifier: config.login,
-        password: config.password
+        identifier: "davilagustavo996@gmail.com",
+        password: "Ana12boeno#",
     }).then((response) => {
         ssid = response.data.ssid
         const loginn = setInterval(() => {
@@ -1757,8 +1691,8 @@ const auth = () => {
 let logged = false
 
 axios.post('https://auth.iqoption.com/api/v2/login', {
-    identifier: config.login,
-    password: config.password
+    identifier: "davilagustavo996@gmail.com",
+    password: "Ana12boeno#",
     // identifier: "carol.davila14@outlook.com",
     // password: "gc896426",
 }).then((response) => {

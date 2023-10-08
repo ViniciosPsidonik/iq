@@ -17,7 +17,7 @@ const func = () => {
         setTimeout(() => {
             resolve()
 
-        }, 1000);
+        }, 50);
 
     })
 }
@@ -25,70 +25,81 @@ const func = () => {
 
 setInterval(() => {
     // robot.mouseClick();
-    // robot.keyTap("tab","control");
-}, 10000);
+    // robot.keyTap("tab", "control");
+}, 30000);
 
 
 let count = 0
 
 
-async function crono(){
-    robot.moveMouse(194, 303);
+async function ninja() {
+    robot.moveMouse(140, 274);
     robot.mouseClick();
     await func()
-    robot.moveMouse(186, 398);
+    robot.moveMouse(140, 341);
     robot.mouseClick();
     await func()
-    robot.moveMouse(170, 323);
+    robot.moveMouse(143, 288);
     robot.mouseClick();
     await func()
-    robot.moveMouse(151, 405);
+    robot.moveMouse(190, 355);
     robot.mouseClick();
     await func()
-    robot.moveMouse(362, 261);
+    robot.moveMouse(381, 255);
     robot.mouseClick();
     await func()
-    robot.moveMouse(365, 298);
+    robot.moveMouse(420, 304);
     robot.mouseClick();
     await func()
-    robot.moveMouse(357, 284);
+    robot.moveMouse(372, 291);
     robot.mouseClick();
     await func()
-    robot.moveMouse(350, 362);
+    robot.moveMouse(372, 331);
     robot.mouseClick();
     await func()
-    robot.moveMouse(601, 295);
+    robot.moveMouse(631, 258);
     robot.mouseClick();
     await func()
-    robot.moveMouse(664, 296);
+    robot.typeString("08:00")
+    await func()
+    robot.moveMouse(673, 261);
     robot.mouseClick();
     await func()
-    robot.moveMouse(603, 322);
+    robot.typeString("12:00")
+    await func()
+    robot.moveMouse(623, 286);
     robot.mouseClick();
     await func()
-    robot.moveMouse(667, 319);
+    robot.typeString("13:00")
+    await func()
+    robot.moveMouse(688, 289);
     robot.mouseClick();
     await func()
-    robot.moveMouse(749, 294);
+    robot.typeString("17:00")
+    await func()
+    robot.moveMouse(749, 261);
     robot.mouseClick();
     await func()
-    robot.moveMouse(729, 315);
+    robot.typeString("Desenvolvimento")
+    await func()
+    robot.moveMouse(749, 284);
     robot.mouseClick();
- 
-
-
-
-
+    await func()
+    robot.typeString("Desenvolvimento")
+    await func()
+    robot.moveMouse(742, 611);
+    robot.mouseClick();
 }
 
-crono()
+ninja()
+
 
 async function loop() {
     if (sql) {
 
-        count ++
+        count++
         console.log(count);
-        if(count > -1)
+        if (count > -1)
             return
         // chrome note visual
 
@@ -99,12 +110,12 @@ async function loop() {
         // poscao inicio arquivo
         robot.moveMouse(76, 111);
         robot.mouseClick();
-        robot.keyTap("end","control");
+        robot.keyTap("end", "control");
         robot.keyTap("end");
-        robot.keyTap("home","shift");
-        robot.keyTap("c","control");
+        robot.keyTap("home", "shift");
+        robot.keyTap("c", "control");
         robot.keyTap("end");
-        robot.keyTap("home","shift");
+        robot.keyTap("home", "shift");
         robot.keyTap("backspace");
         robot.keyTap("backspace");
 
@@ -115,9 +126,9 @@ async function loop() {
         // clica box sql 
         robot.moveMouse(247, 876);
         robot.mouseClick();
-        robot.keyTap("a","control");
+        robot.keyTap("a", "control");
         robot.keyTap("delete");
-        robot.keyTap("v","control");
+        robot.keyTap("v", "control");
         // posicao botao
         robot.moveMouse(93, 987);
         robot.mouseClick();
@@ -141,7 +152,7 @@ let countt = 0;
 
 
 async function loop1() {
-    countt ++
+    countt++
     console.log(countt)
     //notepad ++
     robot.moveMouse(558, 1055);
@@ -150,14 +161,14 @@ async function loop1() {
     //clica fim da linha
     robot.moveMouse(1570, 106);
     robot.mouseClick();
-    robot.keyTap("home","control");
-    robot.keyTap("pagedown","shift");
-    robot.keyTap("pagedown","shift");
-    robot.keyTap("pagedown","shift");
-    robot.keyTap("pagedown","shift");
-    robot.keyTap("pagedown","shift");
-    robot.keyTap("pagedown","shift");
-    robot.keyTap("x","control");
+    robot.keyTap("home", "control");
+    robot.keyTap("pagedown", "shift");
+    robot.keyTap("pagedown", "shift");
+    robot.keyTap("pagedown", "shift");
+    robot.keyTap("pagedown", "shift");
+    robot.keyTap("pagedown", "shift");
+    robot.keyTap("pagedown", "shift");
+    robot.keyTap("x", "control");
     // return
     //executar botao
     // robot.moveMouse(874, 562);
@@ -174,14 +185,14 @@ async function loop1() {
     // clica tela
     robot.moveMouse(679, 582);
     robot.mouseClick();
-    
+
     // vai para baixa guia
-    robot.keyTap("end","control");
+    robot.keyTap("end", "control");
     await func()
     // clica box sql
     robot.moveMouse(95, 927);
     robot.mouseClick();
-    robot.keyTap("v","control");
+    robot.keyTap("v", "control");
     // botao setar sql
     robot.moveMouse(62, 980);
     robot.mouseClick();
@@ -218,7 +229,7 @@ async function loop1() {
 setInterval(() => {
     // robot.keyTap("end","control");
     // robot.keyTap("end","control");
-    
+
 
     // robot.mouseClick();
     // robot.keyTap("v","control");
