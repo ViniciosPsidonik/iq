@@ -1,7 +1,7 @@
 const { MTProto, getSRPParams } = require('@mtproto/core');
 const prompts = require('prompts');
-
-const api_id = 5714815 // insert api_id here
+const moment = require('moment')
+const api_id = 1537314 // insert api_id here
 const api_hash = '1855b411a187811b71f333d904d725d9'; // insert api_hash here
 
 async function getPhone() {
@@ -37,14 +37,53 @@ const mtproto = new MTProto({
 
 function startListener() {
     console.log('[+] starting listener')
-    // mtproto.updates.on('updates', ({ updates }) => {
-    //     const newChannelMessages = updates.filter((update) => update._ === 'updateNewChannelMessage').map(({ message }) => message) // filter `updateNewChannelMessage` types only and extract the 'message' object
+    mtproto.updates.on('updates', ({ updates }) => {
+        const newChannelMessages = updates.filter((update) => (update._ === 'updateNewChannelMessage' || update._ === 'updateEditChannelMessage')).map(({ message }) => message) // filter `updateNewChannelMessage` types only and extract the 'message' object
 
-    //     for (const message of newChannelMessages) {
-    //         // printing new channel messages
-    //         console.log(`[${message.to_id.channel_id}] ${message.message}`)
-    //     }
-    // });
+        for (const message of newChannelMessages) {
+            // printing new channel messages
+            console.log(`[${message.to_id.channel_id}] ${message.message}`)
+            console.log('aaaaaaaaaaaaa');
+            console.log(message);
+            let msg = message.message
+
+            // message.to_id.channel_id == 1756200223
+            // if (msg.includes('CALL') || msg.includes('PUT')) {
+            //     let msgArray = msg.split('\n')
+            //     for (let index = 0; index < msgArray.length; index++) {
+            //         const line = msgArray[index];
+            //         let day
+            //         let time
+            //         if (line.includes('/') && line.includes(':')) {
+            //             let splitLine = line.split(' ')
+            //             for (let I = 0; I < splitLine.length; I++) {
+            //                 const word = splitLine[I];
+            //                 if (word.indexOf(':') == 2) {
+            //                     time = word
+            //                 }
+            //                 if (word.includes('/')) {
+            //                     day = word
+            //                 }
+            //             }
+            //         }
+
+            //         let date = moment(day + " " + time)
+
+            //         if (line.includes('CALL') || line.includes('PUT')) {
+            //             const element = line.split(' ');
+            //             // let par = activesDigitalMapString.get(element[1])
+            //             let par = element[1]
+            //             let time = element[0] == 'M1' ? 1 : element[0] == 'M5' ? 5 : 15
+            //             let taxa = parseFloat(element[2])
+            //             let direction = element[3].toLowerCase()
+            //             taxasEmperium.push({ par, time, taxa, direction, countid, date })
+            //             countid++
+            //         }
+            //         console.log(taxasEmperium);
+            //     }
+            // }
+        }
+    });
 
     mtproto.updates.on('updatesTooLong', (updateInfo) => {
         console.log('updatesTooLong:', updateInfo);
@@ -68,6 +107,12 @@ function startListener() {
 
     mtproto.updates.on('updates', (updateInfo) => {
         console.log('updates:', updateInfo);
+        console.log('bbbbbb');
+        try {
+            updateInfo.updates[0].message
+        } catch (error) {
+            console.log(error);
+        }
     });
 
     mtproto.updates.on('updateShortSentMessage', (updateInfo) => {
