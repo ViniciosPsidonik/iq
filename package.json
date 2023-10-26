@@ -10,7 +10,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@deriv/deriv-api": "^1.0.12",
+    "@deriv/deriv-api": "^1.0.13",
     "@mtproto/core": "^3.4.0",
     "axios": "^0.21.1",
     "canvas": "^2.7.0",

@@ -175,20 +175,21 @@ let veefe = ""
 let counterNine = 0
 async function buyRec() {
 
-
+    console.log('buyreec');
     if (loss > 3) {
-        ativaTicks = true
-        await esperaPoderEntrar()
+        // ativaTicks = true
+        // await esperaPoderEntrar()
         // setTimeout(async () => {
         // let contract = await contracts();
         // startContract(contract, api, connection);
         // }, 4000);
     }
 
-    const connection = new WebSocket('wss://ws.binaryws.com/websockets/v3?app_id=34942');
+    const connection = new WebSocket('wss://ws.binaryws.com/websockets/v3?app_id=34941');
+    console.log(connection.connection);
     const api = new DerivAPI({ connection });
-
     balance = await api.account('pbZQyrw6BRt0lu5');
+    console.log('api');
 
     if (!bancaAtual)
         bancaAtual = balance.balance.amount.value
@@ -198,21 +199,22 @@ async function buyRec() {
 
         const ticks = await api.ticks('R_100');
         bancaVirtual = parseFloat(getCell('N12'))
+        console.log('aaaaaaaa');
         ticks.onUpdate().subscribe(async tick => {
             if (ativaTicks) {
                 let digit = parseInt(tick.raw.quote.toString().slice(-1))
                 console.log(digit);
-                if (digit == 8 || digit == 9 || digit == 7) {
-                    // counterNine++
-                    // if (counterNine >= 2) {
-                    //     counterNine = 0
-                    ativaTicks = false
-                    canTrade = true
-                    // }
+                if (digit == 0 || digit == 1 || digit == 2) {
+                    counterNine++
+                    if (counterNine >= 4) {
+                        counterNine = 0
+                        ativaTicks = false
+                        canTrade = true
+                    }
                 }
-                // else {
-                // counterNine = 0
-                // }
+                else {
+                    counterNine = 0
+                }
             }
         })
 
@@ -227,6 +229,7 @@ async function buyRec() {
 
 
     let contract = await contracts();
+    console.log(contracts);
     startContract(contract, api, connection);
 
     async function contracts() {
@@ -238,7 +241,7 @@ async function buyRec() {
             duration_unit: 't',
             currency: 'USD',
             barrier,
-            proposal: 1,
+            proposal: 2,
             basis: 'stake',
             amount: parseFloat(amount).toFixed(2)
         }).catch(err => console.log(err));
