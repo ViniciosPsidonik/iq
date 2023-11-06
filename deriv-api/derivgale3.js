@@ -6,7 +6,8 @@ var XLSX_CALC = require('xlsx-calc');
 const { log } = require('pkg/lib-es5/log');
 var workbook = XLSX.readFile('./Massanielloderiv.xlsx');
 var worksheet = workbook.Sheets['Calculadora']
-let amount = 0.35
+let amount = 1
+const amountInitial = amount
 const colors = require('colors')
 // change some cell value
 // console.log(getCell('F4'));
@@ -14,6 +15,7 @@ const colors = require('colors')
 let countMass = 3
 // console.log(amount);
 let profitSession = 0
+let cicleSession = 0
 
 // basic.ping().then(console.log);
 let balancesss = false
@@ -116,6 +118,7 @@ let ganhaTrade = 0
 let canTrade = false
 let ativaTicks = false
 let veefe = ""
+let conn = false
 let counterNine = 0
 let lastDigits = [0, 1]
 let lasttrywin = false
@@ -166,14 +169,14 @@ async function buyRec() {
         // modifyCell('N12', balance.balance.amount.value);
         cicleSession = 0;
         // XLSX_CALC(workbook, { continue_after_error: true, log_error: false });
-        amount = parseFloat(getCell('D' + countMass)).toFixed(2)
+        // amount = parseFloat(getCell('D' + countMass)).toFixed(2)
         // console.log('amount=', amount);
     }
 
 
     let contract = await contracts();
     // 
-    if (loss - win > 2 || loss + win > 1) {
+    if (loss > 2) {
         ativaTicks = true
         await esperaPoderEntrar()
         // setTimeout(async () => {
@@ -207,10 +210,9 @@ async function buyRec() {
         return contract;
     }
 }
-let conn = false
 setInterval(() => {
     if (conn) {
-        console.log('conn ====== false');
+        console.log('conn ========= false');
         conn = false
     } else {
         buyRec()
@@ -228,6 +230,8 @@ const esperaPoderEntrar = (type) => {
         }, 100);
     })
 }
+
+let amountSemSoros = amountInitial
 
 function startContract(contract, api, connection) {
 
@@ -251,43 +255,65 @@ function startContract(contract, api, connection) {
                 // bancaAtual += profitSession
                 if (hasloss) {
                     win++;
-                    winMass();
+                    cicleSession += contract.profit.value
+                    // winMass();
+
+                    if (win >= 2) {
+                        amount = amountInitial
+                        console.log(`Takeeee `.green)
+                        win = 0
+                        loss = 0
+                        hasloss = false
+                        console.log(`Cicle Session = ${cicleSession}`.green);
+                        amountSemSoros = amountInitial
+                        cicleSession = 0
+                    } else {
+                        // amount += contract.profit.value;
+                    }
                 } else if (!ganhaTrade) {
                     ganhaTrade = contract.profit.value;
                     console.log('ganhaTrade=', ganhaTrade);
                 }
-                // if (ganhaTrade) {
-                // }
                 let falta = (meta - bancaAtual) / ganhaTrade;
                 console.log(`WIIN - falta = ${parseInt(falta)}`.green);
                 console.log(`Wins: ${win} || Loss: ${loss}`);
                 console.log(`Profit Session = ${profitSession}`.green);
-                // 9981
-                // 10137
-                // resolve()
-                // contract = undefined;
-                // connection.terminate();
-                // clearInterval(intttt);
-                // setTimeout(() => {
-                if (profitSession > 29) {
+                if (profitSession > 25) {
                     console.log(`STOP WIIN`.green);
-                    process.exit()
                 } else {
                     buyRec(api, connection);
                 }
-                // }, 1000);
-                // }
             } else {
-                // if (balance.balance.amount.value < bancaAtual) {
-                // console.log(contract.profit);
                 console.log(bancaAtual);
-                profitSession -= contract.profit.value
+                cicleSession -= contract.profit.value
                 // bancaAtual += profitSession
+                profitSession -= contract.profit.value
+                win = 0
+                if (!hasloss) {
+                    hasloss = true
+                }
+                amount = (Math.abs(cicleSession) / 0.4) / 2
+                // amountSemSoros = amount
+                // } else {
+                //     // amount = amountSemSoros * 1.45
+                //     // amountSemSoros = amount
+                // }
+
                 console.log('LOSS'.red);
                 loss++;
                 console.log(`Wins: ${win} || Loss: ${loss}`);
                 console.log(`Profit Session = ${profitSession}`.green);
-                lossMass('L');
+                console.log(`Cicle Session = ${cicleSession}`.green);
+                if (loss >= 5) {
+                    amount = amountInitial
+                    console.log(`=HIT=`.red)
+                    win = 0
+                    hasloss = false
+                    loss = 0
+                    amountSemSoros = amountInitial
+                    cicleSession = 0
+                }
+                // lossMass('L');
                 // console.log(contract);
                 // contract = undefined;
                 // connection.terminate();

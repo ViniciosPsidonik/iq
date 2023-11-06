@@ -6,7 +6,9 @@ const momentTz = require('moment-timezone');
 const countries = require('../country')
 const WebSocket = require('ws')
 const colors = require('colors')
-
+let { customLog, setFilePath } = require('../customLog')
+setFilePath('horarios.txt')
+console.log = customLog;
 let fsConfig = fs.readFileSync('config.json')
 let config = JSON.parse(fsConfig)
 let openedMap = new Map()
@@ -153,7 +155,7 @@ const onOpen = () => {
 
 const onError = error => {
     console.log('Error -> WebSocket');
-    // console.log(error)
+    console.log(error)
     ws.terminate()
     ws = new WebSocket(url)
     ws.onopen = onOpen
@@ -300,6 +302,9 @@ const getLeaders = (ws) => {
 
 const buy = (amount, active_id, direction, expired, type, msg) => {
     let data
+    if (amount < 2) {
+        amount = 2
+    }
     if (typeof type == 'number') {
         data = {
             "name": "sendMessage",
@@ -1488,7 +1493,7 @@ async function winMass() {
     }
     // || Vee == Efee
 
-    if (getCell('I' + countMass) == '◄◄' || Vee == Efee) {
+    if (getCell('I' + countMass) == '◄◄' || ((Vee == Efee || Vee > Efee) && Vee + Efee > 25)) {
 
         for (let index = countMass; index >= 0; index--) {
             modifyCell('C' + countMass, '');
@@ -1513,13 +1518,13 @@ async function winMass() {
     if (config.conta == "real")
         fs.writeFile('config.json', JSON.stringify(config, null, 4), err => {
             // console.log(err || 'Arquivo salvo');
+            if (winss >= 5) {
+                notify('Stop', `Stop WIN Alcançado...`);
+                console.log('Stop WIN Alcançado...')
+                process.exit(1)
+            }
         });
 
-    if (countResult >= 5) {
-        notify('Stop', `Stop WIN Alcançado...`);
-        console.log('Stop WIN Alcançado...')
-        process.exit(1)
-    }
 
     console.log(amount);
 
@@ -1537,13 +1542,13 @@ function lossMass(winloss) {
     if (config.conta == "real")
         fs.writeFile('config.json', JSON.stringify(config, null, 4), err => {
             // console.log(err || 'Arquivo salvo');
+            if (los >= 3) {
+                notify('Stop', `Stop Loss Alcançado...`);
+                console.log('Stop Loss Alcançado...')
+                process.exit(1)
+            }
         });
 
-    if (countResult <= -5) {
-        notify('Stop', `Stop Loss Alcançado...`);
-        console.log('Stop Loss Alcançado...')
-        process.exit(1)
-    }
 
 }
 
@@ -1779,9 +1784,6 @@ const loginAsync = async (ssid) => {
 
 let ssiddddd
 
-setTimeout(() => {
-    ws.send(JSON.stringify({ 'name': 'ssid', 'msg': ssid, "request_id": "" }))
-}, 8000);
 
 const doLogin = ssid => {
     return new Promise((resolve, reject) => {
@@ -1861,7 +1863,7 @@ let logged = false
 
 let ssidGustavo
 
-setInterval(() => {
+const tryconnect = setInterval(() => {
     if (!connectedd) {
         console.log('CAIU CONEXAO');
         ws.terminate()
@@ -1869,11 +1871,13 @@ setInterval(() => {
 
         start()
         timeeessa = 30000
+        clearInterval(tryconnect)
     } else {
         timeeessa = 5000
     }
     connectedd = false
 }, 7000);
+
 
 
 const start = (force) => {
@@ -1984,12 +1988,15 @@ let countid = 0
 //         }
 // }, 1000);
 
+
 function startttt(taxasss, id, edit) {
     if ((taxasss.includes("CALL") || taxasss.includes("PUT")) && !taxasss.includes("⏳")) {
         if (edit && typeof edit != "undefined") {
+
             console.log('aaaaaaaaaaaaa===========');
             console.log(taxasss);
-            console.log('aaa');
+            console.log(`${currentTimehhmmss} || EDITED `)
+
         } else {
             console.log('===== NOVO SINAL AGENDADO ======');
             let horarioArray = taxasss.split('\n')
@@ -2015,10 +2022,26 @@ function startttt(taxasss, id, edit) {
                     //     paresVer.push(par)
                     // }
 
-                    if (typeof currentTimehhmmss != 'undefined')
-                        if (moment(moment().format("YYYY-MM-DD ") + currentTimehhmmss).isBefore(moment(moment().format("YYYY-MM-DD ") + horario))) {
-                            horariosObj.push({ horario, par, direction, time })
+
+                    let achoutimee = false
+                    for (let indexh = 0; indexh < horariosObj.length; indexh++) {
+                        let hhhh = horariosObj[indexh]
+
+                        if (hhhh.horario == horario && par == hhhh.par && time == hhhh.time) {
+                            achoutimee = true
+                            break
                         }
+                    }
+
+                    if (!achoutimee) {
+                        if (typeof currentTimehhmmss != 'undefined') {
+                            if (moment(moment().format("YYYY-MM-DD ") + currentTimehhmmss).isBefore(moment(moment().format("YYYY-MM-DD ") + horario))) {
+                                horariosObj.push({ horario, par, direction, time })
+                            }
+                        }
+                    } else {
+                        console.log(`${currentTimehhmmss} || ja foi agendado`);
+                    }
                 }
             }
 
@@ -2033,23 +2056,7 @@ function startttt(taxasss, id, edit) {
     }
 }
 
-let taxasss = `07:51 - EURJPY - CALL 🕑 
-08:51 - EURGBP - PUT 🕑 
-08:54 - EURJPY - CALL 🕑 
-10:50 - EURJPY - CALL 🕑 
-11:09 - EURGBP - PUT 🕑 
-13:53 - GBPUSD - PUT 🕑 
-15:09 - GBPUSD - PUT 🕑 
-
-SINAIS M5 
-
- 
-08:10 - GBPUSD - CALL 🕑 
-09:20 - EURJPY - CALL 🕑 
-11:55 - EURJPY - PUT 🕑 
-12:00 - EURGBP - PUT 🕑 
-13:05 - GBPUSD - CALL 🕑 
-15:25 - GBPUSD - CALL 🕑 `
+let taxasss = ``
 let msgArray = taxasss.split('\n')
 // if (taxasss)
 startttt(taxasss);
@@ -2187,7 +2194,7 @@ let horarios = ``
 if (horarios) {
     setTimeout(() => {
         startttt(horarios)
-    }, 20000);
+    }, 10000);
 } else {
     console.log(horariosObj);
 

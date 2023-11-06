@@ -41,10 +41,6 @@ function lossMass(winloss) {
     // console.log('F=', getCell('F' + countMass))
     countMass++;
     amount = parseFloat(getCell('D' + countMass)) > 0 ? parseFloat(getCell('D' + countMass)) : parseFloat(getCell('D' + countMass)) * -1;
-    if (amount < 0.35) {
-        console.log("LOSSSSSSS".red);
-        take();
-    }
 }
 let bancaAtual = 0
 let hasloss = false
@@ -55,35 +51,32 @@ function winMass() {
     // || getCell('N12') - getCell('F' + countMass) <= 1
     if (getCell('F' + (countMass - 1)) > getCell('N12')) {
         console.log(`Takeeee `.green)
-        take();
+        barrier = 0
+        loss = 0
+        win = 0
+
+        hasloss = false
+        // let bancaAtual = getCell('F' + (countMass - 1))
+
+        // console.log(`bancaAtual = ${bancaAtual}`);
+        // for (let index = countMass; index >= 3; index--) {
+        //     modifyCell('C' + countMass, '');
+        // }
+        // modifyCell('N12', balance.balance.amount.value);
+        cicleSession = 0;
+        XLSX_CALC(workbook, { continue_after_error: true, log_error: false });
+        countMass = 3;
+        amount = parseFloat(getCell('D' + countMass)) > 0 ? parseFloat(getCell('D' + countMass)) : parseFloat(getCell('D' + countMass)) * -1;
+        // console.log(amount);
+        if (balance.balance.amount.value >= meta) {
+            console.log('META ATINGIDA...'.green);
+            setTimeout(() => {
+                // process.exit(1)
+            }, 10000);
+        }
     }
 
 
-}
-
-function take() {
-    barrier = 2;
-    loss = 0;
-    win = 0;
-
-    hasloss = false;
-    // let bancaAtual = getCell('F' + (countMass - 1))
-    // console.log(`bancaAtual = ${bancaAtual}`);
-    // for (let index = countMass; index >= 3; index--) {
-    //     modifyCell('C' + countMass, '');
-    // }
-    // modifyCell('N12', balance.balance.amount.value);
-    cicleSession = 0;
-    XLSX_CALC(workbook, { continue_after_error: true, log_error: false });
-    countMass = 3;
-    amount = parseFloat(getCell('D' + countMass)) > 0 ? parseFloat(getCell('D' + countMass)) : parseFloat(getCell('D' + countMass)) * -1;
-    // console.log(amount);
-    if (balance.balance.amount.value >= meta) {
-        console.log('META ATINGIDA...'.green);
-        setTimeout(() => {
-            // process.exit(1)
-        }, 10000);
-    }
 }
 
 function modifyCell(cellString, value) {
@@ -97,7 +90,7 @@ function modifyCell(cellString, value) {
 }
 
 let start = true
-let barrier = 2
+let barrier = 0
 
 let contract
 
@@ -137,22 +130,25 @@ async function buyRec() {
         // console.log('aaaaaaaa');
         ticks.onUpdate().subscribe(async tick => {
             let digit = parseInt(tick.raw.quote.toString().slice(-1))
-            // lastDigits[1] = lastDigits[0]
+            lastDigits[1] = lastDigits[0]
 
-            // lastDigits[0] = parseInt(tick.raw.quote.toString().slice(-1))
-            // if ((digit == 0 || digit == 1 || digit == 2) && (lastDigits[1] == 0 || lastDigits[1] == 1 || lastDigits[1] == 2)) {
-            //     lasttrywin = false
-            // } else if ((digit != 0 && digit != 1 && digit != 2) && (lastDigits[1] == 0 || lastDigits[1] == 1 || lastDigits[1] == 2)) {
-            //     lasttrywin = true
-            // }
+            lastDigits[0] = parseInt(tick.raw.quote.toString().slice(-1))
+            if ((digit == 0 || digit == 1 || digit == 2) && (lastDigits[1] == 0 || lastDigits[1] == 1 || lastDigits[1] == 2)) {
+                lasttrywin = false
+            } else if ((digit != 0 && digit != 1 && digit != 2) && (lastDigits[1] == 0 || lastDigits[1] == 1 || lastDigits[1] == 2)) {
+                lasttrywin = true
+            }
             if (ativaTicks) {
                 console.log(digit);
                 if (digit == 0 || digit == 1 || digit == 2) {
                     counterNine++
-                    if (counterNine >= 1) {
+                    if (counterNine >= 1 && lasttrywin && loss + win > 25 || counterNine >= 1 && loss + win < 25) {
                         counterNine = 0
                         ativaTicks = false
                         canTrade = true
+                    } else if (counterNine >= 1) {
+                        console.log('lasttrywin=', lasttrywin);
+                        counterNine = 0
                     }
                 }
                 else {
@@ -161,7 +157,7 @@ async function buyRec() {
             }
         })
 
-        meta = 9135
+        meta = 9188
         console.log(`Meta = ${meta}`);
         // modifyCell('N12', balance.balance.amount.value);
         cicleSession = 0;
@@ -172,10 +168,10 @@ async function buyRec() {
 
 
     let contract = await contracts();
-    // 
-    if (loss - win > 2 || loss + win > 1) {
-        ativaTicks = true
-        await esperaPoderEntrar()
+    // || loss + win > 25
+    if (loss - win > 2) {
+        // ativaTicks = true
+        // await esperaPoderEntrar()
         // setTimeout(async () => {
         // let contract = await contracts();
         // startContract(contract, api, connection);
@@ -192,8 +188,8 @@ async function buyRec() {
 
     async function contracts() {
         let contract = await api.contract({
-            // contract_type: 'DIGITDIFF',
-            contract_type: 'DIGITOVER',
+            contract_type: 'DIGITDIFF',
+            // contract_type: 'DIGITOVER',
             symbol: 'R_100',
             duration: 1,
             duration_unit: 't',
@@ -207,10 +203,8 @@ async function buyRec() {
         return contract;
     }
 }
-let conn = false
 setInterval(() => {
     if (conn) {
-        console.log('conn ====== false');
         conn = false
     } else {
         buyRec()
@@ -231,7 +225,7 @@ const esperaPoderEntrar = (type) => {
 
 function startContract(contract, api, connection) {
 
-    console.log('amount=', amount);
+    // console.log('amount=', amount);
     let counrt = 0
     contract.onUpdate().subscribe(async (contract) => {
         // console.log('issold after');
@@ -244,10 +238,10 @@ function startContract(contract, api, connection) {
             // console.log('issold');
             if (contract.status == 'won') {
                 // if (balance.balance.amount.value > bancaAtual) {
-                // console.log(contract.profit);
+                console.log(contract.profit);
                 // console.log(contract);
                 console.log(bancaAtual);
-                profitSession += contract.profit.value
+                // profitSession += contract.profit.value
                 // bancaAtual += profitSession
                 if (hasloss) {
                     win++;
@@ -261,7 +255,6 @@ function startContract(contract, api, connection) {
                 let falta = (meta - bancaAtual) / ganhaTrade;
                 console.log(`WIIN - falta = ${parseInt(falta)}`.green);
                 console.log(`Wins: ${win} || Loss: ${loss}`);
-                console.log(`Profit Session = ${profitSession}`.green);
                 // 9981
                 // 10137
                 // resolve()
@@ -269,24 +262,18 @@ function startContract(contract, api, connection) {
                 // connection.terminate();
                 // clearInterval(intttt);
                 // setTimeout(() => {
-                if (profitSession > 29) {
-                    console.log(`STOP WIIN`.green);
-                    process.exit()
-                } else {
-                    buyRec(api, connection);
-                }
+                buyRec(api, connection);
                 // }, 1000);
                 // }
             } else {
                 // if (balance.balance.amount.value < bancaAtual) {
                 // console.log(contract.profit);
                 console.log(bancaAtual);
-                profitSession -= contract.profit.value
+                // profitSession -= contract.profit.value
                 // bancaAtual += profitSession
                 console.log('LOSS'.red);
                 loss++;
                 console.log(`Wins: ${win} || Loss: ${loss}`);
-                console.log(`Profit Session = ${profitSession}`.green);
                 lossMass('L');
                 // console.log(contract);
                 // contract = undefined;

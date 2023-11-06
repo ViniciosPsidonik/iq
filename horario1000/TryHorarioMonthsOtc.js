@@ -607,6 +607,7 @@ let couu = 0
 let indexesss = []
 let timeeactual = 1
 let horariosachou = []
+let horariosachouFive = []
 
 let stringgAcepted = []
 
@@ -1193,6 +1194,7 @@ let candleVictoriesFive = new Map()
 let canfoagain = false
 let counttt = 0
 let canStop = false
+let horariossfive = []
 function candleStuff(message) {
     let candles = message.msg.candles;
 
@@ -1225,19 +1227,27 @@ function candleStuff(message) {
             //     continue
             // }
 
-            if (hh < 17 && hh > 0) {
-                counttt++
-                let dayi = moment.unix(candle.from).utcOffset(-3).format("YYYY-MM-DD HH:mm")
-                let key = getActiveString(parInt, activesDigitalMapStringaaa) + "-" + dayi
-                console.log(key);
-                if (candle.open != candle.close)
-                    if (candle.open < candle.close) {
-                        // green
+            // if (hh < 17 && hh >= 0) {
+            counttt++
+            let dayi = moment.unix(candle.from).utcOffset(-3).format("YYYY-MM-DD HH:mm")
+            let key = getActiveString(parInt, activesMapString) + "-" + dayi
+            console.log(key);
+            if (candle.open != candle.close)
+                if (candle.open < candle.close) {
+                    // green
+                    if (timeeactual == 1) {
                         horariossss.push({ key, direction: 'call' })
                     } else {
-                        horariossss.push({ key, direction: 'put' })
+                        horariossfive.push({ key, direction: 'call' })
                     }
-            }
+                } else {
+                    if (timeeactual == 1) {
+                        horariossss.push({ key, direction: 'put' })
+                    } else {
+                        horariossfive.push({ key, direction: 'put' })
+                    }
+                }
+            // }
             // console.log(dayi)
             // let dayiM = moment.unix(candle.from).utcOffset(-3).format("HH:mm")
             // let parInt = parseInt(message.request_id.split('/')[0]);
@@ -2058,9 +2068,6 @@ let to = null
 
 async function profileStuf1(message, name) {
     counttt = 0
-    // for (var [key, value] of activesDigitalMapStringaaa.entries()) {
-    // console.log(key);
-    // if (!key.includes('OTC'))
     // ['EURUSD', 1],
     // ['EURGBP', 2],
     // ['EURJPY', 4],
@@ -2071,17 +2078,11 @@ async function profileStuf1(message, name) {
     // ['USDCHF', 72],
     // ['USDCAD', 100],
     // ['USDJPY', 6],
-    // console.log('===============');
-    // console.log(key);
-    // console.log('===============');
-    // console.log(index);
-    // console.log(key)
-    // let to = parseInt(moment(moment().format("YYYY-MM-DD ") + hoo.horario).utcOffset(0).format('X'))
-    for (var [key, value] of activesDigitalMapStringaaa.entries()) {
+    for (var [key, value] of activesMapString.entries()) {
         console.log('===============');
         console.log(key);
-        if (!key.includes('OTC'))
-            for (let indexj = 0; indexj < 20; indexj++) {
+        if (key.includes('OTC'))
+            for (let indexj = 0; indexj < 200; indexj++) {
                 console.log("==================");
                 if (!to) {
                     to = parseInt(moment(moment().format("YYYY-MM-DD ") + "17:00").subtract(indexj, 'days').utcOffset(0).format('X'))
@@ -2105,48 +2106,87 @@ async function profileStuf1(message, name) {
     //     canStop = false
 
     // }
+    // timeeactual = 5
+    // for (var [key, value] of activesDigitalMapStringaaa.entries()) {
+    //     console.log('===============');
+    //     console.log(key);
+    //     if (!key.includes('OTC'))
+    //         for (let indexj = 0; indexj < 80; indexj++) {
+    //             console.log("==================");
+    //             if (!to) {
+    //                 to = parseInt(moment(moment().format("YYYY-MM-DD ") + "17:00").subtract(indexj, 'days').utcOffset(0).format('X'))
+    //                 console.log('tooooooo');
+    //             }
+
+    //             console.log(to);
+    //             // currentTimehh = moment.unix(currentTime / 1000).utcOffset(-3).add(2, 'seconds').format("HH")
+    //             // console.log(to);
+    //             // if (hoo.time == 5)
+    //             //     timeeactual = 5
+
+    //             getCandle(value, timeeactual == 1 ? 60 : 300, 1000, to);
+    //             await awaittt()
+
+    //         }
+    //     to = null
+    // }
 
     for (let index = 0; index < horariossss.length; index++) {
         const horario = horariossss[index];
-        let key = horario.key
-        let direction = horario.direction
-        let string = key.split(' ')[0].split('-')[0] + " " + key.split(' ')[1]
-        // console.log(string + key);
-        if (!candleVictories.has(string)) {
-            if (direction == 'call') {
-                // green
-                candleVictories.set(string, { green: 1, red: 0 });
-            } else {
-                candleVictories.set(string, { green: 0, red: 1 });
-            }
-        } else {
-            let green = candleVictories.get(string).green;
-            let red = candleVictories.get(string).red;
-            if (green + red <= 9) {
-                if (direction == 'call') {
-                    // green
-                    green++;
-                    candleVictories.set(string, { green, red });
-                } else {
-                    red++;
-                    candleVictories.set(string, { green, red });
-                }
-            }
-        }
+        lougitics(horario, candleVictories);
     }
 
+    // for (let index = 0; index < horariossfive.length; index++) {
+    //     const horario = horariossfive[index];
+    //     lougitics(horario, candleVictoriesFive);
+    // }
 
-    console.log('horariosachou');
+
+
     for (var [key, value] of candleVictories.entries()) {
-        if (value.green >= 10) {
-            horariosachou.push(key + "=CALL")
-        } else if (value.red >= 10) {
-            horariosachou.push(key + "=PUT")
+
+        let tudo = value.green + value.red
+        let media
+        if (value.green > value.red) {
+            media = value.green * 100 / tudo
+            if (media > 65)
+                horariosachou.push(key + '=' + media + "=" + value.green + ' ' + value.red + "=CALL")
+        } else if (value.green < value.red) {
+            media = value.red * 100 / tudo
+            if (media > 65)
+                horariosachou.push(key + '=' + media + "=" + value.green + ' ' + value.red + "=PUT")
         }
     }
-
+    console.log('horariosachou');
     console.log(horariosachou);
+    for (var [key, value] of candleVictoriesFive.entries()) {
 
+        let tudo = value.green + value.red
+        let media
+        if (value.green > value.red) {
+            media = value.green * 100 / tudo
+            if (media > 65)
+                horariosachouFive.push(key + '=' + media + "=" + value.green + ' ' + value.red + "=CALL")
+        } else if (value.green < value.red) {
+            media = value.red * 100 / tudo
+            if (media > 65)
+                horariosachouFive.push(key + '=' + media + "=" + value.green + ' ' + value.red + "=PUT")
+        }
+    }
+    // console.log('horariosachouFIVE');
+    // console.log(horariosachouFive);
+    // let horarrrr = []
+    // for (let index = 0; index < horariosachou.length; index++) {
+    //     const horariosadddd = horariosachou[index];
+    //     let hora = horariosadddd.split(' ')[1].split('=')[0]
+    //     let par = horariosadddd.split(' ')[0]
+    //     let direction = horariosadddd.split(' ')[2].split('=')[1]
+
+    //     horarrrr.push(hora + " - " + par + " - " + direction)
+
+    // }
+
+    console.log(horarrrr);
 
 
     // }
@@ -2190,6 +2230,33 @@ async function profileStuf1(message, name) {
     // }
     // }
 
+}
+
+function lougitics(horario, candleVictories) {
+    let key = horario.key;
+    let direction = horario.direction;
+    let string = key.split(' ')[0].split('-')[0] + " " + key.split(' ')[1];
+    // console.log(string + key);
+    if (!candleVictories.has(string)) {
+        if (direction == 'call') {
+            // green
+            candleVictories.set(string, { green: 1, red: 0 });
+        } else {
+            candleVictories.set(string, { green: 0, red: 1 });
+        }
+    } else {
+        let green = candleVictories.get(string).green;
+        let red = candleVictories.get(string).red;
+        // if (green + red <= 9) {
+        if (direction == 'call') {
+            // green
+            green++;
+            candleVictories.set(string, { green, red });
+        } else {
+            red++;
+            candleVictories.set(string, { green, red });
+        }
+    }
 }
 
 function profileStuf(message, name) {

@@ -6,18 +6,17 @@ const momentTz = require('moment-timezone');
 const countries = require('../country')
 const WebSocket = require('ws')
 const colors = require('colors')
+// let { customLog, setFilePath } = require('../customLog')
+// setFilePath('horarios2.txt')
+// console.log = customLog;
 
 let fsConfig = fs.readFileSync('config.json')
 let config = JSON.parse(fsConfig)
 let openedMap = new Map()
 let openedMapDigital = new Map()
 
-let fsoConfig = fs.readFileSync('horarios.json')
-let horario = JSON.parse(fsoConfig)
-
 //55099058
-// const url = 'wss://ws.trade.xoption.com/echo/websocket'
-const url = 'wss://ws.trade.exnova.com/echo/websocket'
+const url = 'wss://ws.trade.capitalbear.com/echo/websocket'
 let userBalanceId = 0
 let userBalanceIdGustavo = 0
 let userBalanceReal = 0
@@ -26,6 +25,7 @@ let amount = config.amount
 let sorosNoSoros = config.sorosNoSoros
 let stopWinInfinity = config.stopWinInfinity
 let amountInitial = amount
+let horariosObj = config.horariosObj
 let infinity = config.infinity
 if (infinity == 14) {
     amount = amount * (0.42 / 100)
@@ -69,7 +69,6 @@ let passoSorosLoss = 1
 
 let ssid = config.ssid
 
-let horariossss = horario.horariossss
 
 let sorosCount = 0
 let galeCount = 0
@@ -101,7 +100,7 @@ let buyssTimess = []
 let buyssTimessBinary = []
 
 var XLSX = require('xlsx');
-var workbook = XLSX.readFile('../Massaniello.xlsx');
+var workbook = XLSX.readFile('./Massaniello.xlsx');
 var worksheet = workbook.Sheets['Calculadora']
 // change some cell value
 // console.log(getCell('F4'));
@@ -157,7 +156,7 @@ const onOpen = () => {
 
 const onError = error => {
     console.log('Error -> WebSocket');
-    // console.log(error)
+    console.log(error)
     ws.terminate()
     ws = new WebSocket(url)
     ws.onopen = onOpen
@@ -304,6 +303,9 @@ const getLeaders = (ws) => {
 
 const buy = (amount, active_id, direction, expired, type, msg) => {
     let data
+    if (amount < 2) {
+        amount = 2
+    }
     if (typeof type == 'number') {
         data = {
             "name": "sendMessage",
@@ -346,6 +348,7 @@ const buy = (amount, active_id, direction, expired, type, msg) => {
 
     // console.log(JSON.stringify(data))
     positionOpenedSoros = true
+    // console.log(JSON.stringify(data));
     ws.send(JSON.stringify(data))
 }
 
@@ -529,23 +532,7 @@ const getActiveString = (active, map) => {
 
 let cleanned = false
 
-const b = async () => {
-    if (!!topTradersRange || copyIds.length > 0) {
 
-        let fsConfig = fs.readFileSync('config.json')
-        let config = JSON.parse(fsConfig)
-        copyIds = !isNaN(config.copyIds.split(',')[0]) && !isNaN(config.copyIds.split(',')[1]) ? config.copyIds.split(',') : []
-
-        cleanned = true
-
-        leadersArray = []
-        getLeadersBool = false
-    }
-}
-
-setInterval(() => {
-    b()
-}, 240000)//60000
 
 let currentTime
 let currentTimemmssDate
@@ -605,18 +592,7 @@ let orderIdsss = []
 
 let couu = 0
 let indexesss = []
-let timeeactual = 1
-let horariosachou = []
-
-let stringgAcepted = []
-
-setInterval(() => {
-    // console.log('candleVictories');
-    // console.log(candleVictories);
-    // console.log(candleVictories.size);
-}, 30000);
-// let moedas = [1,4,2]
-const onMessage = async e => {
+const onMessage = e => {
     if (ws.readyState === WebSocket.OPEN) {
         const message = JSON.parse(e.data)
         // console.log('data=' + e.data);
@@ -625,28 +601,15 @@ const onMessage = async e => {
             // console.log(`${currentTimehhmmss} || wiiin alcançado / Digital`.green)
         }
 
-        // if (typeof currentTimehhmmss != "undefined")
-        //     for (let index = 0; index < horariosObj.length; index++) {
-        //         const horario = horariosObj[index];
-
-        //         if (!indexesss.includes(index)) {
-        //             if (moment(moment().format("YYYY-MM-DD ") + currentTimehhmmss).isAfter(moment(moment().format("YYYY-MM-DD ") + horario.horario))) {
-        //                 buyBefor(horario.direction, activesDigitalMapString.has(horario.par) ? activesDigitalMapString.get(horario.par) : activesMapString.get(horario.par), horario.time, activesDigitalMapString.has(horario.par))
-        //                 indexesss.push(index)
-        //             }
-
-        //         }
-        //     }
-
         if (sessionBalance >= StopWin) {
             // notify('Stop', `Stop Win Alcançado...`);
             // console.log('Stop Win Alcançado...')
             // process.exit(1)
         }
 
-        // if (message.name == 'candles-generated' && message.msg) {
-        //     candleStuff(message);
-        // }
+        if (message.name == 'candles-generated' && message.msg) {
+            candleStuff(message);
+        }
 
         if (message.name == 'option-opened' && message.msg) {
             let priceOpened = message.msg.value
@@ -682,12 +645,61 @@ const onMessage = async e => {
         }
 
         if (message.name == 'profile' && message.msg) {
-
             profileStuf(message, 'live-deal-binary-option-placed')
-            profileStuf1()
+            //     for (let index = 0; index < taxasEmperium.length; index++) {
+            //         const element = taxasEmperium[index];
 
+            //         // getCandle(element.par, 60 * 5, 1)
+            //         // getCandle(4, 60 * 5, 1)
+
+            //         ws.send(JSON.stringify({ "name": "subscribeMessage", "msg": { "name": "candles-generated", "params": { "routingFilters": { "active_id": element.par } } }, "request_id": "" }))
+
+            //     }
         }
 
+
+        if (typeof currentTimehhmmss != "undefined")
+            for (let index = 0; index < horariosObj.length; index++) {
+                const horario = horariosObj[index];
+
+                if (!indexesss.includes(index)) {
+                    if (moment(moment().format("YYYY-MM-DD ") + currentTimehhmmss).isAfter(moment(moment().format("YYYY-MM-DD ") + horario.horario))) {
+                        buyBefor(horario.direction, activesDigitalMapString.has(horario.par) ? activesDigitalMapString.get(horario.par) : activesMapString.get(horario.par), horario.time, activesDigitalMapString.has(horario.par))
+                        // indexesss.push(index)
+                        horariosObj.splice(index, 1)
+                        config.horariosObj = horariosObj
+
+                        // console.log(config.horariosObj);
+                        fs.writeFile('config.json', JSON.stringify(config, null, 4), err => {
+                            // console.log(err || 'Arquivo salvo');
+                        });
+                        index--
+                    }
+
+                }
+            }
+
+        try {
+
+            if (message.name == 'option' && message.status != 2000) {
+                totalOrderss--
+                const active = parseInt(message.request_id)
+                let index = openedOrders.indexOf(parseInt(active))
+                openedOrders.splice(index, 1)
+                buysCount.set(parseInt(active), buysCount.get(parseInt(active)) - 1)
+                console.log(`${currentTimehhmmss} || Erro ao comprar -> ${getActiveString(`${active}`, activesMapString)}`.red)
+                console.log('RES = ' + e.data)
+                notify('Error', `Erro ao comprar -> ${getActiveString(`${active}`, activesMapString)}`);
+                if (soros)
+                    positionOpenedSoros = false
+                if (gale)
+                    positionOpenedGale = false
+                buysss = []
+            }
+
+        } catch (error) {
+
+        }
         if (message.name == 'digital-option-placed' && message.status != 2000) {
             totalOrderss--
             const active = parseInt(message.request_id.split('/')[0])
@@ -718,12 +730,12 @@ const onMessage = async e => {
 
         if (message.name == 'heartbeat' || message.name == 'timesync') {
             currentTime = message.msg
-            currentTimehhmm = moment.unix(currentTime / 1000).utcOffset(-3).add(2, 'seconds').format("HH:mm")
-            currentTimemm = moment.unix(currentTime / 1000).utcOffset(-3).add(2, 'seconds').format("mm")
-            currentTimess = moment.unix(currentTime / 1000).utcOffset(-3).add(2, 'seconds').format("ss")
-            currentTimehh = moment.unix(currentTime / 1000).utcOffset(-3).add(2, 'seconds').format("HH")
-            currentTimemmssDate = moment.unix(currentTime / 1000).utcOffset(-3).add(2, 'seconds').format("YYYY-MM-DD HH:mm:ss")
-            currentTimehhmmss = moment.unix(currentTime / 1000).utcOffset(-3).add(2, 'seconds').format("HH:mm:ss")
+            currentTimehhmm = moment.unix(currentTime / 1000).utcOffset(-3).add(3, 'seconds').format("HH:mm")
+            currentTimemm = moment.unix(currentTime / 1000).utcOffset(-3).add(3, 'seconds').format("mm")
+            currentTimess = moment.unix(currentTime / 1000).utcOffset(-3).add(3, 'seconds').format("ss")
+            currentTimehh = moment.unix(currentTime / 1000).utcOffset(-3).add(3, 'seconds').format("HH")
+            currentTimemmssDate = moment.unix(currentTime / 1000).utcOffset(-3).add(3, 'seconds').format("YYYY-MM-DD HH:mm:ss")
+            currentTimehhmmss = moment.unix(currentTime / 1000).utcOffset(-3).add(3, 'seconds').format("HH:mm:ss")
             connectedd = true
             // console.log(currentTimess);
             let timeIntoo = parseInt(currentTimehhmm.substring(currentTimehhmm.length - 1, currentTimehhmm.length));
@@ -769,71 +781,14 @@ const onMessage = async e => {
             }
         }
 
-        if (message.name == 'candles') {
-            candleStuff(message);
-        }
+        // if (message.name == 'candles') {
+        //     candleStuff(message);
+        // }
         // // }
 
     }
-
-    async function calldo(hoorr) {
-        for (let index = 0; index < hoorr.length; index++) {
-            const hoo = hoorr[index];
-            let parInt = activesMapString.get(hoo.par);
-            console.log(hoo);
-            for (let indexj = 1; indexj < 20; indexj++) {
-                let to = parseInt(moment(moment().format("YYYY-MM-DD ") + hoo.horario).subtract(indexj, 'days').utcOffset(0).format('X'));
-                dayyyyyyyyy = moment(moment().format("YYYY-MM-DD ") + hoo.horario).subtract(indexj, 'days').utcOffset(-3).format('YYYY-MM-DD HH:mm')
-                console.log(dayyyyyyyyy);
-                // let to = parseInt(moment(moment().format("YYYY-MM-DD ") + hoo.horario).utcOffset(0).format('X'))
-                // currentTimehh = moment.unix(currentTime / 1000).utcOffset(-3).add(2, 'seconds').format("HH")
-                // console.log(to);
-                if (hoo.time == 5)
-                    timeeactual = 5
-
-                getCandle(parInt, hoo.time == 1 ? 60 : 300, 1, to);
-
-
-                let dayiM = moment(moment().format("YYYY-MM-DD ") + hoo.horario).subtract(indexj, 'days').utcOffset(-3).format('HH:mm')
-                let stringId = getActiveString(parInt, activesMapString) + ' ' + dayiM
-                if (candleVictories.has(parInt)) {
-                    let green = candleVictories.get(parInt).green;
-                    let red = candleVictories.get(parInt).red;
-                    if (green + red >= 9) {
-                        if (timeeactual == 1) {
-                            console.log(candleVictories);
-                        } else {
-                            console.log(candleVictoriesFive);
-
-                        }
-                        break;
-                    }
-                }
-
-                await awaittt()
-            }
-
-        }
-
-        console.log(candleVictories);
-        console.log(candleVictoriesFive);
-    }
 }
 
-let dayyyyyyyyy = ''
-
-
-const awaittt = ssid => {
-    return new Promise((resolve, reject) => {
-        const ssss = setInterval(() => {
-            if (canfoagain) {
-                canfoagain = false
-                resolve()
-                clearInterval(ssss)
-            }
-        }, 1);
-    })
-}
 
 let porcentagensMap = new Map()
 
@@ -849,293 +804,6 @@ setInterval(() => {
     // console.log(veefe);
 }, 2000);
 
-
-const onMessageGustavo = e => {
-    // if (ws.readyState === WebSocket.OPEN) {
-    const message = JSON.parse(e.data)
-
-    // console.log('RES = ' + e.data);
-    if (message.name == 'instrument-quotes-generated') {
-    }
-
-    if (message.name != 'instrument-quotes-generated' && message.name != 'api_option_init_all_result') {
-        // console.log('RES = ' + e.data)
-    }
-
-    if (message.name == 'option-opened' && message.msg) {
-        let priceOpened = message.msg.value
-        let active = message.msg.active_id
-        let direction = message.msg.direction
-
-
-        if (!galePut.includes(active)) {
-            pricesOpenedMap.set(active, {
-                priceOpened,
-                direction,
-                currentTimemm,
-            })
-        }
-        // openedOrders.push(active)
-    }
-
-    if (doispraum && StopWin >= 2) {
-        // console.log('Stop Win Alcançado...')
-        // notify('Stop', `Stop Win Alcançado...`);
-        // process.exit()
-    }
-
-    if (message.name == 'option-opened' && message.status != 0) {
-        // console.log(parseInt(moment.unix(message.msg.expiration_time).format("mm")) - parseInt(moment.unix(currentTime / 1000).utcOffset(-3).add(2, 'seconds').format("mm")))
-
-
-        // console.log(message);
-        // console.log(userBalanceReal);
-
-        let data = {
-            "name": "sendMessage",
-            "msg": {
-                "body":
-                {
-                    "price": parseFloat(amount),
-                    "active_id": message.msg.active_id,
-                    "expired": message.msg.expiration_time,
-                    "direction": message.msg.direction,
-                    "option_type_id": message.msg.option_type_id,//turbo 1 binary
-                    "user_balance_id": userBalanceReal
-                    // "user_balance_id": message.msg.balance_id
-                }
-                , "name": "binary-options.open-option", "version": "1.0"
-            },
-            "request_id": `teta`
-        }
-
-        let achouuu = false
-
-        // for (let index = 0; index < buyssTimessBinary.length; index++) {
-        //     const element = buyssTimessBinary[index];
-        //     if (element.time == message.msg.expiration_time && element.par == message.msg.active_id) {
-        //         achouuu = true
-        //         break
-        //     }
-        // }
-
-        // if (!achouuu) {
-        //     buyssTimessBinary.push({
-        //         time: message.msg.expiration_time,
-        //         par: message.msg.active_id
-        //     })
-
-        // console.log(JSON.stringify(data))
-        if (message.msg.balance_id == userBalanceId && !orderIdsss.includes(message.msg.option_id)) {
-            // ws.send(JSON.stringify(data))
-            // orderIdsss.push(message.msg.option_id)
-            // console.log(`${currentTimehhmmss} || ${message.msg.direction} / ${getActiveString(message.msg.active_id, activesMapString)} / ${amount}`);
-            // notify('[Order Binaria]', `${message.msg.direction} / ${getActiveString(message.msg.active_id, activesMapString)} / ${amount}`);
-
-        }
-        // }
-    }
-
-    if (message.name == 'position-changed') {
-        // console.log('RES = ' + e.data);
-        // positionChangedStuff(message)
-    }
-
-    if (message.name == 'profile' && message.msg) {
-        profileStufGustavo(message, 'live-deal-binary-option-placed')
-    }
-
-    if (message.name == 'option' && message.status != 2000) {
-
-        // console.log(message.status);
-
-        // totalOrderss--
-        // const active = parseInt(message.request_id)
-        // let index = openedOrders.indexOf(parseInt(active))
-        // openedOrders.splice(index, 1)
-        // buysCount.set(parseInt(active), buysCount.get(parseInt(active)) - 1)
-        // console.log(`${currentTimehhmmss} || Erro ao comprar -> ${getActiveString(`${active}`, activesMapString)}`.red)
-        // console.log('RES = ' + e.data)
-        // notify('Error', `Erro ao comprar -> ${getActiveString(`${active}`, activesMapString)}`);
-        // if (soros)
-        //     positionOpenedSoros = false
-        // if (gale)
-        //     positionOpenedGale = false
-        // buysss = []
-    } else if (message.name == 'option') {
-        // console.log('RES = ' + e.data)
-    }
-
-
-    if (message.name == 'digital-option-placed' && message.status != 2000) {
-        // totalOrderss--
-        // const active = parseInt(message.request_id)
-        // let index = openedOrders.indexOf(parseInt(active))
-        // openedOrders.splice(index, 1)
-        // buysCount.set(parseInt(active), buysCount.get(parseInt(active)) - 1)
-        // console.log(`${currentTimehhmmss} || Erro ao comprar -> ${getActiveString(`${active}`, activesMapString)}`.red)
-        // console.log('RES = ' + e.data)
-        // notify('Error', `Erro ao comprar -> ${getActiveString(`${active}`, activesMapString)}`);
-        // if (soros)
-        //     positionOpenedSoros = false
-        // if (gale)
-        //     positionOpenedGale = false
-        // buysss = []
-
-        // if (message.status == 5000 && message.msg.message == 'exposure_limit') {
-        //     let data = {//do4A20210413D174500T15MCSPT
-        //         "name": "sendMessage",
-        //         "msg": {
-        //             "name": "digital-options.place-digital-option",
-        //             "version": "1.0",
-        //             "body": {
-        //                 // "user_balance_id": userBalanceId,
-        //                 "user_balance_id": userBalanceReal,
-        //                 "instrument_id": message.request_id,
-        //                 "amount": amount.toString()
-        //             }
-        //         }, "request_id": `${message.request_id}`
-        //     }
-
-        //     ws.send(JSON.stringify(data))
-
-        //     console.log(`${currentTimehhmmss} || TENTOU DE NOVO`);
-        //     notify('[Order Digital]', `TENTOU DE NOVO`);
-
-        // }
-    } else if (message.name == 'digital-option-placed') {
-        // console.log('RES = ' + e.data)
-    }
-
-    if (message.name == 'option-closed') {
-        // console.log('RES = ' + e.data);
-        optionClosed(message)
-    }
-
-
-    if (message.name == 'heartbeat' || message.name == 'timesync') {
-        connecteddGustavo = true
-
-        //noticias...
-    }
-
-    // if (message.name == 'candles') {
-    //     let candles = message.msg.candles
-    //     let price = candles[1].close
-    //     let open = candles[1].open
-    //     let active = parseInt(message.request_id.split('/')[0])
-
-    //     pricesMap.set(parseInt(message.request_id.split('/')[0]), price)
-
-    //     // console.log(price);
-
-    //     for (var [key, value] of pricesMap.entries()) {
-    //         if (key == active) {
-    //             if (pricesOpenedMap.has(key)) {
-    //                 let openedPrice = pricesOpenedMap.get(key).priceOpened
-    //                 let direction = pricesOpenedMap.get(key).direction
-    //                 if (parseInt(currentTimess) >= 01 && parseInt(currentTimemm) == parseInt(pricesOpenedMap.get(key).currentTimemm) + 1) {
-    //                     if (direction == 'call') {
-    //                         if (value <= openedPrice) {
-    //                             galePut.push(active)
-    //                             amount *= 1.05
-    //                             buyBefor(direction, active, 1)
-    //                             amount = amountInitial
-    //                             pricesOpenedMap.delete(key)
-    //                             pricesMap.delete(key)
-    //                         } else {
-    //                             pricesOpenedMap.delete(key)
-    //                             pricesMap.delete(key)
-    //                         }
-    //                     } else {
-    //                         if (value >= openedPrice) {
-    //                             galePut.push(active)
-    //                             amount *= 1.05
-    //                             buyBefor(direction, active, 1)
-    //                             amount = amountInitial
-    //                             pricesOpenedMap.delete(key)
-    //                             pricesMap.delete(key)
-    //                         } else {
-    //                             pricesOpenedMap.delete(key)
-    //                             pricesMap.delete(key)
-    //                         }
-    //                     }
-
-    //                     if (openedOrders.includes(active)) {
-    //                         let indexx = openedOrders.indexOf(parseInt(active))
-    //                         openedOrders.splice(indexx, 1)
-    //                     }
-    //                     // console.log(openedOrders);
-    //                 }
-    //             }
-    //         }
-    //     }
-
-    // let openLast = candles[1].open
-    // let closeLast = candles[1].close
-
-
-    // for (let index = 0; index < checkCandle.length; index++) {
-    //     const element = checkCandle[index];
-    //     if (parseInt(message.request_id.split('/')[0]) == element.parInt) {
-    //         let timeInt = parseInt(currentTimehhmm.substring(currentTimehhmm.length - 2, currentTimehhmm.length));
-    //         if (timeInt == element.timeInt + (cincoum ? 1 : timeFramer)) {
-    //             // console.log(openLast);
-    //             // console.log(closeLast);
-    //             if (element.direction == 'call') {
-    //                 if (openLast < closeLast) {
-    //                     let isStopedPar = false
-    //                     for (let index = 0; index < stopOrdersPares.length; index++) {
-    //                         const stopOrdersPar = stopOrdersPares[index];
-    //                         if (getActiveString(element.parInt, activesMapString).includes(stopOrdersPar)) {
-    //                             isStopedPar = true
-    //                             break
-    //                         }
-    //                     }
-
-    //                     if (!stopOrders && !isStopedPar && (!doispraum || doispraum && openedOrders.length == 0)) {
-    //                         buyBefor(element.direction, element.parInt, 5)
-    //                     }
-    //                 }
-    //             } else {
-    //                 if (openLast > closeLast) {
-    //                     let isStopedPar = false
-    //                     for (let index = 0; index < stopOrdersPares.length; index++) {
-    //                         const stopOrdersPar = stopOrdersPares[index];
-    //                         if (getActiveString(element.parInt, activesMapString).includes(stopOrdersPar)) {
-    //                             isStopedPar = true
-    //                             break
-    //                         }
-    //                     }
-
-    //                     if (!stopOrders && !isStopedPar && (!doispraum || doispraum && openedOrders.length == 0)) {
-    //                         buyBefor(element.direction, element.parInt, 5)
-    //                     }
-
-
-    //                 }
-    //             }
-    //             // console.log(`${currentTimehhmmss} || Sinal Retirado / ${element.direction} / ${getActiveString(element.parInt, activesMapString)}`);
-    //             checkCandle.splice(index, 1)
-    //             index--
-    //         }
-    //     }
-    // }
-
-    // }
-}
-
-// setInterval(() => {
-//     if (!connectedd)
-//         console.log('CAIU CONEXAO');
-//     connectedd = false
-// }, 5000);
-
-// setInterval(() => {
-//     if (!connecteddGustavo)
-//         // console.log('CAIU CONEXAO GUSTAVO');
-//         connecteddGustavo = false
-// }, 5000);
 
 let pricesMap = new Map()
 let pricesOpenedMap = new Map()
@@ -1188,89 +856,42 @@ let openedOrderIds = []
 
 let m15Expires = []
 let candleId = new Map()
-let candleVictories = new Map()
-let candleVictoriesFive = new Map()
-let canfoagain = false
-let counttt = 0
-let canStop = false
+
 function candleStuff(message) {
-    let candles = message.msg.candles;
-
-    //     process.stdout.write("Esta é a linha atual. "); // Imprime sem quebra de linha
-    // setTimeout(() => {
-    //   process.stdout.clearLine(); // Limpa a linha atual
-    //   process.stdout.cursorTo(0); // Move o cursor para a coluna 0
-    //   process.stdout.write("Esta é a nova linha."); // Substitui a linha atual
-    //   process.stdout.write("\n"); // Adiciona uma quebra de linha no final
-    // }, 2000); // Após 2 segundos
-
-    if (candles) {
-        // console.log(candles);
-        let candleZ = candles[0]
-        to = candleZ.from
-        let parInt = parseInt(message.request_id.split('/')[0]);
-        for (let index = candles.length - 1; index >= 0; index--) {
-
-            const candle = candles[index];
-            let hh = parseInt(moment.unix(candle.from).utcOffset(-3).format("HH"))
-            // let found = false
-            // for (let i = 0; i < horariossss.length; i++) {
-            //     const element = horariossss[i];
-            //     if (element.key == dayi) {
-            //         found = true
-            //         break
-            //     }
-            // }
-            // if (found) {
-            //     continue
-            // }
-
-            if (hh < 17 && hh > 0) {
-                counttt++
-                let dayi = moment.unix(candle.from).utcOffset(-3).format("YYYY-MM-DD HH:mm")
-                let key = getActiveString(parInt, activesDigitalMapStringaaa) + "-" + dayi
-                console.log(key);
-                if (candle.open != candle.close)
-                    if (candle.open < candle.close) {
-                        // green
-                        horariossss.push({ key, direction: 'call' })
+    for (let index = 0; index < taxasEmperium.length; index++) {
+        const taxasEmper = taxasEmperium[index];
+        if (!openedOrderIds.includes(taxasEmper.countid)) {
+            if (taxasEmper.par == message.msg.active_id) {
+                let close = message.msg.value
+                // console.log(close);
+                if (taxasEmper.direction == 'call') {
+                    if (close <= taxasEmper.taxa) {
+                        if (!canEnter.includes(taxasEmper.par) && !cantEnter.includes(taxasEmper.par)) {
+                            cantEnter.push(taxasEmper.par)
+                        }
+                        if (canEnter.includes(taxasEmper.par))
+                            checkGatilho(taxasEmper, message, 'call');
                     } else {
-                        horariossss.push({ key, direction: 'put' })
+                        if (!canEnter.includes(taxasEmper.par) && !cantEnter.includes(taxasEmper.par)) {
+                            canEnter.push(taxasEmper.par)
+                        }
                     }
+                } else {
+                    if (close >= taxasEmper.taxa) {
+                        if (!canEnter.includes(taxasEmper.par) && !cantEnter.includes(taxasEmper.par)) {
+                            cantEnter.push(taxasEmper.par)
+                        }
+                        if (canEnter.includes(taxasEmper.par))
+                            checkGatilho(taxasEmper, message, 'put');
+                    } else {
+                        if (!canEnter.includes(taxasEmper.par) && !cantEnter.includes(taxasEmper.par)) {
+                            canEnter.push(taxasEmper.par)
+                        }
+                    }
+                }
             }
-            // console.log(dayi)
-            // let dayiM = moment.unix(candle.from).utcOffset(-3).format("HH:mm")
-            // let parInt = parseInt(message.request_id.split('/')[0]);
-
-            // let stringId = getActiveString(parInt, activesMapString) + ' ' + dayiM
-            // console.log(stringId);
-            // if (stringgAcepted.includes(dayi))
-            //     if (timeeactual == 1) {
-            //         dologicss(candle, stringId, candleVictories);
-            //         // console.log(candleVictories);
-            //     } else {
-            // dologicss(candle, stringId, candleVictoriesFive);
-            //         // console.log(candleVictoriesFive);
-            //     }
-
         }
-
-        // horario.horariossss = horariossss
-        // fs.writeFile('horarios.json', JSON.stringify(horario, null, 4), err => {
-        //     // console.log(err || 'Arquivo salvo');
-        // });
-
-        console.log('aaaaaaaaaaaa');
-        // to = null
-        canfoagain = true
-
     }
-    // process.stdout.cursorTo(0);
-    // process.stdout.write(counttt.toString());
-    // setTimeout(() => {
-    //     process.stdout.clearLine();
-    // }, 200);
-    // console.log(counttt);
 }
 
 let onstart = []
@@ -1295,38 +916,6 @@ setInterval(() => {
 
 let canEnter = []
 let cantEnter = []
-function dologicss(candle, stringId, candleVictories) {
-    if (dayyyyyyyyy == moment.unix(candle.from).utcOffset(-3).format("YYYY-MM-DD HH:mm"))
-        if (!candleVictories.has(stringId)) {
-            if (candle.open != candle.close) {
-                if (candle.open < candle.close) {
-                    // green
-                    candleVictories.set(stringId, { green: 1, red: 0 });
-                } else {
-                    candleVictories.set(stringId, { green: 0, red: 1 });
-                }
-            }
-        } else {
-            if (candle.open != candle.close) {
-                let green = candleVictories.get(stringId).green;
-                let red = candleVictories.get(stringId).red;
-                if (green + red <= 9) {
-                    if (candle.open < candle.close) {
-                        // green
-                        green++;
-                        candleVictories.set(stringId, { green, red });
-                    } else {
-                        red++;
-                        candleVictories.set(stringId, { green, red });
-                    }
-                } else {
-                    // console.log(candleVictories);
-                    canStop = true
-                }
-            }
-        }
-}
-
 function checkGatilho(taxasEmper, message, direction) {
     if (taxasEmper.gatilho == 'ONSTART_30' && parseInt(currentTimess) <= 31) {
         doOrder(taxasEmper, message, direction);
@@ -1575,12 +1164,12 @@ function buyBefor(direction, parInt, type, gatilho) {
     let hourmm
     if (type == 1) {
         // if (gatilho == 'ONSTART_30') {
-        //     hourmm = moment.unix(currentTime / 1000).utcOffset(-3).add(2, 'seconds').add(1, 'm').format("HH:mm");
+        //     hourmm = moment.unix(currentTime / 1000).utcOffset(-3).add(3, 'seconds').add(1, 'm').format("HH:mm");
         // } else {
         if (parseInt(currentTimess) >= 31) {
-            hourmm = moment.unix(currentTime / 1000).utcOffset(-3).add(2, 'seconds').add(2, 'm').format("HH:mm");
+            hourmm = moment.unix(currentTime / 1000).utcOffset(-3).add(3, 'seconds').add(2, 'm').format("HH:mm");
         } else {
-            hourmm = moment.unix(currentTime / 1000).utcOffset(-3).add(2, 'seconds').add(1, 'm').format("HH:mm");
+            hourmm = moment.unix(currentTime / 1000).utcOffset(-3).add(3, 'seconds').add(1, 'm').format("HH:mm");
         }
         // }
     } else if (type == 5) {
@@ -1588,9 +1177,9 @@ function buyBefor(direction, parInt, type, gatilho) {
         //     hourmm = moment.unix(currentTime / 1000).utcOffset(-3).add(2, 'seconds').add(5, 'm').format("HH:mm");
         // } else {
         if (parseInt(currentTimess) >= 31 && (timeInt == 4 || timeInt == 9)) {
-            hourmm = moment.unix(currentTime / 1000).utcOffset(-3).add(2, 'seconds').add(6, 'm').format("HH:mm");
+            hourmm = moment.unix(currentTime / 1000).utcOffset(-3).add(3, 'seconds').add(6, 'm').format("HH:mm");
         } else {
-            hourmm = moment.unix(currentTime / 1000).utcOffset(-3).add(2, 'seconds').add(5, 'm').format("HH:mm");
+            hourmm = moment.unix(currentTime / 1000).utcOffset(-3).add(3, 'seconds').add(timeFrameL, 'm').format("HH:mm");
         }
         // }
     } else {
@@ -1599,9 +1188,9 @@ function buyBefor(direction, parInt, type, gatilho) {
         // } else {
         let minute = parseInt(currentTimemm)
         if (parseInt(currentTimess) >= 31 && (minute == 14 || minute == 29 || minute == 44 || minute == 59)) {
-            hourmm = moment.unix(currentTime / 1000).utcOffset(-3).add(2, 'seconds').add(16, 'm').format("HH:mm");
+            hourmm = moment.unix(currentTime / 1000).utcOffset(-3).add(3, 'seconds').add(16, 'm').format("HH:mm");
         } else {
-            hourmm = moment.unix(currentTime / 1000).utcOffset(-3).add(2, 'seconds').add(15, 'm').format("HH:mm");
+            hourmm = moment.unix(currentTime / 1000).utcOffset(-3).add(3, 'seconds').add(timeFrameL, 'm').format("HH:mm");
         }
         // }
     }
@@ -1615,8 +1204,11 @@ function checkOpenedPayoutBeforeBuy(parInt, direction, hourmm, timeFrame) {
     let turboPayout = null;
     let digitalPayout = null;
 
-    openOrderDigital(direction, parInt, hourmm, timeFrame);
-    // openOrderBinary(direction, parInt, hourmm);
+    if (activesDigitalMapString.has(getActiveString(parInt, activesMapString))) {
+        openOrderDigital(direction, parInt, hourmm, timeFrame);
+    } else {
+        openOrderBinary(direction, parInt, hourmm);
+    }
     // return;
 
     // if (timeFrame == 1 && parseInt(currentTimess) < 30) {
@@ -1694,14 +1286,14 @@ function openOrderDigital(direction, parInt, hourmm, timeFrame) {
     openedOrders.push(parInt);
 }
 
-function getCandle(active_id, size, count, to) {
+function getCandle(active_id, size, count) {
     let data = {
         "name": "get-candles",
         "version": "2.0",
         "body": {
             "active_id": active_id,
             "size": size,
-            "to": to,
+            "to": currentTime,
             "count": count,
         }
     };
@@ -1713,6 +1305,7 @@ let galePut = []
 let galecCall = []
 
 function optionClosed(message) {
+
     let amounth = buysss[0] && buysss[0].amount ? buysss[0].amount : amount
     let active = message.msg.active_id
     let direction = message.msg.direction
@@ -1721,59 +1314,53 @@ function optionClosed(message) {
         let index = openedOrders.indexOf(parseInt(active))
         openedOrders.splice(index, 1)
     }
-
-    console.log(message);
-
-    profitAmount = message.msg.profit_amount - amounth
+    profitAmount = message.msg.result == 'win' ? message.msg.profit_amount - message.msg.amount : message.msg.amount * -1
     sessionBalance += profitAmount
 
     if (profitAmount < 0) {
 
-        losss++
-        // console.log(`${currentTimehhmmss} || ${profitAmount < 0 ? "Loss" : "Win"} ${profitAmount.toFixed(2)} / Balance: ${parseFloat(sessionBalance.toFixed(2))} / ${getActiveString(active, activesMapString) ? getActiveString(active, activesMapString) : active} / Binario`.red)
-        // notify('Loss', `${profitAmount < 0 ? "Loss" : "Win"} ${profitAmount.toFixed(2)} / Balance: ${parseFloat(sessionBalance.toFixed(2))} / ${getActiveString(active, activesMapString) ? getActiveString(active, activesMapString) : active} / Binario`);
-        if (doispraum) {
-            winss = 0
-            console.log(`${currentTimehhmmss} || StopLoss alcançado`.red)
-            process.exit(1)
-        } else {
+        los++
+        // console.log('los=', los);
+        countResult--
 
-            if (gale)
-                if (!galePut.includes(active)) {
-                    //         galePut.push(active)
-                    //         amount *= 1.05
-                    //         buyBefor(direction, active, 1)
-                    //         amount = amountInitial
-                } else {
-                    let index = galePut.indexOf(parseInt(active))
-                    galePut.splice(index, 1)
-                }
-        }
+        if (config.conta == "real")
+            veefe += "L"
+        console.log('los=', los)
+        console.log('winss=', winss)
+        console.log('countResult=', countResult);
+        losss++
+        lossMass('L');
+        console.log(`${currentTimehhmmss} || ${profitAmount < 0 ? "Loss" : "Win"} ${profitAmount.toFixed(2)} / Balance: ${parseFloat(sessionBalance.toFixed(2))} / ${getActiveString(active, activesMapString) ? getActiveString(active, activesMapString) : active} / Digital`.red)
+        notify('Loss', `${profitAmount < 0 ? "Loss" : "Win"} ${profitAmount.toFixed(2)} / Balance: ${parseFloat(sessionBalance.toFixed(2))} / ${getActiveString(active, activesMapString) ? getActiveString(active, activesMapString) : active} / Digital`);
+
+
+        // console.log(`${currentTimehhmmss} || StopLoss = ${StopLoss}`)
+        // buyBefor('put', 1, 1)
+
+        positionOpenedSoros = false
+        console.log('=====================');
     } else if (profitAmount == 0) {
-        // console.log(`${currentTimehhmmss} || ${profitAmount < 0 ? "Loss" : "Win"} ${profitAmount.toFixed(2)} / Balance: ${parseFloat(sessionBalance.toFixed(2))} / ${getActiveString(active, activesMapString) ? getActiveString(active, activesMapString) : active} / Binario`.red)
-        // notify('Empate', `Empate ${profitAmount.toFixed(2)} / Balance: ${parseFloat(sessionBalance.toFixed(2))} / ${getActiveString(active, activesMapString) ? getActiveString(active, activesMapString) : active} / Binario`);
+        console.log(`${currentTimehhmmss} || ${profitAmount < 0 ? "Loss" : "Win"} ${profitAmount.toFixed(2)} / Balance: ${parseFloat(sessionBalance.toFixed(2))} / ${getActiveString(active, activesMapString) ? getActiveString(active, activesMapString) : active} / Digital`.red)
+        notify('Empate', `Empate ${profitAmount.toFixed(2)} / Balance: ${parseFloat(sessionBalance.toFixed(2))} / ${getActiveString(active, activesMapString) ? getActiveString(active, activesMapString) : active} / Digital`);
     } else {
         winss++
-        // if (amount != amountInitial) {
-        //     amount = amountInitial
-        // } else {
-        //     amount += profitAmount
-        // }
-        if (doispraum) {
-            StopWin++
-            amount += profitAmount.toFixed(2)
-            setWinss(amount);
-        }
+        countResult++
+        // winMass();
+        if (config.conta == "real")
+            veefe += "W"
 
-        // if (gale) {
-        //     let index = galePut.indexOf(parseInt(active))
-        //     galePut.splice(index, 1)
-        // }
+        console.log('los=', los)
+        console.log('winss=', winss)
+        console.log('countResult=', countResult);
+        winMass()
+        // StopWin++
+        // console.log(`${currentTimehhmmss} || StopWin = ${StopWin}`)
+        console.log(`${currentTimehhmmss} || ${profitAmount < 0 ? "Loss" : "Win"} ${profitAmount.toFixed(2)} / Balance: ${parseFloat(sessionBalance.toFixed(2))} / ${getActiveString(active, activesMapString) ? getActiveString(active, activesMapString) : active} / Digital`.green)
+        notify('Wiiin!!', `${profitAmount < 0 ? "Loss" : "Win"} ${profitAmount.toFixed(2)} / Balance: ${parseFloat(sessionBalance.toFixed(2))} / ${getActiveString(active, activesMapString) ? getActiveString(active, activesMapString) : active} / Digital`);
 
-        // console.log(`${currentTimehhmmss} || ${profitAmount < 0 ? "Loss" : "Win"} ${profitAmount.toFixed(2)} / Balance: ${parseFloat(sessionBalance.toFixed(2))} / ${getActiveString(active, activesMapString) ? getActiveString(active, activesMapString) : active} / Binario`.green)
-        // notify('Wiiin!!', `${profitAmount < 0 ? "Loss" : "Win"} ${profitAmount.toFixed(2)} / Balance: ${parseFloat(sessionBalance.toFixed(2))} / ${getActiveString(active, activesMapString) ? getActiveString(active, activesMapString) : active} / Binario`);
+        positionOpenedSoros = false
+        console.log('=====================');
     }
-    positionOpenedSoros = false
 }
 
 function setWinss(amount) {
@@ -1802,69 +1389,16 @@ let orderopenned = []
 let cicleSession = 0
 
 
-const getCandlee = setInterval(() => {
+// const getCandlee = setInterval(() => {
+// for (var [key, value] of activesMapString) {
+// for (let index = 0; index < taxasEmperium.length; index++) {
+// const element = taxasEmperium[index];
 
-    // if (ws && ws.readyState === WebSocket.OPEN) {
-    //     // if ((taxasss.includes("CALL") || taxasss.includes("PUT"))) {
-    //     // console.log('===== NOVO SINAL AGENDADO ======');
-    //     let horarioArray = horarios.split('\n')
-    //     let time = 1
-    //     let hoorr = []
-    //     for (let index = 0; index < horarioArray.length; index++) {
-    //         const linha = horarioArray[index];
+// getCandle(element.par, 60 * 5, 1)
+// getCandle(4, 60 * 5, 1)
 
-    //         if (linha.includes('M5')) {
-    //             time = 5
-    //         }
-
-    //         if (linha.includes('M1')) {
-    //             time = 1
-    //         }
-
-    //         if (linha.includes('CALL') || linha.includes('PUT')) {
-    //             let words = linha.split(' ')
-    //             let horario = words[0]
-    //             let par = words[2]
-    //             let direction = words[4].toLowerCase()
-
-    //             // if (paresVer.includes(par)) {
-    //             //     paresVer.push(par)
-    //             // }
-    //             hoorr.push({ horario, par, direction, time })
-    //         }
-    //     }
-
-    //     console.log(hoorr);
-    //     // }
-
-    //     for (let index = 0; index < hoorr.length; index++) {
-    //         const hoo = hoorr[index];
-    //         let parInt = activesMapString.get(hoo.par)
-    //         console.log(hoo);
-    //         for (let index = 1; index < 2; index++) {
-    //             // let to = parseInt(moment(moment().format("YYYY-MM-DD ") + hoo.horario).subtract(index, 'days').utcOffset(0).format('X'))
-    //             let to = parseInt(moment(moment().format("YYYY-MM-DD ") + hoo.horario).utcOffset(0).format('X'))
-    //             // currentTimehh = moment.unix(currentTime / 1000).utcOffset(-3).add(2, 'seconds').format("HH")
-    //             console.log(to);
-    //             getCandle(parInt, hoo.time == 1 ? 60 : 300, 1, currentTime)
-
-    //             if (candleVictories.has(parInt)) {
-    //                 let green = candleVictories.get(parInt).green
-    //                 let red = candleVictories.get(parInt).red
-    //                 if (green + red >= 10) {
-    //                     break
-    //                 }
-    //             }
-    //         }
-
-    //         break
-    //     }
-
-    //     clearInterval(getCandlee)
-    // }
-
-    // }
-}, 5000)
+// }
+// }, 500)
 
 function positionChangedStuff(message) {
     // if (!orderopenned.includes(message.msg.raw_event.instrument_id))
@@ -1918,6 +1452,7 @@ function positionChangedStuff(message) {
             // buyBefor('put', 1, 1)
 
             positionOpenedSoros = false
+            console.log('=====================');
         } else if (profitAmount == 0) {
             console.log(`${currentTimehhmmss} || ${profitAmount < 0 ? "Loss" : "Win"} ${profitAmount.toFixed(2)} / Balance: ${parseFloat(sessionBalance.toFixed(2))} / ${getActiveString(active, activesMapString) ? getActiveString(active, activesMapString) : active} / Digital`.red)
             notify('Empate', `Empate ${profitAmount.toFixed(2)} / Balance: ${parseFloat(sessionBalance.toFixed(2))} / ${getActiveString(active, activesMapString) ? getActiveString(active, activesMapString) : active} / Digital`);
@@ -1938,6 +1473,7 @@ function positionChangedStuff(message) {
             notify('Wiiin!!', `${profitAmount < 0 ? "Loss" : "Win"} ${profitAmount.toFixed(2)} / Balance: ${parseFloat(sessionBalance.toFixed(2))} / ${getActiveString(active, activesMapString) ? getActiveString(active, activesMapString) : active} / Digital`);
 
             positionOpenedSoros = false
+            console.log('=====================');
         }
 
         // if (!positionOpenedSoros)
@@ -1962,7 +1498,7 @@ async function winMass() {
     }
     // || Vee == Efee
 
-    if (getCell('I' + countMass) == '◄◄' || Vee == Efee) {
+    if (getCell('I' + countMass) == '◄◄' || ((Vee == Efee || Vee > Efee) && Vee + Efee > 25)) {
 
         for (let index = countMass; index >= 0; index--) {
             modifyCell('C' + countMass, '');
@@ -1984,15 +1520,16 @@ async function winMass() {
     config.veefe = veefe
     console.log(veefe);
     config.lastAmount = parseFloat(getCell('N12'))
-    fs.writeFile('config.json', JSON.stringify(config, null, 4), err => {
-        // console.log(err || 'Arquivo salvo');
-    });
+    if (config.conta == "real")
+        fs.writeFile('config.json', JSON.stringify(config, null, 4), err => {
+            // console.log(err || 'Arquivo salvo');
+            if (countResult >= 3) {
+                notify('Stop', `Stop WIN Alcançado...`);
+                console.log('Stop WIN Alcançado...')
+                process.exit(1)
+            }
+        });
 
-    if (countResult >= 5) {
-        notify('Stop', `Stop WIN Alcançado...`);
-        console.log('Stop WIN Alcançado...')
-        process.exit(1)
-    }
 
     console.log(amount);
 
@@ -2007,15 +1544,16 @@ function lossMass(winloss) {
 
     console.log(veefe);
     config.veefe = veefe
-    fs.writeFile('config.json', JSON.stringify(config, null, 4), err => {
-        // console.log(err || 'Arquivo salvo');
-    });
+    if (config.conta == "real")
+        fs.writeFile('config.json', JSON.stringify(config, null, 4), err => {
+            // console.log(err || 'Arquivo salvo');
+            if (countResult <= -4) {
+                notify('Stop', `Stop Loss Alcançado...`);
+                console.log('Stop Loss Alcançado...')
+                process.exit(1)
+            }
+        });
 
-    if (countResult <= -5) {
-        notify('Stop', `Stop Loss Alcançado...`);
-        console.log('Stop Loss Alcançado...')
-        process.exit(1)
-    }
 
 }
 
@@ -2053,144 +1591,6 @@ function profileStufGustavo(message, name) {
 
 let Banca = 0
 let BancaDemo = 0
-
-let to = null
-
-async function profileStuf1(message, name) {
-    counttt = 0
-    // for (var [key, value] of activesDigitalMapStringaaa.entries()) {
-    // console.log(key);
-    // if (!key.includes('OTC'))
-    // ['EURUSD', 1],
-    // ['EURGBP', 2],
-    // ['EURJPY', 4],
-    // ['AUDUSD', 99],
-    // ['AUDCAD', 7],
-    // ['GBPJPY', 3],
-    // ['GBPUSD', 5],
-    // ['USDCHF', 72],
-    // ['USDCAD', 100],
-    // ['USDJPY', 6],
-    // console.log('===============');
-    // console.log(key);
-    // console.log('===============');
-    // console.log(index);
-    // console.log(key)
-    // let to = parseInt(moment(moment().format("YYYY-MM-DD ") + hoo.horario).utcOffset(0).format('X'))
-    for (var [key, value] of activesDigitalMapStringaaa.entries()) {
-        console.log('===============');
-        console.log(key);
-        if (!key.includes('OTC'))
-            for (let indexj = 0; indexj < 20; indexj++) {
-                console.log("==================");
-                if (!to) {
-                    to = parseInt(moment(moment().format("YYYY-MM-DD ") + "17:00").subtract(indexj, 'days').utcOffset(0).format('X'))
-                    console.log('tooooooo');
-                }
-
-                console.log(to);
-                // currentTimehh = moment.unix(currentTime / 1000).utcOffset(-3).add(2, 'seconds').format("HH")
-                // console.log(to);
-                // if (hoo.time == 5)
-                //     timeeactual = 5
-
-                getCandle(value, timeeactual == 1 ? 60 : 300, 1000, to);
-                await awaittt()
-
-            }
-        to = null
-    }
-    // if (canStop) {
-    //     // console.log('canStop');
-    //     canStop = false
-
-    // }
-
-    for (let index = 0; index < horariossss.length; index++) {
-        const horario = horariossss[index];
-        let key = horario.key
-        let direction = horario.direction
-        let string = key.split(' ')[0].split('-')[0] + " " + key.split(' ')[1]
-        // console.log(string + key);
-        if (!candleVictories.has(string)) {
-            if (direction == 'call') {
-                // green
-                candleVictories.set(string, { green: 1, red: 0 });
-            } else {
-                candleVictories.set(string, { green: 0, red: 1 });
-            }
-        } else {
-            let green = candleVictories.get(string).green;
-            let red = candleVictories.get(string).red;
-            if (green + red <= 9) {
-                if (direction == 'call') {
-                    // green
-                    green++;
-                    candleVictories.set(string, { green, red });
-                } else {
-                    red++;
-                    candleVictories.set(string, { green, red });
-                }
-            }
-        }
-    }
-
-
-    console.log('horariosachou');
-    for (var [key, value] of candleVictories.entries()) {
-        if (value.green >= 10) {
-            horariosachou.push(key + "=CALL")
-        } else if (value.red >= 10) {
-            horariosachou.push(key + "=PUT")
-        }
-    }
-
-    console.log(horariosachou);
-
-
-
-    // }
-
-
-    // if (ws && ws.readyState === WebSocket.OPEN) {
-    //     // if ((taxasss.includes("CALL") || taxasss.includes("PUT"))) {
-    //     // console.log('===== NOVO SINAL AGENDADO ======');
-    //     let horarioArray = horarios.split('\n')
-    //     let time = 1
-    //     let hoorr = []
-    //     for (let index = 0; index < horarioArray.length; index++) {
-    //         const linha = horarioArray[index];
-
-    //         if (linha.includes('M5')) {
-    //             time = 5
-    //         }
-
-    //         if (linha.includes('M1')) {
-    //             time = 1
-    //         }
-
-    //         if (linha.includes('CALL') || linha.includes('PUT')) {
-    //             let words = linha.split(' ')
-    //             let horario = words[0]
-    //             let par = words[2]
-    //             let direction = words[4].toLowerCase()
-
-    //             // if (paresVer.includes(par)) {
-    //             //     paresVer.push(par)o
-    //             // }
-    //             hoorr.push({ horario, par, direction, time })
-    //         }
-    //     }
-
-    //     console.log(hoorr);
-    //     await calldo(hoorr);
-    // }
-
-
-    // }
-    // }
-
-}
 
 function profileStuf(message, name) {
     const balances = message.msg.balances
@@ -2363,20 +1763,6 @@ const activesMapString = new Map([
     ['GBPJPY-OTC', 84],
     ['AUDCAD-OTC', 86]
 ])
-
-const activesDigitalMapStringaaa = new Map([
-    ['EURUSD', 1],
-    ['EURGBP', 2],
-    ['EURJPY', 4],
-    ['AUDUSD', 99],
-    ['AUDCAD', 7],
-    ['GBPJPY', 3],
-    ['GBPUSD', 5],
-    ['USDCHF', 72],
-    ['USDCAD', 100],
-    ['USDJPY', 6],
-])
-
 const activesDigitalMapString = new Map([
     ['EURUSD', 1],
     ['EURGBP', 2],
@@ -2386,8 +1772,7 @@ const activesDigitalMapString = new Map([
     ['GBPJPY', 3],
     ['GBPUSD', 5],
     ['USDCAD', 100],
-    ['USDCHF', 72],
-    ['AUDJPY', 101],
+    // ['AUDJPY', 101],
     ['EURUSD-OTC', 76],
     ['EURGBP-OTC', 77],
     ['USDCHF-OTC', 78],
@@ -2404,9 +1789,6 @@ const loginAsync = async (ssid) => {
 
 let ssiddddd
 
-setTimeout(() => {
-    ws.send(JSON.stringify({ 'name': 'ssid', 'msg': ssid, "request_id": "" }))
-}, 8000);
 
 const doLogin = ssid => {
     return new Promise((resolve, reject) => {
@@ -2486,19 +1868,21 @@ let logged = false
 
 let ssidGustavo
 
-setInterval(() => {
+const tryconnect = setInterval(() => {
     if (!connectedd) {
         console.log('CAIU CONEXAO');
         ws.terminate()
         ws = new WebSocket(url)
-        process.exit()
+
         start()
         timeeessa = 30000
+        clearInterval(tryconnect)
     } else {
         timeeessa = 5000
     }
     connectedd = false
 }, 7000);
+
 
 
 const start = (force) => {
@@ -2508,8 +1892,8 @@ const start = (force) => {
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/117.0.0.0 Safari/537.36', // You can adjust the content type based on your needs
             // Add more headers if necessary
         };
-        // axios.post('https://api.trade.xoption.com/v2/login', {
-        axios.post('https://auth.trade.exnova.com/api/v2/login', {
+        axios.post('https://api.trade.capitalbear.com/v2/login', {
+            // axios.post('https://auth.trade.exnova.com/api/v2/login', {
             identifier: 'vinipsidonik@hotmail.com',
             password: 'gc896426'
             // identifier: "carol.davila14@outlook.com",
@@ -2527,7 +1911,7 @@ const start = (force) => {
                     clearInterval(loginn)
                 }
                 loginAsync(ssid)
-            }, 5000);
+            }, 500);
             config.ssid = ssid
             fs.writeFile('config.json', JSON.stringify(config, null, 4), err => {
                 // console.log(err || 'Arquivo salvo');
@@ -2609,37 +1993,63 @@ let countid = 0
 //         }
 // }, 1000);
 
-function startttt(taxasss, id) {
-    // if ((taxasss.includes("CALL") || taxasss.includes("PUT"))) {
-    //     console.log('===== NOVO SINAL AGENDADO ======');
-    //     let horarioArray = taxasss.split('\n')
-    //     let time = 1
-    //     for (let index = 0; index < horarioArray.length; index++) {
-    //         const linha = horarioArray[index];
+function startttt(taxasss, id, edit) {
+    if ((taxasss.includes("CALL") || taxasss.includes("PUT")) && !taxasss.includes("⏳")) {
+        console.log('===== NOVO SINAL AGENDADO ======');
+        let horarioArray = taxasss.split('\n')
+        let time = 1
+        for (let index = 0; index < horarioArray.length; index++) {
+            const linha = horarioArray[index];
 
-    //         if (linha.includes('M5')) {
-    //             time = 5
-    //         }
+            if (linha.includes('M5')) {
+                time = 5
+            }
 
-    //         if (linha.includes('M1')) {
-    //             time = 1
-    //         }
+            if (linha.includes('M1')) {
+                time = 1
+            }
 
-    //         if (linha.includes('CALL') || linha.includes('PUT')) {
-    //             let words = linha.split(' ')
-    //             let horario = words[0]
-    //             let par = words[2]
-    //             let direction = words[4].toLowerCase()
+            if (linha.includes('CALL') || linha.includes('PUT')) {
+                let words = linha.split(' ')
+                let horario = words[0]
+                let par = words[2]
+                let direction = words[4].toLowerCase()
 
-    //             // if (paresVer.includes(par)) {
-    //             //     paresVer.push(par)
-    //             // }
-    //             horariosObj.push({ horario, par, direction, time })
-    //         }
-    //     }
+                // if (paresVer.includes(par)) {
+                //     paresVer.push(par)
+                // }
 
-    //     console.log(horariosObj);
-    // }
+
+                let achoutimee = false
+                for (let indexh = 0; indexh < horariosObj.length; indexh++) {
+                    let hhhh = horariosObj[indexh]
+
+                    if (hhhh.horario == horario && par == hhhh.par && time == hhhh.time) {
+                        achoutimee = true
+                        break
+                    }
+                }
+
+                if (!achoutimee) {
+                    if (typeof currentTimehhmmss != 'undefined') {
+                        if (moment(moment().format("YYYY-MM-DD ") + currentTimehhmmss).isBefore(moment(moment().format("YYYY-MM-DD ") + horario))) {
+                            horariosObj.push({ horario, par, direction, time })
+                        }
+                    }
+                } else {
+                    console.log(`${currentTimehhmmss} || ja foi agendado`);
+                }
+            }
+        }
+
+        console.log(horariosObj);
+        config.horariosObj = horariosObj
+
+        // console.log(config.horariosObj);
+        fs.writeFile('config.json', JSON.stringify(config, null, 4), err => {
+            // console.log(err || 'Arquivo salvo');
+        });
+    }
 }
 
 let taxasss = ``
@@ -2658,7 +2068,6 @@ const { NewMessageEvent } = require("telegram/events/NewMessage");
 const { DeletedMessage } = require("telegram/events/DeletedMessage");
 const { EditedMessage } = require("telegram/events/EditedMessage");
 const { Message } = require("telegram/tl/custom/message");
-const { pair } = require('ramda');
 
 const apiId = 1537314;
 const apiHash = "1855b411a187811b71f333d904d725d9";
@@ -2689,12 +2098,12 @@ async function eventPrint(event) {
 
 async function eventPrintE(event) {
     // console.log('Edited');
-    // const message = event.message;
+    const message = event.message;
     // console.log('======================');
     // console.log(message.message);
     // console.log(message.id);
     // console.log(event.className)
-    // startttt(message.message, message.id);
+    startttt(message.message, message.id, true);
     // Checks if it's a private message (from user or bot)
     // if (event.isPrivate) {
     //     // prints sender id
@@ -2703,6 +2112,7 @@ async function eventPrintE(event) {
     //     if (message.text == "hello") {
     //         const sender = await message.getSender();
     //         console.log("sender is", sender);
+
     //         await client.sendMessage(sender, {
     //             message: `hi your id is ${message.senderId}`,
     //         });
@@ -2747,76 +2157,54 @@ async function eventPrintD(event) {
 }
 
 
-// (async () => {
-//     console.log("Loading interactive example...");
-//     const client = new TelegramClient(stringSession, apiId, apiHash, {
-//         connectionRetries: 5,
-//     });
-//     await client.start({
-//         phoneNumber: '+5554992563317',
-//         password: async () => await input.text("Please enter your password: "),
-//         phoneCode: async () =>
-//             await input.text("Please enter the code you received: "),
-//         onError: (err) => console.log(err),
-//     });
-//     console.log("You should now be connected.");
-//     console.log(client.session.save()); // Save this string to avoid logging in again
-//     // await client.sendMessage("me", { message: "Hello!" });
+(async () => {
+    // console.log("Loading interactive example...");
+    // const client = new TelegramClient(stringSession, apiId, apiHash, {
+    //     connectionRetries: 5,
+    // });
+    // await client.start({
+    //     phoneNumber: '+5554992563317',
+    //     password: async () => await input.text("Please enter your password: "),
+    //     phoneCode: async () =>
+    //         await input.text("Please enter the code you received: "),
+    //     onError: (err) => console.log(err),
+    // });
+    // console.log("You should now be connected.");
+    // console.log(client.session.save()); // Save this string to avoid logging in again
+    // // await client.sendMessage("me", { message: "Hello!" });
 
-//     client.addEventHandler(eventPrint, new NewMessage({}))
-//     client.addEventHandler(eventPrintD, new DeletedMessage({}))
-//     client.addEventHandler(eventPrintE, new EditedMessage({}))
+    // client.addEventHandler(eventPrint, new NewMessage({}))
+    // client.addEventHandler(eventPrintD, new DeletedMessage({}))
+    // client.addEventHandler(eventPrintE, new EditedMessage({}))
 
-// })();
+})();
 
 
 let day = '2023-10-14 '
 
-let horariosObj = config.horariosObj
 // let paresVer = []
-let horarios = `
-SINAIS SEM GALE
-SINAIS M1 
-
-06:15 - EURJPY - PUT 🕑 
-06:18 - GBPUSD - CALL 🕑 
-06:23 - EURGBP - PUT 🕑 
-06:27 - GBPUSD - PUT 🕑 
-07:06 - USDJPY - PUT 🕑 
-08:49 - GBPJPY - PUT 🕑 
-09:22 - AUDUSD - CALL 🕑 
-09:50 - GBPUSD - PUT 🕑 
-10:34 - EURJPY - PUT 🕑 
-11:09 - EURGBP - PUT 🕑 
-11:18 - USDCAD - PUT 🕑 
-11:42 - USDJPY - CALL 🕑 
-11:48 - USDCAD - CALL 🕑 
-12:07 - GBPUSD - PUT 🕑 
-12:54 - EURGBP - PUT 🕑  
-14:37 - EURGBP - CALL 🕑 
-15:09 - USDJPY - CALL 🕑  
-
-SINAIS M5 
-
-06:15 - GBPUSD - CALL 🕑 
-07:15 - EURGBP - PUT 🕑 
-08:00 - GBPJPY - PUT 🕑 
-08:10 - USDJPY - CALL 🕑 
-08:35 - AUDUSD - CALL 🕑 
-08:35 - USDCAD - PUT 🕑 
-09:20 - EURJPY - CALL 🕑 
-11:25 - EURGBP - CALL 🕑 
-11:45 - GBPJPY - PUT 🕑 
-11:55 - USDJPY - PUT 🕑 
-11:55 - EURJPY - CALL 🕑 
-12:00 - EURGBP - PUT 🕑 
-16:15 - EURJPY - PUT 🕑 
-`
+let horarios = ``
 
 
-// horarios = '09:22 - AUDUSD - CALL'
 
-// if (horarios)
-// startttt(horarios)
+if (horarios) {
+    setTimeout(() => {
+
+        let strdate = moment().format("YYYY-MM-DD ") + currentTimehhmm
+        console.log('strdate=', strdate);
+        let dateAfter = moment(moment(strdate).add(1, 'days').format("YYYY-MM-DD ") + "00:01")
+        console.log('dateAfter=', dateAfter);
+        const inrtt = setInterval(() => {
+            if (typeof currentTime != "undefined" && moment(moment().format("YYYY-MM-DD ") + currentTimehhmm).isAfter(dateAfter)) {
+                startttt(horarios)
+                clearInterval(inrtt)
+            }
+        }, 10000);
+    }, 10000);
+} else {
+    console.log(horariosObj);
+    // moment().add(1, 'days').format("YYYY-MM-DD ") + "00:01")
+
+}
 // LLLLWLLWWL
 // 233.40196566958488

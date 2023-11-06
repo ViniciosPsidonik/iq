@@ -777,6 +777,8 @@ const onMessage = async e => {
 
 let winsMap = new Map()
 let winsMap2 = new Map()
+
+let winsMap3 = new Map()
 async function calldo(hoorr, winsMap) {
     for (let index = 0; index < hoorr.length; index++) {
         const hoo = hoorr[index];
@@ -2161,8 +2163,26 @@ async function profileStuf1(message, name) {
 
             console.log(hoorr);
             await calldo(hoorr, horar.includes('tipo2') ? winsMap2 : winsMap);
+
         }
     }
+
+    if (horariosnn.length > 0) {
+        horariosnn.sort((a, b) => {
+            const nameA = a.horario.toUpperCase(); // Convert names to uppercase for case-insensitive sorting
+            const nameB = b.horario.toUpperCase();
+
+            if (nameA < nameB) {
+                return -1;
+            }
+            if (nameA > nameB) {
+                return 1;
+            }
+            return 0; // names are equal
+        });
+        await calldo(horariosnn, winsMap3);
+    }
+
     console.log(winsMap);
     let wind = 0
     let lossd = 0
@@ -2181,6 +2201,20 @@ async function profileStuf1(message, name) {
     lossd = 0
     console.log(winsMap2);
     for (var [key, value] of winsMap2.entries()) {
+        if (value.includes('win')) {
+            wind++
+        } else {
+            lossd++
+        }
+    }
+
+    console.log('wind=', wind);
+    console.log('lossd=', lossd);
+
+    wind = 0
+    lossd = 0
+    console.log(winsMap3);
+    for (var [key, value] of winsMap3.entries()) {
         if (value.includes('win')) {
             wind++
         } else {
@@ -2777,49 +2811,102 @@ let horariosObj = config.horariosObj
 // let paresVer = []
 let horarios = [`
 tipo1
-EURUSD 15:42=PUT
-EURGBP 11:13=PUT
-EURGBP 06:21=PUT
-EURGBP 02:34=CALL
-EURJPY 10:50=CALL
-AUDUSD 10:51=PUT
-GBPJPY 08:14=CALL
-GBPJPY 03:50=PUT
-GBPUSD 14:55=CALL
-USDCHF 16:33=CALL
-USDCAD 04:07=CALL
-USDJPY 07:59=CALL
-EURUSD 05:44=CALL
-EURGBP 11:02=CALL
-EURGBP 03:06=PUT
-EURJPY 15:07=CALL
-EURJPY 01:59=PUT
-AUDUSD 08:39=CALL
-GBPJPY 05:01=PUT
-GBPJPY 03:41=CALL
-USDCHF 15:42=CALL
-USDCAD 15:41=PUT
-USDJPY 13:36=CALL
-USDJPY 01:55=CALL
+EURUSD 14:00=CALL
+EURUSD 10:13=CALL
+EURUSD 02:59=PUT
+EURGBP 05:40=CALL
+EURGBP 04:12=PUT
+EURJPY 07:59=CALL
+EURJPY 03:05=CALL
+AUDUSD 15:18=CALL
+AUDUSD 10:25=PUT
+AUDCAD 02:03=PUT
+GBPJPY 02:35=PUT
+GBPUSD 11:34=PUT
+USDCHF 04:38=PUT
+USDCAD 16:32=PUT
+USDCAD 03:23=CALL
+USDJPY 03:58=PUT
+EURUSD 12:24=PUT
+EURUSD 09:21=CALL
+EURGBP 06:29=CALL
+EURGBP 05:14=PUT
+EURJPY 08:51=CALL
+EURJPY 03:59=CALL
+EURJPY 02:51=PUT
+AUDUSD 11:25=PUT
+AUDUSD 04:45=PUT
+GBPJPY 17:24=CALL
+GBPUSD 17:34=PUT
+GBPUSD 11:25=PUT
+USDCHF 02:54=PUT
+USDCAD 10:57=CALL
+USDJPY 17:02=PUT
+
 `,
+    //     `
+    // tipo2
+
+    // EURUSD 13:35=65.92592592592592=46 89=PUT
+    // EURUSD 09:02=67.4074074074074=91 44=CALL
+    // EURUSD 04:56=65.69343065693431=90 47=CALL
+    // EURGBP 06:58=65.94202898550725=47 91=PUT
+    // EURGBP 06:13=65.92592592592592=89 46=CALL
+    // EURGBP 04:30=68.34532374100719=95 44=CALL
+    // EURGBP 03:12=66.66666666666667=45 90=PUT
+    // AUDUSD 12:42=65.67164179104478=46 88=PUT
+    // AUDCAD 12:57=67.6470588235294=44 92=PUT
+    // GBPUSD 14:54=68.38235294117646=43 93=PUT
+    // USDCHF 09:09=69.34306569343066=95 42=CALL
+    // USDCHF 01:38=65.07936507936508=44 82=PUT
+    // USDCHF 00:13=65.89147286821705=44 85=PUT
+    // USDCAD 13:03=65.94202898550725=91 47=CALL
+    // USDCAD 10:57=65.41353383458646=46 87=PUT`
+    //     ,
     `
 tipo2
-EURUSD 09:02=65.92592592592592=89 46=CALL
-EURGBP 06:58=68.1159420289855=44 94=PUT
-EURGBP 04:30=66.18705035971223=92 47=CALL
-AUDUSD 12:42=66.41791044776119=45 89=PUT
-AUDCAD 12:57=66.91176470588235=45 91=PUT
-GBPUSD 14:54=68.38235294117646=43 93=PUT
-USDCHF 09:09=70.8029197080292=97 40=CALL
-USDCHF 03:18=65.69343065693431=90 47=CALL
-USDCAD 13:03=66.66666666666667=92 46=CALL
-USDCAD 11:08=66.18705035971223=47 92=PUT
-USDCAD 09:56=65.67164179104478=88 46=CALL
-USDCAD 12:57=66.91176470588235=45 91=PUT
-USDJPY 12:57=66.18705035971223=92 47=CALL`
-
+EURUSD 14:35=65.92592592592592=46 89=PUT
+EURUSD 10:02=67.4074074074074=91 44=CALL
+EURUSD 05:56=65.69343065693431=90 47=CALL
+EURGBP 07:58=65.94202898550725=47 91=PUT
+EURGBP 07:13=65.92592592592592=89 46=CALL
+EURGBP 05:30=68.34532374100719=95 44=CALL
+EURGBP 04:12=66.66666666666667=45 90=PUT
+AUDUSD 13:42=65.67164179104478=46 88=PUT
+AUDCAD 13:57=67.6470588235294=44 92=PUT
+GBPUSD 15:54=68.38235294117646=43 93=PUT
+USDCHF 10:09=69.34306569343066=95 42=CALL
+USDCHF 02:38=65.07936507936508=44 82=PUT
+USDCHF 01:13=65.89147286821705=44 85=PUT
+USDCAD 14:03=65.94202898550725=91 47=CALL
+USDCAD 11:57=65.41353383458646=46 87=PUT
+`
 ]
 
+
+let horariosnn = [
+    // { horario: '13:56', par: 'EURUSD', direction: 'call', time: 1 },
+    // { horario: '14:04', par: 'GBPJPY', direction: 'put', time: 1 },
+    // { horario: '14:44', par: 'EURGBP', direction: 'put', time: 1 },
+    // { horario: '15:07', par: 'EURJPY', direction: 'call', time: 1 },
+    // { horario: '15:31', par: 'GBPUSD', direction: 'put', time: 1 },
+    // { horario: '15:49', par: 'AUDUSD', direction: 'put', time: 1 },
+    // { horario: '16:12', par: 'EURGBP', direction: 'call', time: 1 },
+    // { horario: '16:23', par: 'USDJPY', direction: 'call', time: 1 },
+    // { horario: '16:34', par: 'AUDCAD', direction: 'put', time: 1 },
+    // { horario: '13:35', par: 'EURUSD', direction: 'put', time: 5 },
+    // { horario: '14:05', par: 'USDCHF', direction: 'call', time: 5 },
+    // { horario: '14:30', par: 'EURUSD', direction: 'put', time: 5 },
+    // { horario: '14:30', par: 'GBPUSD', direction: 'put', time: 5 },
+    // { horario: '14:35', par: 'USDJPY', direction: 'call', time: 5 },
+    // { horario: '15:15', par: 'EURJPY', direction: 'put', time: 5 },
+    // { horario: '15:55', par: 'EURUSD', direction: 'put', time: 5 },
+    // { horario: '15:55', par: 'GBPJPY', direction: 'put', time: 5 },
+    // { horario: '15:55', par: 'EURJPY', direction: 'put', time: 5 },
+    // { horario: '16:35', par: 'AUDUSD', direction: 'put', time: 5 }
+
+
+]
 
 // horarios = '09:22 - AUDUSD - CALL'
 

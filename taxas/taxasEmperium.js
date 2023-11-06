@@ -11,6 +11,9 @@ let fsConfig = fs.readFileSync('config.json')
 let config = JSON.parse(fsConfig)
 let openedMap = new Map()
 let openedMapDigital = new Map()
+let { customLog, setFilePath } = require('../customLog')
+setFilePath('taxas.txt')
+console.log = customLog;
 
 //55099058
 // const url = 'wss://ws.trade.exnova.com/echo/websocket'
@@ -153,7 +156,7 @@ const onOpen = () => {
 
 const onError = error => {
     console.log('Error -> WebSocket');
-    // console.log(error)
+    console.log(error)
     ws.terminate()
     ws = new WebSocket(url)
     ws.onopen = onOpen
@@ -300,6 +303,9 @@ const getLeaders = (ws) => {
 
 const buy = (amount, active_id, direction, expired, type, msg) => {
     let data
+    if (amount < 2) {
+        amount = 2
+    }
     if (typeof type == 'number') {
         data = {
             "name": "sendMessage",
@@ -1112,7 +1118,7 @@ let candleId = new Map()
 function candleStuff(message) {
     for (let index = 0; index < taxasEmperium.length; index++) {
         const taxasEmper = taxasEmperium[index];
-        if (!openedOrderIds.includes(taxasEmper.countid)) {
+        if (!openedOrderIds.includes(taxasEmper.taxa)) {
             if (taxasEmper.par == message.msg.active_id) {
                 let close = message.msg.value
                 // console.log(close);
@@ -1169,15 +1175,14 @@ setInterval(() => {
 let canEnter = []
 let cantEnter = []
 function checkGatilho(taxasEmper, message, direction) {
-
-    if (taxasEmper.gatilho == 'ONNEXT') {
-        let par = getActiveString(taxasEmper.par, activesMapString)
-        console.log(`${currentTimehhmmss} || taxasEmper.taxa= ${taxasEmper.taxa} PAR=${getActiveString(taxasEmper.par, activesMapString)}`);
-        horariosObj.push({ horario: moment.unix(currentTime / 1000).utcOffset(-3).add(1, 'minutes').format("HH:mm"), par, direction, time: taxasEmper.time })
-        openedOrderIds.push(taxasEmper.taxa);
-    } else if (taxasEmper.gatilho == 'ONSTART_30' && parseInt(currentTimess) <= 31) {
+    if (taxasEmper.gatilho.toUpperCase() == 'ONNEXT') {
+        // let par = getActiveString(taxasEmper.par, activesMapString)
+        // console.log(`${currentTimehhmmss} || taxasEmper.taxa= ${taxasEmper.taxa} PAR=${par}`);
+        // horariosObj.push({ horario: moment.unix(currentTime / 1000).utcOffset(-3).add(1, 'minutes').format("HH:mm"), par, direction, time: taxasEmper.time })
         doOrder(taxasEmper, message, direction);
-    } else if (taxasEmper.gatilho == 'ONCLOSE_2' || taxasEmper.gatilho == 'ONSTART_30' && parseInt(currentTimess) > 31) {
+    } else if (taxasEmper.gatilho.toUpperCase() == 'ONSTART_30' && parseInt(currentTimess) <= 31) {
+        doOrder(taxasEmper, message, direction);
+    } else if (taxasEmper.gatilho.toUpperCase() == 'ONCLOSE_2' || taxasEmper.gatilho.toUpperCase() == 'ONSTART_30' && parseInt(currentTimess) > 31) {
 
         let minute = parseInt(currentTimemm);
         let timeInt = parseInt(currentTimehhmm.substring(currentTimehhmm.length - 2, currentTimehhmm.length));
@@ -1211,7 +1216,7 @@ function checkOnstart(taxasEmper, minute) {
 function doOrder(taxasEmper, message, direction) {
     if (moment(moment().format("YYYY-MM-DD ") + currentTimehhmmss).isBefore(moment(taxasEmper.date))) {
         console.log(`${currentTimehhmmss} || taxasEmper.taxa= ${taxasEmper.taxa} PAR=${getActiveString(taxasEmper.par, activesMapString)}`);
-        buyBefor(direction, message.msg.active_id, taxasEmper.time, taxasEmper.gatilho);
+        buyBefor(direction, message.msg.active_id, taxasEmper.time, taxasEmper.gatilho.toUpperCase());
     } else {
         console.log(`${currentTimehhmmss} || taxasEmper.taxa= ${taxasEmper.taxa} PAR=${getActiveString(taxasEmper.par, activesMapString)} depois do horario`);
     }
@@ -1420,20 +1425,21 @@ function buyBefor(direction, parInt, type, gatilho) {
     }
 
     let hourmm
+    let seconds30 = false
     if (type == 1) {
-        // if (gatilho == 'ONSTART_30') {
-        //     hourmm = moment.unix(currentTime / 1000).utcOffset(-3).add(2, 'seconds').add(1, 'm').format("HH:mm");
-        // } else {
-        if (parseInt(currentTimess) >= 31) {
+        if (gatilho.toUpperCase() == 'ONNEXT') {
+            hourmm = moment.unix(currentTime / 1000).utcOffset(-3).add(2, 'm').format("HH:mm");
+        } else if (parseInt(currentTimess) >= 31) {
             hourmm = moment.unix(currentTime / 1000).utcOffset(-3).add(2, 'seconds').add(2, 'm').format("HH:mm");
+            seconds30 = true
         } else {
             hourmm = moment.unix(currentTime / 1000).utcOffset(-3).add(2, 'seconds').add(1, 'm').format("HH:mm");
         }
         // }
     } else if (type == 5) {
-        // if (gatilho == 'ONSTART_30') {
+        // if (gatilho.toUpperCase() == 'ONNEXT') {
         //     hourmm = moment.unix(currentTime / 1000).utcOffset(-3).add(2, 'seconds').add(5, 'm').format("HH:mm");
-        // } else {
+        // } else 
         if (parseInt(currentTimess) >= 31 && (timeInt == 4 || timeInt == 9)) {
             hourmm = moment.unix(currentTime / 1000).utcOffset(-3).add(2, 'seconds').add(6, 'm').format("HH:mm");
         } else {
@@ -1453,16 +1459,18 @@ function buyBefor(direction, parInt, type, gatilho) {
         // }
     }
     // console.log(hourmm);
-    checkOpenedPayoutBeforeBuy(parInt, direction, hourmm, type);
+    checkOpenedPayoutBeforeBuy(parInt, direction, hourmm, type, gatilho, seconds30);
 }
 
 let notOrder = []
 
-function checkOpenedPayoutBeforeBuy(parInt, direction, hourmm, timeFrame) {
+function checkOpenedPayoutBeforeBuy(parInt, direction, hourmm, timeFrame, gatilho, seconds30) {
     let turboPayout = null;
     let digitalPayout = null;
 
-    if (activesDigitalMapString.has(getActiveString(parInt, activesDigitalMapString))) {
+    if (!seconds30 && gatilho.toUpperCase() == 'ONNEXT' && activesDigitalMapString.has(getActiveString(parInt, activesDigitalMapString))) {
+        openOrderDigital(direction, parInt, hourmm, timeFrame);
+    } else if (activesDigitalMapString.has(getActiveString(parInt, activesDigitalMapString)) && gatilho.toUpperCase() != 'ONNEXT') {
         openOrderDigital(direction, parInt, hourmm, timeFrame);
     } else {
         openOrderBinary(direction, parInt, hourmm);
@@ -1564,6 +1572,7 @@ let galePut = []
 let galecCall = []
 
 function optionClosed(message) {
+
     let amounth = buysss[0] && buysss[0].amount ? buysss[0].amount : amount
     let active = message.msg.active_id
     let direction = message.msg.direction
@@ -1596,6 +1605,7 @@ function optionClosed(message) {
         // buyBefor('put', 1, 1)
 
         positionOpenedSoros = false
+        console.log('=====================');
     } else if (profitAmount == 0) {
         console.log(`${currentTimehhmmss} || ${profitAmount < 0 ? "Loss" : "Win"} ${profitAmount.toFixed(2)} / Balance: ${parseFloat(sessionBalance.toFixed(2))} / ${getActiveString(active, activesMapString) ? getActiveString(active, activesMapString) : active} / Digital`.red)
         notify('Empate', `Empate ${profitAmount.toFixed(2)} / Balance: ${parseFloat(sessionBalance.toFixed(2))} / ${getActiveString(active, activesMapString) ? getActiveString(active, activesMapString) : active} / Digital`);
@@ -1616,6 +1626,7 @@ function optionClosed(message) {
         notify('Wiiin!!', `${profitAmount < 0 ? "Loss" : "Win"} ${profitAmount.toFixed(2)} / Balance: ${parseFloat(sessionBalance.toFixed(2))} / ${getActiveString(active, activesMapString) ? getActiveString(active, activesMapString) : active} / Digital`);
 
         positionOpenedSoros = false
+        console.log('=====================');
     }
 }
 
@@ -1752,7 +1763,7 @@ async function winMass() {
     }
     // || Vee == Efee
 
-    if (getCell('I' + countMass) == '◄◄' || Vee == Efee) {
+    if (getCell('I' + countMass) == '◄◄' || ((Vee == Efee || Vee > Efee) && Vee + Efee > 25)) {
 
         for (let index = countMass; index >= 0; index--) {
             modifyCell('C' + countMass, '');
@@ -1776,13 +1787,13 @@ async function winMass() {
     config.lastAmount = parseFloat(getCell('N12'))
     fs.writeFile('config.json', JSON.stringify(config, null, 4), err => {
         // console.log(err || 'Arquivo salvo');
+        if (winss >= 5) {
+            notify('Stop', `Stop WIN Alcançado...`);
+            console.log('Stop WIN Alcançado...')
+            process.exit(1)
+        }
     });
 
-    if (winss >= 3) {
-        notify('Stop', `Stop WIN Alcançado...`);
-        console.log('Stop WIN Alcançado...')
-        process.exit(1)
-    }
 
     console.log(amount);
 
@@ -1799,13 +1810,13 @@ function lossMass(winloss) {
     config.veefe = veefe
     fs.writeFile('config.json', JSON.stringify(config, null, 4), err => {
         // console.log(err || 'Arquivo salvo');
+        if (losss >= 3) {
+            notify('Stop', `Stop Loss Alcançado...`);
+            console.log('Stop Loss Alcançado...')
+            process.exit(1)
+        }
     });
 
-    if (losss >= 3) {
-        notify('Stop', `Stop Loss Alcançado...`);
-        console.log('Stop Loss Alcançado...')
-        process.exit(1)
-    }
 
 }
 
@@ -2042,9 +2053,6 @@ const loginAsync = async (ssid) => {
 
 let ssiddddd
 
-setTimeout(() => {
-    ws.send(JSON.stringify({ 'name': 'ssid', 'msg': ssid, "request_id": "" }))
-}, 8000);
 
 const doLogin = ssid => {
     return new Promise((resolve, reject) => {
@@ -2126,14 +2134,15 @@ let logged = false
 
 let ssidGustavo
 
-setInterval(() => {
+const tryconnect = setInterval(() => {
     if (!connectedd) {
         console.log('CAIU CONEXAO');
         ws.terminate()
         ws = new WebSocket(url)
 
-        start(false)
+        start()
         timeeessa = 30000
+        clearInterval(tryconnect)
     } else {
         timeeessa = 5000
     }
@@ -2498,8 +2507,8 @@ let day = '2023-10-13 '
 let horariosObj = []
 // let paresVer = []
 let horarios = ``
+setTimeout(() => {
 
-if (horarios)
-    startttt(horarios)
-// LLLLWLLWWL
-// 233.40196566958488
+    if (horarios)
+        startttt(horarios)
+}, 10000);

@@ -7,9 +7,9 @@
     "toCloseM5": ";;;;;;;;;;;;;;;;",
     "stopWinInfinity": 1000,
     "sorosNoSoros": 1,
-    "veefe": "L",
+    "veefe": "LWLLLWLWLL",
     "ssid": "0d761bac21470446347fdc98b5365b24",
-    "lastAmount": 223.44810355208745,
+    "lastAmount": 250,
     "cores": 1,
     "infinity": 14,
     "notifyy": 0,
@@ -37,7 +37,122 @@
     "filtroPorPais": "Worldwide",
     "topTradersRange": 0,
     "kill": 0,
-    "horariosObj": [],
+    "horariosObj": [
+        {
+            "horario": "05:29",
+            "par": "EURGBP",
+            "direction": "call",
+            "time": 1
+        },
+        {
+            "horario": "06:59",
+            "par": "EURJPY",
+            "direction": "call",
+            "time": 1
+        },
+        {
+            "horario": "07:51",
+            "par": "EURJPY",
+            "direction": "call",
+            "time": 1
+        },
+        {
+            "horario": "08:21",
+            "par": "EURUSD",
+            "direction": "call",
+            "time": 1
+        },
+        {
+            "horario": "09:13",
+            "par": "EURUSD",
+            "direction": "call",
+            "time": 1
+        },
+        {
+            "horario": "10:25",
+            "par": "GBPUSD",
+            "direction": "put",
+            "time": 1
+        },
+        {
+            "horario": "10:34",
+            "par": "GBPUSD",
+            "direction": "put",
+            "time": 1
+        },
+        {
+            "horario": "11:24",
+            "par": "EURUSD",
+            "direction": "put",
+            "time": 1
+        },
+        {
+            "horario": "13:00",
+            "par": "EURUSD",
+            "direction": "call",
+            "time": 1
+        },
+        {
+            "horario": "16:34",
+            "par": "GBPUSD",
+            "direction": "put",
+            "time": 1
+        },
+        {
+            "horario": "05:45",
+            "par": "EURGBP",
+            "direction": "call",
+            "time": 5
+        },
+        {
+            "horario": "09:15",
+            "par": "EURUSD",
+            "direction": "call",
+            "time": 5
+        },
+        {
+            "horario": "11:40",
+            "par": "EURGBP",
+            "direction": "call",
+            "time": 5
+        },
+        {
+            "horario": "12:35",
+            "par": "GBPUSD",
+            "direction": "put",
+            "time": 5
+        },
+        {
+            "horario": "12:45",
+            "par": "EURGBP",
+            "direction": "put",
+            "time": 5
+        },
+        {
+            "horario": "13:30",
+            "par": "EURGBP",
+            "direction": "put",
+            "time": 5
+        },
+        {
+            "horario": "13:35",
+            "par": "EURJPY",
+            "direction": "put",
+            "time": 5
+        },
+        {
+            "horario": "13:35",
+            "par": "EURUSD",
+            "direction": "put",
+            "time": 5
+        },
+        {
+            "horario": "14:35",
+            "par": "EURGBP",
+            "direction": "put",
+            "time": 5
+        }
+    ],
     "schedules": "",
     "galeLevel": 2,
     "galeFactor": 2.2,

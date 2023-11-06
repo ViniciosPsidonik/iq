@@ -3,7 +3,7 @@ const fs = require('fs')
 const axios = require('axios')
 const moment = require('moment')
 const momentTz = require('moment-timezone');
-const countries = require('./country')
+const countries = require('../country')
 const WebSocket = require('ws')
 const colors = require('colors')
 
@@ -14,7 +14,7 @@ let openedMapDigital = new Map()
 
 //55099058
 // const url = 'wss://ws.trade.xoption.com/echo/websocket'
-const url = 'wss://ws.trade.exnova.com/echo/websocket'
+const url = 'wss://iqoption.com/echo/websocket'
 let userBalanceId = 0
 let userBalanceIdGustavo = 0
 let userBalanceReal = 0
@@ -153,7 +153,7 @@ const onOpen = () => {
 
 const onError = error => {
     console.log('Error -> WebSocket');
-    // console.log(error)
+    console.log(error)
     ws.terminate()
     ws = new WebSocket(url)
     ws.onopen = onOpen
@@ -525,24 +525,6 @@ const getActiveString = (active, map) => {
 
 let cleanned = false
 
-const b = async () => {
-    if (!!topTradersRange || copyIds.length > 0) {
-
-        let fsConfig = fs.readFileSync('config.json')
-        let config = JSON.parse(fsConfig)
-        copyIds = !isNaN(config.copyIds.split(',')[0]) && !isNaN(config.copyIds.split(',')[1]) ? config.copyIds.split(',') : []
-
-        cleanned = true
-
-        leadersArray = []
-        getLeadersBool = false
-    }
-}
-
-setInterval(() => {
-    b()
-}, 240000)//60000
-
 let currentTime
 let currentTimemmssDate
 let currentTimehhmm
@@ -711,6 +693,28 @@ const onMessage = async e => {
             // optionClosed(message)
         }
 
+        try {
+
+            if (message.name == 'option' && message.status != 2000) {
+                totalOrderss--
+                const active = parseInt(message.request_id)
+                let index = openedOrders.indexOf(parseInt(active))
+                openedOrders.splice(index, 1)
+                buysCount.set(parseInt(active), buysCount.get(parseInt(active)) - 1)
+                console.log(`${currentTimehhmmss} || Erro ao comprar -> ${getActiveString(`${active}`, activesMapString)}`.red)
+                console.log('RES = ' + e.data)
+                notify('Error', `Erro ao comprar -> ${getActiveString(`${active}`, activesMapString)}`);
+                if (soros)
+                    positionOpenedSoros = false
+                if (gale)
+                    positionOpenedGale = false
+                buysss = []
+            }
+
+        } catch (error) {
+
+        }
+
 
         if (message.name == 'heartbeat' || message.name == 'timesync') {
             currentTime = message.msg
@@ -842,17 +846,6 @@ const awaittt = ssid => {
 
 let porcentagensMap = new Map()
 
-setInterval(() => {
-    var mapAsc = new Map([...porcentagensMap.entries()].sort());
-
-    porcentagensMap[Symbol.iterator] = function* () {
-        yield* [...this.entries()].sort((a, b) => a[1] - b[1]);
-    }
-    // console.log(porcentagensMap);
-    // console.log(los)
-    // console.log(winss)
-    // console.log(veefe);
-}, 2000);
 
 
 const onMessageGustavo = e => {
@@ -1219,9 +1212,15 @@ server.on('connection', (socket) => {
         if (message !== "Conectar-se") {
             let direction = message.split('/')[0]
             let parInt = activesMapString.get(message.split('/')[1])
-            if (!openedOrders.includes(parInt)) {
-                buyBefor(direction, parInt, 1);
-                openedOrders.push(parInt);
+            if (typeof currentTimehhmmss != "undefined" && moment(moment().format("YYYY-MM-DD ") + currentTimehhmmss).isAfter(moment(moment().format("YYYY-MM-DD 02:00"))) && moment(moment().format("YYYY-MM-DD ") + currentTimehhmmss).isBefore(moment(moment().format("YYYY-MM-DD 17:00")))) {
+                if (!openedOrders.includes(parInt)) {
+                    // setTimeout(() => {
+                    buyBefor(direction, parInt, 1);
+                    openedOrders.push(parInt);
+                    // }, 300);
+                }
+            } else {
+                console.log(`${currentTimehhmmss} || Entrada fora do horario - ${message.split('/')[1]}`)
             }
         }
         // Enviar uma resposta para o cliente
@@ -1697,8 +1696,8 @@ function optionClosed(message) {
         // console.log('los=', los);
         countResult--
 
-        if (config.conta == "real")
-            veefe += "L"
+        // if (config.conta == "real")
+        veefe += "L"
         console.log('los=', los)
         console.log('winss=', winss)
         console.log('countResult=', countResult);
@@ -1719,8 +1718,8 @@ function optionClosed(message) {
         winss++
         countResult++
         // winMass();
-        if (config.conta == "real")
-            veefe += "W"
+        // if (config.conta == "real")
+        veefe += "W"
 
         console.log('los=', los)
         console.log('winss=', winss)
@@ -1862,8 +1861,8 @@ function positionChangedStuff(message) {
             // console.log('los=', los);
             countResult--
 
-            if (config.conta == "real")
-                veefe += "L"
+            // if (config.conta == "real")
+            veefe += "L"
             console.log('los=', los)
             console.log('winss=', winss)
             console.log('countResult=', countResult);
@@ -1884,8 +1883,8 @@ function positionChangedStuff(message) {
             winss++
             countResult++
             // winMass();
-            if (config.conta == "real")
-                veefe += "W"
+            // if (config.conta == "real")
+            veefe += "W"
 
             console.log('los=', los)
             console.log('winss=', winss)
@@ -1931,8 +1930,8 @@ async function winMass() {
         await XLSX_CALC(workbook, { continue_after_error: true, log_error: false });
         cicleSession = 0;
         countMass = 3;
-        if (config.conta)
-            veefe = ""
+        // if (config.conta)
+        veefe = ""
         amount = parseFloat(getCell('D' + countMass)) > 0 ? parseFloat(getCell('D' + countMass)) : parseFloat(getCell('D' + countMass)) * -1;
         console.log(`${currentTimehhmmss} || Ciclo com Ganhoo!! `.green)
     } else {
@@ -1945,13 +1944,13 @@ async function winMass() {
     config.lastAmount = parseFloat(getCell('N12'))
     fs.writeFile('config.json', JSON.stringify(config, null, 4), err => {
         // console.log(err || 'Arquivo salvo');
+        if (countResult >= 3) {
+            notify('Stop', `Stop WIN Alcançado...`);
+            console.log('Stop WIN Alcançado...')
+            process.exit(1)
+        }
     });
 
-    if (countResult >= 5) {
-        notify('Stop', `Stop WIN Alcançado...`);
-        console.log('Stop WIN Alcançado...')
-        process.exit(1)
-    }
 
     console.log(amount);
 
@@ -1968,13 +1967,13 @@ function lossMass(winloss) {
     config.veefe = veefe
     fs.writeFile('config.json', JSON.stringify(config, null, 4), err => {
         // console.log(err || 'Arquivo salvo');
+        if (countResult <= -4) {
+            notify('Stop', `Stop Loss Alcançado...`);
+            console.log('Stop Loss Alcançado...')
+            process.exit(1)
+        }
     });
 
-    if (countResult <= -5) {
-        notify('Stop', `Stop Loss Alcançado...`);
-        console.log('Stop Loss Alcançado...')
-        process.exit(1)
-    }
 
 }
 
@@ -2396,9 +2395,9 @@ const loginAsync = async (ssid) => {
 
 let ssiddddd
 
-setTimeout(() => {
-    ws.send(JSON.stringify({ 'name': 'ssid', 'msg': ssid, "request_id": "" }))
-}, 8000);
+// setTimeout(() => {
+//     ws.send(JSON.stringify({ 'name': 'ssid', 'msg': ssid, "request_id": "" }))
+// }, 8000);
 
 const doLogin = ssid => {
     return new Promise((resolve, reject) => {
@@ -2478,7 +2477,7 @@ let logged = false
 
 let ssidGustavo
 
-setInterval(() => {
+const tryconnect = setInterval(() => {
     if (!connectedd) {
         console.log('CAIU CONEXAO');
         ws.terminate()
@@ -2486,6 +2485,7 @@ setInterval(() => {
 
         start()
         timeeessa = 30000
+        // clearInterval(tryconnect)
     } else {
         timeeessa = 5000
     }
@@ -2501,9 +2501,9 @@ const start = (force) => {
             // Add more headers if necessary
         };
         // axios.post('https://api.trade.xoption.com/v2/login', {
-        axios.post('https://auth.trade.exnova.com/api/v2/login', {
-            identifier: 'vinipsidonik@hotmail.com',
-            password: 'gc896426'
+        axios.post('https://auth.iqoption.com/api/v2/login', {
+            identifier: "davilagustavo996@gmail.com",
+            password: "Ana12boeno#"
             // identifier: "carol.davila14@outlook.com",
             // password: "gc896426",
         }, {
@@ -2539,7 +2539,7 @@ const start = (force) => {
                 clearInterval(loginn)
             }
             loginAsync(ssid)
-        }, 5000);
+        }, 10000);
     }
 }
 start(false)
