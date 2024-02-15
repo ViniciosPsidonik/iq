@@ -13,7 +13,7 @@ let openedMap = new Map()
 let openedMapDigital = new Map()
 
 //55099058
-const url = 'wss://ws.trade.exnova.com/echo/websocket'
+const url = 'wss://iqoption.com/echo/websocket'
 let userBalanceId = 0
 let userBalanceIdGustavo = 0
 let userBalanceReal = 0
@@ -698,6 +698,7 @@ const onMessage = e => {
                 for (var [key, value] of candleId.entries()) {
                     candleId.set(key, { ...value, open: false })
                 }
+                // console.log(candleId);
             }
 
             // console.log(candleId);
@@ -1113,7 +1114,7 @@ let candleId = new Map()
 function candleStuff(message) {
     let candles = message.msg.candles;
     let porcentagemRetraiuMedia = 0;
-    let desvios = [0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9]
+    let desvios = [0.4, 0.5, 0.6, 0.7, 0.8, 0.9]
     if (candles) {
         // console.log('candles');
         let parInt = parseInt(message.request_id.split('/')[0]);
@@ -1154,18 +1155,18 @@ function candleStuff(message) {
 
             const close = candles[39].close;
 
-            if (openedOrders.length == 0 && !parError.includes(parInt) && win + loss >= 4) {
+            if (!openedOrders.includes(parInt) && !parError.includes(parInt) && win + loss >= 4) {
                 if (porcenagemWin > 70 && candleId.get(parInt).open) {
                     if (close >= bandaMaior) {
                         console.log('bandaMaior=', bandaMaior);
                         console.log('bandaMenor=', bandaMenor);
-                        buyBefor(inverso ? 'call' : 'put', parInt, 5);
+                        buyBefor('put', parInt, 5);
                     }
 
                     if (close <= bandaMenor) {
                         console.log('bandaMaior=', bandaMaior);
                         console.log('bandaMenor=', bandaMenor);
-                        buyBefor(inverso ? 'put' : 'call', parInt, 5);
+                        buyBefor('call', parInt, 5);
                     }
                 } else {
                     // console.log('porcenagemWin=', porcenagemWin);
@@ -1262,12 +1263,12 @@ function calcDesvio(prices, candles, desvio) {
     // console.log(porcentagensMap);
     let porcenagemWin = 0;
     let inverso = 0;
-    if (loss > win) {
-        porcenagemWin = (loss * 100) / (loss + win);
-        inverso = 1;
-    } else {
-        porcenagemWin = (win * 100) / (loss + win);
-    }
+    // if (loss > win) {
+    //     porcenagemWin = (loss * 100) / (loss + win);
+    //     inverso = 1;
+    // } else {
+    porcenagemWin = (win * 100) / (loss + win);
+    // }
     return { win, loss, porcenagemWin, bandaMaior, bandaMenor, inverso };
 }
 
@@ -1950,7 +1951,7 @@ const activesDigitalMapString = new Map([
     ['GBPJPY', 3],
     ['GBPUSD', 5],
     ['USDCAD', 100],
-    ['USDCHF', 72],
+    // ['USDCHF', 72],
     // ['AUDJPY', 101],
     ['EURUSD-OTC', 76],
     ['EURGBP-OTC', 77],
@@ -2050,11 +2051,11 @@ let logged = false
 
 let ssidGustavo
 
-axios.post('https://auth.trade.exnova.com/api/v2/login', {
+axios.post('https://auth.iqoption.com/api/v2/login', {
     // identifier: config.login,
     // password: config.password
-    identifier: "vinipsidonik@hotmail.com",
-    password: "gc896426",
+    identifier: "davilagustavo996@gmail.com",
+    password: "Ana12boeno#"
 }).then((response) => {
     ssid = response.data.ssid
     console.log(ssid);

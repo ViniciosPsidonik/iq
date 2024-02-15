@@ -2,7 +2,7 @@ const fs = require('fs')
 const axios = require('axios')
 const moment = require('moment')
 const momentTz = require('moment-timezone');
-const countries = require('./country')
+const countries = require('../country')
 const WebSocket = require('ws')
 const colors = require('colors')
 
@@ -17,6 +17,8 @@ let taxasjson = JSON.parse(fstaxas)
 let pricesToSend = fs.readFileSync('pricesToSend.json')
 let pricesToSendObj = JSON.parse(pricesToSend)
 let pricesToSendMap = new Map()
+
+let veefe = config.veefe
 
 var express = require('express')
 var app = express()
@@ -39,7 +41,12 @@ let candlesticksMap = new Map()
 
 app.get('/candlestick/:actives', function (req, res) {
     let actives = req.params.actives
-    getCandleTime(activesMapString.get(actives), 1, 500)
+
+    if (activesDigitalMapString.has(actives)) {
+        getCandleTime(activesDigitalMapString.get(actives), 5, 100)
+    } else {
+        getCandleTime(activesMapString.get(actives), 5, 100)
+    }
     const getActives = setInterval(() => {
         if (candlesticksMap.has(actives)) {
             clearInterval(getActives)
@@ -56,7 +63,11 @@ app.get('/candlestick/:actives', function (req, res) {
 let candlesticksLastCandleMap = new Map()
 app.get('/candlesticklast/:actives', function (req, res) {
     let actives = req.params.actives
-    getCandleTime(activesMapString.get(actives), 5, 1)
+    if (activesDigitalMapString.has(actives)) {
+        getCandleTime(activesDigitalMapString.get(actives), 5, 1)
+    } else {
+        getCandleTime(activesMapString.get(actives), 5, 1)
+    }
     const getActives = setInterval(() => {
         if (candlesticksLastCandleMap.has(actives)) {
             clearInterval(getActives)
@@ -139,7 +150,8 @@ app.listen(PORT)
 //     buyBeforOne('put', 1, 1);
 // }, 5000);
 //55099058
-const url = 'wss://iqoption.com/echo/websocket'
+// const url = 'wss://iqoption.com/echo/websocket'
+const url = 'wss://ws.trade.xoption.com/echo/websocket'
 let userBalanceId = 0
 let amount = config.amount
 let verpar = config.verpar
@@ -161,7 +173,7 @@ let soros = config.soros
 let gale = config.gale
 let galeLevel = config.galeLevel
 let galeFactor = config.galeFactor
-let ssid
+let ssid = config.ssid
 let amountInitial = amount
 let sorosCount = 0
 let galeCount = 0
@@ -213,9 +225,35 @@ var worksheet = workbook.Sheets['Calculadora']
 // change some cell value
 // console.log(getCell('F4'));
 
-let countMass = 15
+let countMass = 3
 amount = parseFloat(getCell('D' + countMass))
 console.log(amount);
+
+const getamount = async () => {
+
+
+    modifyCell('N' + 12, config.lastAmount);
+    for (let index = 0; index < veefe.length; index++) {
+        const element = veefe[index];
+
+        // console.log(element);
+        modifyCell('C' + countMass, element);
+
+        countMass++
+
+    }
+    XLSX_CALC(workbook, { continue_after_error: true, log_error: false });
+
+    amount = parseFloat(getCell('D' + countMass))
+    console.log('Banca=', getCell('N12'));
+    console.log(amount);
+
+    // console.log(getCell('I' + 3))
+    // console.log(getCell('F' + 3))
+    // console.log(getCell('N' + 12))
+
+}
+getamount()
 
 function modifyCell(cellString, value) {
     if (value == undefined) {
@@ -639,23 +677,6 @@ const getActiveString = (active, map) => {
 
 let cleanned = false
 
-const b = async () => {
-    if (!!topTradersRange || copyIds.length > 0) {
-
-        let fsConfig = fs.readFileSync('config.json')
-        let config = JSON.parse(fsConfig)
-        copyIds = !isNaN(config.copyIds.split(',')[0]) && !isNaN(config.copyIds.split(',')[1]) ? config.copyIds.split(',') : []
-
-        cleanned = true
-
-        leadersArray = []
-        getLeadersBool = false
-    }
-}
-
-setInterval(() => {
-    b()
-}, 240000)//60000
 
 let currentTime
 let currentTimemmssDate
@@ -757,9 +778,9 @@ let m15Expires = []
 
 function candleStuff(message) {
     try {
-        if (message.msg.candles.length > 10) {
-            candlesticksMap.set(getActiveString(parseInt(message.request_id.split('/')[0]), activesDigitalMapString), message.msg.candles);
-        } else if (message.request_id.includes('/1')) {
+        if (message?.msg?.candles?.length > 10) {
+            candlesticksMap.set(getActiveString(parseInt(message.request_id.split('/')[0]), activesMapString), message.msg.candles);
+        } else if (message?.request_id?.includes('/1')) {
             candlesticksLastCandleMap.set(getActiveString(parseInt(message.request_id.split('/')[0]), activesDigitalMapString), message.msg.candles);
             let candles = message.msg.candles;
             let price = candles[1].close;
@@ -831,8 +852,8 @@ function candleStuff(message) {
                             }
                         }
 
-                        if (!stopOrders && !isStopedPar && !toClose && openedOrders.length == 0) {
-                            buyBeforOne(direction, parInt, 1);
+                        if (!stopOrders && !isStopedPar && !openedOrders.includes(parInt) && openedOrders.length == 0) {
+                            buyBeforOne(direction, parInt, 5);
                             clearSupres(parInt, direction);
                         } else if (toClose) {
                             console.log(`${currentTimehhmmss} || Vela iniciou muito proximo do preço -> ${activeString} - ${direction}`);
@@ -890,9 +911,8 @@ function candleStuff(message) {
                                 min = toCloseM5Obj.get(activeString).min;
                             }
                         }
-
-                        if (!stopOrders && !isStopedPar && !toClose && openedOrders.length == 0) {
-                            buyBeforOne(direction, parInt, 1);
+                        if (!stopOrders && !isStopedPar && !openedOrders.includes(parInt) && openedOrders.length == 0) {
+                            buyBeforOne(direction, parInt, 5);
                             clearSupres(parInt, direction);
                         } else if (toClose) {
                             console.log(`${currentTimehhmmss} || Vela iniciou muito proximo do preço -> ${activeString} - ${direction}`);
@@ -919,6 +939,7 @@ function candleStuff(message) {
             // console.log(lastTickCandles);
         }
     } catch (error) {
+        console.log(error);
     }
 }
 
@@ -1109,7 +1130,7 @@ function setConfig(element, direction, m) {
 
 function buyBeforOne(direction, parInt, type) {
     let timeFrameL = null
-    let timeFrame = 1
+    let timeFrame = type
 
     // console.log(direction);
     // console.log(parInt);
@@ -1127,8 +1148,8 @@ function buyBeforOne(direction, parInt, type) {
         if (resto != 0) {
             timeFrameL = timeFrameL - resto;
         }
-    }
 
+    }
 
     let hourmm
     if (type == 1) {
@@ -1138,11 +1159,11 @@ function buyBeforOne(direction, parInt, type) {
             hourmm = moment.unix(currentTime / 1000).utcOffset(-3).add(1, 'm').format(" HH:mm");
         }
     } else if (type == 5) {
-        // if (parseInt(currentTimess) >= 30) {
-        //     hourmm = moment.unix(currentTime / 1000).utcOffset(-3).add(6, 'm').format(" HH:mm");
-        // } else {
-        hourmm = moment.unix(currentTime / 1000).utcOffset(-3).add(5, 'm').format(" HH:mm");
-        // }
+        if (parseInt(currentTimess) >= 30 && (timeInt == 4 || timeInt == 9)) {
+            hourmm = moment.unix(currentTime / 1000).utcOffset(-3).add(2, 'seconds').add(6, 'm').format("HH:mm");
+        } else {
+            hourmm = moment.unix(currentTime / 1000).utcOffset(-3).add(2, 'seconds').add(timeFrameL, 'm').format("HH:mm");
+        }
     } else {
         hourmm = moment.unix(currentTime / 1000).utcOffset(-3).add(2, 'seconds').add(15, 'm').format(" HH:mm");
     }
@@ -1204,43 +1225,17 @@ function buyBefor(direction, parInt, type) {
 let notOrder = []
 
 function checkOpenedPayoutBeforeBuy(parInt, direction, hourmm, type) {
-    let turboPayout = null;
-    let digitalPayout = null;
 
-    openOrderDigital(direction, parInt, hourmm, type);
-    return
-
-    if (payoutMap.has('turbo')) {
-        if (payoutMap.get('turbo').has(parInt)) {
-            turboPayout = payoutMap.get('turbo').get(parInt);
-        }
-    }
-    if (payoutMap.has('digital')) {
-        if (payoutMap.get('digital').has(parInt)) {
-            digitalPayout = payoutMap.get('digital').get(parInt);
-        }
-    }
-
-    if (openedMap.has(parInt) && openedMap.get(parInt) && openedMapDigital.has(parInt) && openedMapDigital.get(parInt)) {
-        if (digitalPayout && turboPayout && digitalPayout > turboPayout) {
-            openOrderDigital(direction, parInt, hourmm);
-        } else if (digitalPayout && turboPayout && digitalPayout <= turboPayout) {
-            openOrderBinary(direction, parInt, hourmm);
-        } else if (turboPayout) {
-            openOrderBinary(direction, parInt, hourmm);
-        } else if (digitalPayout) {
-            openOrderDigital(direction, parInt, hourmm);
-        } else {
-            openOrderBinary(direction, parInt, hourmm);
-        }
-    } else if (openedMap.get(parInt)) {
+    if (activesDigitalMapString.has(getActiveString(parInt, activesMapString))) {
+        openOrderDigital(direction, parInt, hourmm, type);
+    } else {
+        console.log('openOrderBinary');
         openOrderBinary(direction, parInt, hourmm);
-    } else if (openedMapDigital.has(parInt) && openedMapDigital.get(parInt)) {
-        openOrderDigital(direction, parInt, hourmm);
     }
 }
 
 function openOrderBinary(direction, parInt, hourmm) {
+    console.log('aaaaaaaaa');
     console.log(`${currentTimehhmmss} || ${direction} / ${getActiveString(parInt, activesMapString)} / ${amount}`);
     notify('[Order Binaria]', `${direction} / ${getActiveString(parInt, activesMapString)} / ${amount}`);
     buy(amount, parInt, direction, parseInt(moment(moment().format("YYYY-MM-DD ") + hourmm).utcOffset(0).format('X')), 3);
@@ -1294,47 +1289,56 @@ let galePut = []
 let galecCall = []
 
 function optionClosed(message) {
+    console.log('=====================');
     let amounth = buysss[0] && buysss[0].amount ? buysss[0].amount : amount
     let active = message.msg.active_id
     let direction = message.msg.direction
 
-    let index = openedOrders.indexOf(parseInt(active))
-    openedOrders.splice(index, 1)
-    profitAmount = message.msg.profit_amount - amounth
+    if (openedOrders.includes(active)) {
+        let index = openedOrders.indexOf(parseInt(active))
+        openedOrders.splice(index, 1)
+    }
+    profitAmount = message.msg.result == 'win' ? message.msg.profit_amount - message.msg.amount : message.msg.amount * -1
     sessionBalance += profitAmount
 
     if (profitAmount < 0) {
-        // if (direction == 'put' && !galePut.includes(active)) {
-        //     buyBefor('put', active, 5);
-        //     galePut.push(active)
-        // } else if (direction == 'call' && !galecCall.includes(active)) {
-        //     buyBefor('call', active, 5);
-        //     galeCall.push(active)
-        // }
 
+        // if (config.conta == "real")
+        veefe += "L"
         losss++
-        StopLoss++
-        console.log(`${currentTimehhmmss} || ${profitAmount < 0 ? "Loss" : "Win"} ${profitAmount.toFixed(2)} / Balance: ${parseFloat(sessionBalance.toFixed(2))} / ${getActiveString(active, activesMapString) ? getActiveString(active, activesMapString) : active} / Binario`.red)
-        notify('Loss', `${profitAmount < 0 ? "Loss" : "Win"} ${profitAmount.toFixed(2)} / Balance: ${parseFloat(sessionBalance.toFixed(2))} / ${getActiveString(active, activesMapString) ? getActiveString(active, activesMapString) : active} / Binario`);
-        if (doispraum) {
-            winss = 0
-            console.log(`${currentTimehhmmss} || StopLoss alcançado`.red)
-            // process.exit(1)
-        }
+        diffwinloss--
+        console.log('winss=', winss)
+        console.log('losss=', losss)
+        console.log('diffwinloss=', diffwinloss)
+        lossMass('L');
+        console.log(`${currentTimehhmmss} || ${profitAmount < 0 ? "Loss" : "Win"} ${profitAmount.toFixed(2)} / Balance: ${parseFloat(sessionBalance.toFixed(2))} / ${getActiveString(active, activesMapString) ? getActiveString(active, activesMapString) : active} / Digital`.red)
+        notify('Loss', `${profitAmount < 0 ? "Loss" : "Win"} ${profitAmount.toFixed(2)} / Balance: ${parseFloat(sessionBalance.toFixed(2))} / ${getActiveString(active, activesMapString) ? getActiveString(active, activesMapString) : active} / Digital`);
+
+
+        // console.log(`${currentTimehhmmss} || StopLoss = ${StopLoss}`)
+        // buyBefor('put', 1, 1)
+
+        positionOpenedSoros = false
     } else if (profitAmount == 0) {
-        console.log(`${currentTimehhmmss} || ${profitAmount < 0 ? "Loss" : "Win"} ${profitAmount.toFixed(2)} / Balance: ${parseFloat(sessionBalance.toFixed(2))} / ${getActiveString(active, activesMapString) ? getActiveString(active, activesMapString) : active} / Binario`.red)
-        notify('Empate', `Empate ${profitAmount.toFixed(2)} / Balance: ${parseFloat(sessionBalance.toFixed(2))} / ${getActiveString(active, activesMapString) ? getActiveString(active, activesMapString) : active} / Binario`);
+        console.log(`${currentTimehhmmss} || ${profitAmount < 0 ? "Loss" : "Win"} ${profitAmount.toFixed(2)} / Balance: ${parseFloat(sessionBalance.toFixed(2))} / ${getActiveString(active, activesMapString) ? getActiveString(active, activesMapString) : active} / Digital`.red)
+        notify('Empate', `Empate ${profitAmount.toFixed(2)} / Balance: ${parseFloat(sessionBalance.toFixed(2))} / ${getActiveString(active, activesMapString) ? getActiveString(active, activesMapString) : active} / Digital`);
     } else {
         winss++
-        StopWin++
-        if (doispraum) {
-            amount += profitAmount
-        }
-        console.log(`${currentTimehhmmss} || ${profitAmount < 0 ? "Loss" : "Win"} ${profitAmount.toFixed(2)} / Balance: ${parseFloat(sessionBalance.toFixed(2))} / ${getActiveString(active, activesMapString) ? getActiveString(active, activesMapString) : active} / Binario`.green)
-        notify('Wiiin!!', `${profitAmount < 0 ? "Loss" : "Win"} ${profitAmount.toFixed(2)} / Balance: ${parseFloat(sessionBalance.toFixed(2))} / ${getActiveString(active, activesMapString) ? getActiveString(active, activesMapString) : active} / Binario`);
-        setWinss(amount);
+        // winMass();
+        // if (config.conta == "real")
+        veefe += "W"
+        diffwinloss++
+        console.log('winss=', winss)
+        console.log('losss=', losss)
+        console.log('diffwinloss=', diffwinloss)
+        winMass()
+        // StopWin++
+        // console.log(`${currentTimehhmmss} || StopWin = ${StopWin}`)
+        console.log(`${currentTimehhmmss} || ${profitAmount < 0 ? "Loss" : "Win"} ${profitAmount.toFixed(2)} / Balance: ${parseFloat(sessionBalance.toFixed(2))} / ${getActiveString(active, activesMapString) ? getActiveString(active, activesMapString) : active} / Digital`.green)
+        notify('Wiiin!!', `${profitAmount < 0 ? "Loss" : "Win"} ${profitAmount.toFixed(2)} / Balance: ${parseFloat(sessionBalance.toFixed(2))} / ${getActiveString(active, activesMapString) ? getActiveString(active, activesMapString) : active} / Digital`);
+
+        positionOpenedSoros = false
     }
-    positionOpenedSoros = false
 }
 
 function setWinss(amount) {
@@ -1347,59 +1351,81 @@ function setWinss(amount) {
     });
 }
 
+
+let diffwinloss = 0
 function positionChangedStuff(message) {
+    // if (!orderopenned.includes(message.msg.raw_event.instrument_id))
+    // orderopenned.push(message.msg.raw_event.instrument_id)
+
+    // console.log(JSON.stringify(message));
+    //console.log('aaaaaa');
     if (message.msg.status == 'closed') {
+        console.log('=====================');
         let id = message.msg.id
+        let direction = message.msg.raw_event.instrument_dir
         buysCount.set(message.msg.active_id, buysCount.get(message.msg.active_id) - 1)
         idsArray.push(id)
 
-        if (soros)
-            positionOpenedSoros = false
+        // console.log(message);
+
         if (gale)
             positionOpenedGale = false
 
         let profitAmount = message.msg.close_profit ? message.msg.close_profit - amount : amount * -1
         let active = message.msg.active_id
-        let index = openedOrders.indexOf(parseInt(active))
-        openedOrders.splice(index, 1);
+
+        // console.log('profitAmount', profitAmount);
+
+        if (openedOrders.includes(active)) {
+            let index = openedOrders.indexOf(parseInt(active))
+            openedOrders.splice(index, 1);
+        }
         sessionBalance += profitAmount
         cicleSession += profitAmount
 
-        if (profitAmount < 0) {
-            // amount = amountInitial
-            // let expire = parseInt(message.raw_event.instrument_expiration) / 1000
-            // if (!m15Expires.includes(expire)) {
-            //     if (direction == 'put' && !galePut.includes(active)) {
-            //         buyBefor('put', active, 5);
-            //         galePut.push(active)
-            //     } else if (direction == 'call' && !galecCall.includes(active)) {
-            //         buyBefor('call', active, 5);
-            //         galeCall.push(active)
-            //     }
-            // }
 
-            lossMass('L');
+        if (profitAmount < 0) {
+
+
+            // if (config.conta == "real")
+            veefe += "L"
             losss++
+            diffwinloss--
+            console.log('winss=', winss)
+            console.log('losss=', losss)
+            console.log('diffwinloss=', diffwinloss)
+            lossMass('L');
             console.log(`${currentTimehhmmss} || ${profitAmount < 0 ? "Loss" : "Win"} ${profitAmount.toFixed(2)} / Balance: ${parseFloat(sessionBalance.toFixed(2))} / ${getActiveString(active, activesMapString) ? getActiveString(active, activesMapString) : active} / Digital`.red)
             notify('Loss', `${profitAmount < 0 ? "Loss" : "Win"} ${profitAmount.toFixed(2)} / Balance: ${parseFloat(sessionBalance.toFixed(2))} / ${getActiveString(active, activesMapString) ? getActiveString(active, activesMapString) : active} / Digital`);
-            console.log(`${currentTimehhmmss} || StopLoss alcançado`.red)
-            // process.exit(1)
+
+
+            // console.log(`${currentTimehhmmss} || StopLoss = ${StopLoss}`)
+            // buyBefor('put', 1, 1)
+
+            positionOpenedSoros = false
         } else if (profitAmount == 0) {
             console.log(`${currentTimehhmmss} || ${profitAmount < 0 ? "Loss" : "Win"} ${profitAmount.toFixed(2)} / Balance: ${parseFloat(sessionBalance.toFixed(2))} / ${getActiveString(active, activesMapString) ? getActiveString(active, activesMapString) : active} / Digital`.red)
             notify('Empate', `Empate ${profitAmount.toFixed(2)} / Balance: ${parseFloat(sessionBalance.toFixed(2))} / ${getActiveString(active, activesMapString) ? getActiveString(active, activesMapString) : active} / Digital`);
         } else {
             winss++
-            StopWin++
-            if (doispraum)
-                amount += profitAmount
-
+            // winMass();
+            // if (config.conta == "real")
+            veefe += "W"
+            diffwinloss++
+            console.log('winss=', winss)
+            console.log('losss=', losss)
+            console.log('diffwinloss=', diffwinloss)
             winMass()
+            // StopWin++
+            // console.log(`${currentTimehhmmss} || StopWin = ${StopWin}`)
             console.log(`${currentTimehhmmss} || ${profitAmount < 0 ? "Loss" : "Win"} ${profitAmount.toFixed(2)} / Balance: ${parseFloat(sessionBalance.toFixed(2))} / ${getActiveString(active, activesMapString) ? getActiveString(active, activesMapString) : active} / Digital`.green)
             notify('Wiiin!!', `${profitAmount < 0 ? "Loss" : "Win"} ${profitAmount.toFixed(2)} / Balance: ${parseFloat(sessionBalance.toFixed(2))} / ${getActiveString(active, activesMapString) ? getActiveString(active, activesMapString) : active} / Digital`);
-            setWinss(amount)
+
+            positionOpenedSoros = false
         }
-        positionOpenedSoros = false
-    } else {
+
+        // if (!positionOpenedSoros)
+        //  buyBefor('put', 76, 1)
 
     }
 }
@@ -1409,27 +1435,77 @@ let cicleSession = 0
 function lossMass(winloss) {
     modifyCell('C' + countMass, winloss);
     XLSX_CALC(workbook, { continue_after_error: true, log_error: false });
-    // console.log(getCell('I' + countMass))
     countMass++;
     amount = parseFloat(getCell('D' + countMass)) > 0 ? parseFloat(getCell('D' + countMass)) : parseFloat(getCell('D' + countMass)) * -1;
+    console.log(amount);
+
+    console.log(veefe);
+    config.veefe = veefe
+    fs.writeFile('config.json', JSON.stringify(config, null, 4), err => {
+        // console.log(err || 'Arquivo salvo');
+        setTimeout(() => {
+
+            if (diffwinloss >= 3) {
+                notify('Stop', `Stop Loss Alcançado...`);
+                console.log('Stop Loss Alcançado...')
+                process.exit(1)
+            }
+        }, 3000);
+    });
+
+
 }
 
-function winMass() {
-    if (cicleSession >= 0.01) {
+async function winMass() {
+    modifyCell('C' + countMass, 'W');
+    await XLSX_CALC(workbook, { continue_after_error: true, log_error: false });
+
+    let Vee = 0
+    let Efee = 0
+    for (let index = 0; index < veefe.length; index++) {
+        const element = veefe[index];
+        if (element == 'W') {
+            Vee++
+        } else {
+            Efee++
+        }
+    }
+    // || Vee == Efee
+
+    if (getCell('I' + countMass) == '◄◄' || ((Vee == Efee || Vee > Efee) && Vee + Efee > 25)) {
+
         for (let index = countMass; index >= 0; index--) {
             modifyCell('C' + countMass, '');
         }
+
+        modifyCell('N' + 12, getCell('F' + countMass));
+        await XLSX_CALC(workbook, { continue_after_error: true, log_error: false });
         cicleSession = 0;
-        // modifyCell('C' + countMass, 'W')
-        XLSX_CALC(workbook, { continue_after_error: true, log_error: false });
         countMass = 3;
+        if (config.conta)
+            veefe = ""
         amount = parseFloat(getCell('D' + countMass)) > 0 ? parseFloat(getCell('D' + countMass)) : parseFloat(getCell('D' + countMass)) * -1;
+        console.log(`${currentTimehhmmss} || Ciclo com Ganhoo!! `.green)
     } else {
-        modifyCell('C' + countMass, 'W');
-        XLSX_CALC(workbook, { continue_after_error: true, log_error: false });
         countMass++;
         amount = parseFloat(getCell('D' + countMass)) > 0 ? parseFloat(getCell('D' + countMass)) : parseFloat(getCell('D' + countMass)) * -1;
     }
+
+    config.veefe = veefe
+    console.log(veefe);
+    config.lastAmount = parseFloat(getCell('N12'))
+    fs.writeFile('config.json', JSON.stringify(config, null, 4), err => {
+        // console.log(err || 'Arquivo salvo');
+        if (diffwinloss >= 3) {
+            notify('Stop', `Stop WIN Alcançado...`);
+            console.log('Stop WIN Alcançado...')
+            process.exit(1)
+        }
+    });
+
+
+    console.log(amount);
+
 }
 
 function profileStuf(message, name) {
@@ -1621,7 +1697,6 @@ const activesDigitalMapString = new Map([
     ['NZDUSD', 8],
     ['USDCAD', 100],
     ['USDCHF', 72],
-    ['USDJPY', 6],
     ['USDNOK', 168],
     ['EURUSD-OTC', 76],
     ['EURGBP-OTC', 77],
@@ -1688,29 +1763,82 @@ const auth = () => {
             console.log('Erro ao se conectar... Tente novamente')
     })
 }
+
+const start = (force) => {
+    if (!ssid || force) {
+        const customHeaders = {
+            'Sec-Ch-Ua': '"Google Chrome";v="117", "Not;A=Brand";v="8", "Chromium";v="117"',
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/117.0.0.0 Safari/537.36', // You can adjust the content type based on your needs
+            // Add more headers if necessary
+        };
+        axios.post('https://api.trade.xoption.com/v2/login', {
+            // axios.post('https://auth.iqoption.com/api/v2/login', {
+            // identifier: "davilagustavo996@gmail.com",
+            // password: "Ana12boeno#",
+            identifier: "vinipsidonik@hotmail.com",
+            password: "gc8966426",
+
+        }, {
+            headers: customHeaders
+        }).then((response) => {
+            ssid = response.data.ssid
+            console.log(ssid);
+            ws.onopen = onOpen
+            ws.onerror = onError
+            ws.onmessage = onMessage
+            const loginn = setInterval(() => {
+                if (logged) {
+                    clearInterval(loginn)
+                }
+                loginAsync(ssid)
+            }, 500);
+            config.ssid = ssid
+            fs.writeFile('config.json', JSON.stringify(config, null, 4), err => {
+                // console.log(err || 'Arquivo salvo');
+            });
+
+        }).catch(function (err) {
+            if (err)
+                console.log('Erro ao se conectar... Tente novamente')
+        })
+    } else {
+        console.log("ssid=", ssid);
+        ws.onopen = onOpen
+        ws.onerror = onError
+        ws.onmessage = onMessage
+        const loginn = setInterval(() => {
+            if (logged) {
+                clearInterval(loginn)
+            }
+            loginAsync(ssid)
+        }, 5000);
+    }
+}
+start(false)
+
 let logged = false
 
-axios.post('https://auth.iqoption.com/api/v2/login', {
-    identifier: "davilagustavo996@gmail.com",
-    password: "Ana12boeno#",
-    // identifier: "carol.davila14@outlook.com",
-    // password: "gc896426",
-}).then((response) => {
-    ssid = response.data.ssid
-    console.log(ssid);
-    ws.onopen = onOpen
-    ws.onerror = onError
-    ws.onmessage = onMessage
-    const loginn = setInterval(() => {
-        if (logged) {
-            clearInterval(loginn)
-        }
-        loginAsync(ssid)
-    }, 500);
-}).catch(function (err) {
-    if (err)
-        console.log('Erro ao se conectar... Tente novamente')
-})
+// axios.post('https://auth.iqoption.com/api/v2/login', {
+//     identifier: "davilagustavo996@gmail.com",
+//     password: "Ana12boeno#",
+//     // identifier: "carol.davila14@outlook.com",
+//     // password: "gc896426",
+// }).then((response) => {
+//     ssid = response.data.ssid
+//     console.log(ssid);
+//     ws.onopen = onOpen
+//     ws.onerror = onError
+//     ws.onmessage = onMessage
+//     const loginn = setInterval(() => {
+//         if (logged) {
+//             clearInterval(loginn)
+//         }
+//         loginAsync(ssid)
+//     }, 500);
+// }).catch(function (err) {
+//     if (err)
+//         console.log('Erro ao se conectar... Tente novamente')
+// })
 
 function subscribePortifolio() {
     let data = { "name": "portfolio.position-changed", "version": "2.0", "params": { "routingFilters": { "instrument_type": "digital-option", "user_balance_id": userBalanceId } } }

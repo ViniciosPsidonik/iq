@@ -539,9 +539,6 @@ const b = async () => {
     }
 }
 
-setInterval(() => {
-    b()
-}, 240000)//60000
 
 let currentTime
 let currentTimemmssDate
@@ -784,8 +781,21 @@ async function calldo(hoorr, winsMap) {
         const hoo = hoorr[index];
         let parInt = activesMapString.get(hoo.par);
         // console.log(hoo);
-        let to = parseInt(moment(moment().format("YYYY-MM-DD ") + hoo.horario).utcOffset(0).format('X'));
-        dayyyyyyyyy = moment(moment().format("YYYY-MM-DD ") + hoo.horario).utcOffset(-3).format('YYYY-MM-DD HH:mm')
+        let to
+        let dayiM
+        // let to = parseInt(moment(moment().format("YYYY-MM-DD ") + hoo.horario).utcOffset(0).format('X'));
+        // dayyyyyyyyy = moment(moment().format("YYYY-MM-DD ") + hoo.horario).utcOffset(-3).format('YYYY-MM-DD HH:mm')
+        if (moment(moment().format("YYYY-MM-DD ") + hoo.horario).utcOffset(-3).isAfter(moment('2023-11-06 00:00')) && verao) {
+            to = parseInt(moment(moment().format("YYYY-MM-DD ") + hoo.horario).add(1, 'hours').utcOffset(0).format('X'));
+            dayyyyyyyyy = moment(moment().format("YYYY-MM-DD ") + hoo.horario).add(1, 'hours').utcOffset(-3).format('YYYY-MM-DD HH:mm')
+            dayiM = moment(moment().format("YYYY-MM-DD ") + hoo.horario).add(1, 'hours').utcOffset(-3).format('HH:mm')
+        } else {
+            to = parseInt(moment(moment().format("YYYY-MM-DD ") + hoo.horario).utcOffset(0).format('X'));
+            dayyyyyyyyy = moment(moment().format("YYYY-MM-DD ") + hoo.horario).utcOffset(-3).format('YYYY-MM-DD HH:mm')
+            dayiM = moment(moment().format("YYYY-MM-DD ") + hoo.horario).utcOffset(-3).format('HH:mm')
+        }
+
+
         // console.log(dayyyyyyyyy);
         // let to = parseInt(moment(moment().format("YYYY-MM-DD ") + hoo.horario).utcOffset(0).format('X'))
         // currentTimehh = moment.unix(currentTime / 1000).utcOffset(-3).add(2, 'seconds').format("HH")
@@ -799,7 +809,6 @@ async function calldo(hoorr, winsMap) {
 
         await awaittt()
         // break
-        let dayiM = moment(moment().format("YYYY-MM-DD ") + hoo.horario).utcOffset(-3).format('HH:mm')
         let stringId = getActiveString(parInt, activesMapString) + ' ' + dayiM
 
         // console.log(stringId);
@@ -1264,6 +1273,8 @@ setInterval(() => {
 let canEnter = []
 let cantEnter = []
 function dologicss(candle, stringId, candleVictories) {
+    // console.log(moment.unix(candle.from).utcOffset(-3).format("YYYY-MM-DD HH:mm"));
+    // console.log(dayyyyyyyyy);
     if (dayyyyyyyyy == moment.unix(candle.from).utcOffset(-3).format("YYYY-MM-DD HH:mm"))
         if (!candleVictories.has(stringId)) {
             if (candle.open != candle.close) {
@@ -2809,77 +2820,49 @@ let day = '2023-10-14 '
 
 let horariosObj = config.horariosObj
 // let paresVer = []
+let verao = false
 let horarios = [`
 tipo1
-EURUSD 14:00=CALL
-EURUSD 10:13=CALL
-EURUSD 02:59=PUT
-EURGBP 05:40=CALL
-EURGBP 04:12=PUT
-EURJPY 07:59=CALL
-EURJPY 03:05=CALL
-AUDUSD 15:18=CALL
-AUDUSD 10:25=PUT
-AUDCAD 02:03=PUT
-GBPJPY 02:35=PUT
-GBPUSD 11:34=PUT
-USDCHF 04:38=PUT
-USDCAD 16:32=PUT
-USDCAD 03:23=CALL
-USDJPY 03:58=PUT
-EURUSD 12:24=PUT
-EURUSD 09:21=CALL
-EURGBP 06:29=CALL
-EURGBP 05:14=PUT
-EURJPY 08:51=CALL
-EURJPY 03:59=CALL
-EURJPY 02:51=PUT
-AUDUSD 11:25=PUT
-AUDUSD 04:45=PUT
-GBPJPY 17:24=CALL
-GBPUSD 17:34=PUT
-GBPUSD 11:25=PUT
-USDCHF 02:54=PUT
-USDCAD 10:57=CALL
-USDJPY 17:02=PUT
+EURUSD 11:24=CALL
+EURUSD 07:18=CALL
+EURGBP 02:00=CALL
+EURJPY 04:04=PUT
+AUDUSD 08:30=PUT
+AUDUSD 03:59=PUT
+AUDUSD 01:53=PUT
+GBPJPY 05:05=CALL
+GBPUSD 16:59=CALL
+GBPUSD 03:59=PUT
+USDCAD 11:55=CALL
+USDJPY 11:22=PUT
+USDJPY 02:51=CALL
+EURUSD 10:22=CALL
+EURGBP 13:02=CALL
+EURJPY 11:48=CALL
+EURJPY 02:00=CALL
+AUDUSD 07:57=CALL
+AUDUSD 01:31=CALL
+AUDCAD 16:25=CALL
+GBPJPY 04:35=PUT
+GBPUSD 05:44=PUT
+USDCHF 03:24=CALL
+USDCAD 08:11=CALL
+USDJPY 04:57=CALL
 
 `,
-    //     `
-    // tipo2
-
-    // EURUSD 13:35=65.92592592592592=46 89=PUT
-    // EURUSD 09:02=67.4074074074074=91 44=CALL
-    // EURUSD 04:56=65.69343065693431=90 47=CALL
-    // EURGBP 06:58=65.94202898550725=47 91=PUT
-    // EURGBP 06:13=65.92592592592592=89 46=CALL
-    // EURGBP 04:30=68.34532374100719=95 44=CALL
-    // EURGBP 03:12=66.66666666666667=45 90=PUT
-    // AUDUSD 12:42=65.67164179104478=46 88=PUT
-    // AUDCAD 12:57=67.6470588235294=44 92=PUT
-    // GBPUSD 14:54=68.38235294117646=43 93=PUT
-    // USDCHF 09:09=69.34306569343066=95 42=CALL
-    // USDCHF 01:38=65.07936507936508=44 82=PUT
-    // USDCHF 00:13=65.89147286821705=44 85=PUT
-    // USDCAD 13:03=65.94202898550725=91 47=CALL
-    // USDCAD 10:57=65.41353383458646=46 87=PUT`
-    //     ,
     `
 tipo2
-EURUSD 14:35=65.92592592592592=46 89=PUT
-EURUSD 10:02=67.4074074074074=91 44=CALL
-EURUSD 05:56=65.69343065693431=90 47=CALL
-EURGBP 07:58=65.94202898550725=47 91=PUT
-EURGBP 07:13=65.92592592592592=89 46=CALL
-EURGBP 05:30=68.34532374100719=95 44=CALL
-EURGBP 04:12=66.66666666666667=45 90=PUT
-AUDUSD 13:42=65.67164179104478=46 88=PUT
-AUDCAD 13:57=67.6470588235294=44 92=PUT
-GBPUSD 15:54=68.38235294117646=43 93=PUT
-USDCHF 10:09=69.34306569343066=95 42=CALL
-USDCHF 02:38=65.07936507936508=44 82=PUT
-USDCHF 01:13=65.89147286821705=44 85=PUT
-USDCAD 14:03=65.94202898550725=91 47=CALL
-USDCAD 11:57=65.41353383458646=46 87=PUT
+EURUSD 09:02=65.18518518518519=88 47=CALL
+EURGBP 06:13=67.4074074074074=91 44=CALL
+EURGBP 04:30=69.7841726618705=97 42=CALL
+AUDCAD 12:57=68.38235294117646=43 93=PUT
+AUDCAD 06:58=66.42335766423358=46 91=PUT
+USDCHF 09:09=66.17647058823529=90 46=CALL
+USDCHF 07:49=65.44117647058823=89 47=CALL
+USDCHF 07:00=65.92592592592592=46 89=PUT
+USDCAD 12:57=66.91176470588235=45 91=PUT
+USDCAD 08:58=66.9172932330827=89 44=CALL
+USDJPY 06:00=65.46762589928058=91 48=CALL
 `
 ]
 

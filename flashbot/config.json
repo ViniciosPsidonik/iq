@@ -5,17 +5,20 @@
     "taxasM15": "",
     "taxasM5": "",
     "toCloseM5": ";;;;;;;;;;;;;;;;",
-    "stopWinInfinity": 1000,
+    "stopWinInfinity": 500,
     "sorosNoSoros": 1,
-    "veefe": "",
-    "lastAmount": 513.9487124390679,
+    "winG": 31,
+    "lossG": 21,
+    "veefe": "LLLLWWLLLLLWWWLWLLWWWW",
+    "ssid": "af7b700b09f52fcd952f365fffc93544",
+    "lastAmount": 1316,
     "cores": 1,
     "infinity": 14,
     "notifyy": 0,
     "toCloseM15": "",
-    "text": "M1 EURUSD-OTC 98.1 PUT;M1 EURUSD-OTC 98.1 CALL;M1 EURUSD-OTC 98.1 PUT;M1 EURUSD-OTC 98.1 PUT",
+    "text": "",
     "StopLoss": 999999,
-    "StopWin": 464,
+    "StopWin": 41,
     "noticias": "USD,14:00;USD,14:00",
     "verpar": "",
     "taxas": "",
@@ -24,7 +27,7 @@
     "cincoum": 1,
     "doispraum": 0,
     "gale": 0,
-    "conta": "demo",
+    "conta": "real",
     "percentageScalper": 10,
     "copyy": 1,
     "payout": 0,
@@ -36,6 +39,7 @@
     "filtroPorPais": "Worldwide",
     "topTradersRange": 0,
     "kill": 0,
+    "horariosObj": [],
     "schedules": "",
     "galeLevel": 2,
     "galeFactor": 2.2,
@@ -46,6 +50,7 @@
     "delaySeconds": 1,
     "copyIds": "70421908,1111",
     "tradesPerActive": 25,
+    "taxasEmperium": [],
     "binarias": 1,
     "binariasTimes": "",
     "digital": 1,
@@ -55,5 +60,14 @@
     "copyBestIdsRange": 0,
     "pass": "senhaloka",
     "cleanUp": 0,
-    "ssid": "5be629b8b84662f174fc23e94027821f"
+    "operations": [
+        {
+            "id": 6551,
+            "result": "W"
+        },
+        {
+            "id": 6555,
+            "result": "W"
+        }
+    ]
 }

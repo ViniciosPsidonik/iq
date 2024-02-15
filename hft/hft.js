@@ -1213,9 +1213,10 @@ server.on('connection', (socket) => {
             let direction = message.split('/')[0]
             let parInt = activesMapString.get(message.split('/')[1])
             if (typeof currentTimehhmmss != "undefined" && moment(moment().format("YYYY-MM-DD ") + currentTimehhmmss).isAfter(moment(moment().format("YYYY-MM-DD 02:00"))) && moment(moment().format("YYYY-MM-DD ") + currentTimehhmmss).isBefore(moment(moment().format("YYYY-MM-DD 17:00")))) {
-                if (!openedOrders.includes(parInt)) {
+                if (openedOrders.length == 0) {
                     // setTimeout(() => {
                     buyBefor(direction, parInt, 1);
+                    // buyBefor(direction == 'call' ? 'put' : 'call', parInt, 1);
                     openedOrders.push(parInt);
                     // }, 300);
                 }
@@ -1945,9 +1946,11 @@ async function winMass() {
     fs.writeFile('config.json', JSON.stringify(config, null, 4), err => {
         // console.log(err || 'Arquivo salvo');
         if (countResult >= 3) {
-            notify('Stop', `Stop WIN Alcançado...`);
-            console.log('Stop WIN Alcançado...')
-            process.exit(1)
+            setTimeout(() => {
+                notify('Stop', `Stop WIN Alcançado...`);
+                console.log('Stop WIN Alcançado...')
+                process.exit(1)
+            }, 1000);
         }
     });
 
@@ -1967,10 +1970,12 @@ function lossMass(winloss) {
     config.veefe = veefe
     fs.writeFile('config.json', JSON.stringify(config, null, 4), err => {
         // console.log(err || 'Arquivo salvo');
-        if (countResult <= -4) {
-            notify('Stop', `Stop Loss Alcançado...`);
-            console.log('Stop Loss Alcançado...')
-            process.exit(1)
+        if (countResult <= -3) {
+            setTimeout(() => {
+                notify('Stop', `Stop Loss Alcançado...`);
+                console.log('Stop Loss Alcançado...')
+                process.exit(1)
+            }, 3000);
         }
     });
 
@@ -2492,6 +2497,7 @@ const tryconnect = setInterval(() => {
     connectedd = false
 }, 7000);
 
+//7x5
 
 const start = (force) => {
     if (!ssid || force) {

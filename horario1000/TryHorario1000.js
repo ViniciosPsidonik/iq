@@ -1193,6 +1193,7 @@ let candleVictoriesFive = new Map()
 let canfoagain = false
 let counttt = 0
 let canStop = false
+let verao = false
 function candleStuff(message) {
     let candles = message.msg.candles;
 
@@ -1212,22 +1213,18 @@ function candleStuff(message) {
         for (let index = candles.length - 1; index >= 0; index--) {
 
             const candle = candles[index];
-            let hh = parseInt(moment.unix(candle.from).utcOffset(-3).format("HH"))
-            // let found = false
-            // for (let i = 0; i < horariossss.length; i++) {
-            //     const element = horariossss[i];
-            //     if (element.key == dayi) {
-            //         found = true
-            //         break
-            //     }
-            // }
-            // if (found) {
-            //     continue
-            // }
-
+            let hh
+            let dayi
+            if (moment.unix(candle.from).utcOffset(-3).isAfter(moment('2023-11-06 00:00')) && verao) {
+                // console.log('isafteeer');
+                hh = parseInt(moment.unix(candle.from).subtract(1, 'hours').utcOffset(-3).format("HH"))
+                dayi = moment.unix(candle.from).subtract(1, 'hours').utcOffset(-3).format("YYYY-MM-DD HH:mm")
+            } else {
+                hh = parseInt(moment.unix(candle.from).utcOffset(-3).format("HH"))
+                dayi = moment.unix(candle.from).utcOffset(-3).format("YYYY-MM-DD HH:mm")
+            }
             if (hh < 17 && hh > 0) {
                 counttt++
-                let dayi = moment.unix(candle.from).utcOffset(-3).format("YYYY-MM-DD HH:mm")
                 let key = getActiveString(parInt, activesDigitalMapStringaaa) + "-" + dayi
                 console.log(key);
                 if (candle.open != candle.close)
@@ -1238,39 +1235,15 @@ function candleStuff(message) {
                         horariossss.push({ key, direction: 'put' })
                     }
             }
-            // console.log(dayi)
-            // let dayiM = moment.unix(candle.from).utcOffset(-3).format("HH:mm")
-            // let parInt = parseInt(message.request_id.split('/')[0]);
-
-            // let stringId = getActiveString(parInt, activesMapString) + ' ' + dayiM
-            // console.log(stringId);
-            // if (stringgAcepted.includes(dayi))
-            //     if (timeeactual == 1) {
-            //         dologicss(candle, stringId, candleVictories);
-            //         // console.log(candleVictories);
-            //     } else {
-            // dologicss(candle, stringId, candleVictoriesFive);
-            //         // console.log(candleVictoriesFive);
-            //     }
 
         }
 
-        // horario.horariossss = horariossss
-        // fs.writeFile('horarios.json', JSON.stringify(horario, null, 4), err => {
-        //     // console.log(err || 'Arquivo salvo');
-        // });
 
         console.log('aaaaaaaaaaaa');
         // to = null
         canfoagain = true
 
     }
-    // process.stdout.cursorTo(0);
-    // process.stdout.write(counttt.toString());
-    // setTimeout(() => {
-    //     process.stdout.clearLine();
-    // }, 200);
-    // console.log(counttt);
 }
 
 let onstart = []

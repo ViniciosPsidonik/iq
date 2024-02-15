@@ -6,7 +6,7 @@ const DerivAPI = require('@deriv/deriv-api/dist/DerivAPI');
 var XLSX = require('xlsx');
 var XLSX_CALC = require('xlsx-calc');
 const { log } = require('pkg/lib-es5/log');
-var workbook = XLSX.readFile('./Massanielloderiv.xlsx');
+var workbook = XLSX.readFile('./MassanielloderivDiffers.xlsx');
 var worksheet = workbook.Sheets['Calculadora']
 let amount = 0.35
 let fsConfig = fs.readFileSync('deriv.json')
@@ -29,7 +29,6 @@ let win = 0
 let loss = 0
 let meta = 100
 let bancaVirtual = 0
-let waiting = false
 
 function getCell(cellString) {
     if (typeof worksheet[cellString] != "undefined") {
@@ -76,6 +75,7 @@ function winMass() {
         console.log(`Takeeee `.green)
         veefe = ''
         take();
+        barrier = 5
         lastTake = profitSession
     }
 
@@ -86,7 +86,7 @@ function winMass() {
 }
 
 function take() {
-    barrier = 2;
+    barrier = 5;
     loss = 0;
     win = 0;
 
@@ -121,7 +121,7 @@ function modifyCell(cellString, value) {
 }
 
 let start = true
-let barrier = 2
+let barrier = 5
 
 let contract
 
@@ -133,6 +133,8 @@ const openDigitDiff = async (api) => {
 
     // })
 }
+
+let mettaa = 0
 
 const getamount = async () => {
 
@@ -160,6 +162,7 @@ const getamount = async () => {
     amount = parseFloat(getCell('D' + countMass))
     console.log('Banca=', getCell('N12'));
     console.log(amount);
+    mettaa = getCell('N12') * 2
 
     // console.log(getCell('I' + 3))
     // console.log(getCell('F' + 3))
@@ -174,6 +177,9 @@ let ativaTicks = false
 let counterNine = 0
 let lastDigits = [0, 1]
 let lasttrywin = false
+let proposal = 0
+let wing = 0
+let lossg = 0
 async function buyRec() {
     console.log('biy rec');
     const connection = new WebSocket('wss://ws.binaryws.com/websockets/v3?app_id=34941');
@@ -187,24 +193,26 @@ async function buyRec() {
         start = false
         // meta = balance.balance.amount.value + 50
 
-        const ticks = await api.ticks('R_100');
+        const ticks = await api.ticks('R_10');
         bancaVirtual = parseFloat(getCell('N12'))
         // console.log('aaaaaaaa');
         ticks.onUpdate().subscribe(async tick => {
-            let digit = parseInt(tick.raw.quote.toString().slice(-1))
-            // lastDigits[1] = lastDigits[0]
 
-            // lastDigits[0] = parseInt(tick.raw.quote.toString().slice(-1))
+            let digit = parseInt(tick.raw.quote.toString().slice(-2))
+            // lastDigits[1] = lastDigits[0]
+            // lastDigits[0] = parseInt(tick.raw.quote.toString().slice(-2))
             // if ((digit == 0 || digit == 1 || digit == 2) && (lastDigits[1] == 0 || lastDigits[1] == 1 || lastDigits[1] == 2)) {
             //     lasttrywin = false
             // } else if ((digit != 0 && digit != 1 && digit != 2) && (lastDigits[1] == 0 || lastDigits[1] == 1 || lastDigits[1] == 2)) {
             //     lasttrywin = true
             // }
+            console.log(digit);
             if (ativaTicks) {
-                console.log(digit);
-                if (digit == 0 || digit == 1 || digit == 2) {
+                if (digit.toString()[1] == digit.toString()[0]) {
                     counterNine++
                     if (counterNine >= 1) {
+                        // console.log('noow');
+                        barrier = parseInt(digit.toString()[0])
                         counterNine = 0
                         ativaTicks = false
                         canTrade = true
@@ -213,6 +221,8 @@ async function buyRec() {
                 else {
                     counterNine = 0
                 }
+            } else {
+                // barrier = digit
             }
         })
 
@@ -227,17 +237,15 @@ async function buyRec() {
     }
 
 
-    let contract = await contracts();
     // 
     // if (loss + win > 0) {
-    if (loss - win > 1 || loss + win >= 10) {
-        // ativaTicks = true
-        // await esperaPoderEntrar()
-        // setTimeout(async () => {
-        // let contract = await contracts();
-        // startContract(contract, api, connection);
-        // }, 4000);
+    if (loss > 0) {
+        ativaTicks = true
+        waiting = true
+        await esperaPoderEntrar()
+        waiting = false
     }
+    let contract = await contracts();
     console.log('=====================');
     conn = true
     contract.buy().catch(err => {
@@ -248,15 +256,19 @@ async function buyRec() {
     startContract(contract, api, connection);
 
     async function contracts() {
+        if (typeof barrier == "undefined") {
+            barrier = 5
+        }
+        console.log('Barrie=', barrier);
         let contract = await api.contract({
             // contract_type: 'DIGITDIFF',
-            contract_type: 'DIGITOVER',
-            symbol: 'R_100',
+            contract_type: 'DIGITDIFF',
+            symbol: 'R_10',
             duration: 1,
             duration_unit: 't',
             currency: 'USD',
             barrier,
-            // proposal: 2,
+            // proposal,
             basis: 'stake',
             amount: parseFloat(amount).toFixed(2)
         }).catch(err => console.log(err));
@@ -265,14 +277,16 @@ async function buyRec() {
     }
 }
 let conn = false
+let waiting = false
 setInterval(() => {
-    if (conn) {
+    if (conn && !waiting) {
         console.log('conn ====== false');
         conn = false
-    } else {
+    } else if (!waiting) {
+        console.log('denovooooooooo');
         buyRec()
     }
-}, 90000);
+}, 25000);
 const esperaPoderEntrar = (type) => {
     return new Promise((resolve, reject) => {
         const intt = setInterval(() => {
@@ -306,6 +320,7 @@ function startContract(contract, api, connection) {
                 console.log(bancaAtual);
                 profitSession += contract.profit.value
                 // bancaAtual += profitSession
+                wing++
                 if (hasloss) {
                     win++;
                     winMass();
@@ -321,6 +336,7 @@ function startContract(contract, api, connection) {
                 // console.log(`WIIN - falta = ${parseInt(falta)}`.green);
                 console.log(`Wins: ${win} || Loss: ${loss}`);
                 console.log(`Profit Session = ${profitSession}`.green);
+                console.log(`wing: ${wing} || lossg: ${lossg}`);
                 // 9981
                 // 10137
                 // resolve()
@@ -328,7 +344,7 @@ function startContract(contract, api, connection) {
                 // connection.terminate();
                 // clearInterval(intttt);
                 // setTimeout(() => {
-                if (profitSession > 25) {
+                if (profitSession > mettaa) {
                     console.log(`STOP WIIN`.green);
                     process.exit()
                 } else {
@@ -346,13 +362,15 @@ function startContract(contract, api, connection) {
                 loss++;
                 console.log(`Wins: ${win} || Loss: ${loss}`);
                 console.log(`Profit Session = ${profitSession}`.green);
+                console.log(`wing: ${wing} || lossg: ${lossg}`);
                 lossMass('L');
+                lossg++
                 // console.log(contract);
                 // contract = undefined;
                 // connection.terminate();
                 // clearInterval(intttt);
                 // setTimeout(() => {
-                if (profitSession <= -25) {
+                if (profitSession <= -  40) {
                     console.log(`STOP WIIN`.green);
                     process.exit()
                 } else {

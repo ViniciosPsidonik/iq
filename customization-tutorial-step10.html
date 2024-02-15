@@ -66,7 +66,9 @@
       <button onclick="myFunction('GBPUSD')">GBPUSD</button>
       <button onclick="myFunction('USDCAD')">USDCAD</button>
       <button onclick="myFunction('AUDJPY')">AUDJPY</button>
-      <button onclick="myFunction('USDCHF')">USDCHF</button>
+      <button onclick="myFunction('USDJPY')">USDJPY</button>
+      <button onclick="myFunction('AUDUSD')">AUDUSD</button>
+      <button onclick="myFunction('AUDCAD')">AUDCAD</button>
       <button onclick="enviar()">ENVIAR</button>
       <button onclick="clearAll()">clearAll</button>
     </div>
@@ -118,6 +120,44 @@
     }
     // Function to generate a sample set of Candlestick datapoints
     let moedas = []
+
+    let arrmoeda = ['EURUSD',
+      'EURJPY',
+      'EURGBP',
+      'GBPJPY',
+      'GBPUSD',
+      'USDCAD',
+      'AUDJPY',
+      'USDJPY',
+      'AUDUSD',
+      'AUDCAD']
+
+    for (let index = 0; index < arrmoeda.length; index++) {
+      const arrmoed = arrmoeda[index];
+      console.log(arrmoed);
+      axios.get(`http://localhost:1234/candlestick/${arrmoed}`).then((res) => {
+        if (res.data) {
+          // res.data.length
+          for (let index = 0; index < res.data.length; index++) {
+            const element = res.data[index];
+            if (typeof element.direction != "undefined") {
+
+              console.log(element);
+              for (const [key, value] of pricesToSend) {
+                if (key === element.actives) {
+                  if (element.direction == 'call') {
+                    pricesToSend.set(key, { ...value, sup: undefined, supd: undefined })
+                  } else {
+                    pricesToSend.set(key, { ...value, res: undefined, resd: undefined })
+                  }
+                  console.log('bbbbbbbb');
+                }
+              }
+            }
+          }
+        }
+      })
+    }
 
     getCandleStick('EURUSD')
 

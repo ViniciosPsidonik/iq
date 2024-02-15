@@ -7,9 +7,9 @@
     "toCloseM5": ";;;;;;;;;;;;;;;;",
     "stopWinInfinity": 1000,
     "sorosNoSoros": 1,
-    "veefe": "LLLLWLWWWWLLLLWWLLLW",
+    "veefe": "LLLWWLWLWLLWWLWLLLL",
     "ssid": "b1ad73017d5320a85fbfae0e4e2d8add",
-    "lastAmount": 72,
+    "lastAmount": 114.29378231287002,
     "cores": 1,
     "infinity": 14,
     "notifyy": 0,
@@ -37,7 +37,38 @@
     "filtroPorPais": "Worldwide",
     "topTradersRange": 0,
     "kill": 0,
-    "horariosObj": [],
+    "horariosObj": [
+        {
+            "horario": "12:57",
+            "par": "AUDCAD",
+            "direction": "put",
+            "time": 1
+        },
+        {
+            "horario": "12:57",
+            "par": "USDCAD",
+            "direction": "put",
+            "time": 1
+        },
+        {
+            "horario": "14:00",
+            "par": "AUDCAD",
+            "direction": "call",
+            "time": 5
+        },
+        {
+            "horario": "12:45",
+            "par": "GBPJPY",
+            "direction": "call",
+            "time": 5
+        },
+        {
+            "horario": "12:55",
+            "par": "USDCAD",
+            "direction": "put",
+            "time": 5
+        }
+    ],
     "schedules": "",
     "galeLevel": 2,
     "galeFactor": 2.2,

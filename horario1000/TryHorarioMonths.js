@@ -608,6 +608,7 @@ let indexesss = []
 let timeeactual = 1
 let horariosachou = []
 let horariosachouFive = []
+let horariosachouFifteen = []
 
 let stringgAcepted = []
 
@@ -1191,10 +1192,13 @@ let m15Expires = []
 let candleId = new Map()
 let candleVictories = new Map()
 let candleVictoriesFive = new Map()
+let candleVictoriesFifteen = new Map()
 let canfoagain = false
 let counttt = 0
 let canStop = false
 let horariossfive = []
+let horariossFifteen = []
+let verao = false
 function candleStuff(message) {
     let candles = message.msg.candles;
 
@@ -1214,73 +1218,48 @@ function candleStuff(message) {
         for (let index = candles.length - 1; index >= 0; index--) {
 
             const candle = candles[index];
-            let hh = parseInt(moment.unix(candle.from).utcOffset(-3).format("HH"))
-            // let found = false
-            // for (let i = 0; i < horariossss.length; i++) {
-            //     const element = horariossss[i];
-            //     if (element.key == dayi) {
-            //         found = true
-            //         break
-            //     }
-            // }
-            // if (found) {
-            //     continue
-            // }
-
+            let hh
+            let dayi
+            if (moment.unix(candle.from).utcOffset(-3).isAfter(moment('2023-11-06 00:00')) && verao) {
+                // console.log('isafteeer');
+                hh = parseInt(moment.unix(candle.from).subtract(1, 'hours').utcOffset(-3).format("HH"))
+                dayi = moment.unix(candle.from).subtract(1, 'hours').utcOffset(-3).format("YYYY-MM-DD HH:mm")
+            } else {
+                hh = parseInt(moment.unix(candle.from).utcOffset(-3).format("HH"))
+                dayi = moment.unix(candle.from).utcOffset(-3).format("YYYY-MM-DD HH:mm")
+            }
+            let key = getActiveString(parInt, activesDigitalMapStringaaa) + "-" + dayi
             if (hh < 17 && hh >= 0) {
                 counttt++
-                let dayi = moment.unix(candle.from).utcOffset(-3).format("YYYY-MM-DD HH:mm")
-                let key = getActiveString(parInt, activesDigitalMapStringaaa) + "-" + dayi
                 console.log(key);
                 if (candle.open != candle.close)
                     if (candle.open < candle.close) {
                         // green
                         if (timeeactual == 1) {
                             horariossss.push({ key, direction: 'call' })
-                        } else {
+                        } else if (timeeactual == 5) {
                             horariossfive.push({ key, direction: 'call' })
+                        } else if (timeeactual == 15) {
+                            horariossFifteen.push({ key, direction: 'call' })
                         }
                     } else {
                         if (timeeactual == 1) {
                             horariossss.push({ key, direction: 'put' })
-                        } else {
+                        } else if (timeeactual == 5) {
                             horariossfive.push({ key, direction: 'put' })
+                        } else if (timeeactual == 15) {
+                            horariossFifteen.push({ key, direction: 'put' })
                         }
                     }
             }
-            // console.log(dayi)
-            // let dayiM = moment.unix(candle.from).utcOffset(-3).format("HH:mm")
-            // let parInt = parseInt(message.request_id.split('/')[0]);
-
-            // let stringId = getActiveString(parInt, activesMapString) + ' ' + dayiM
-            // console.log(stringId);
-            // if (stringgAcepted.includes(dayi))
-            //     if (timeeactual == 1) {
-            //         dologicss(candle, stringId, candleVictories);
-            //         // console.log(candleVictories);
-            //     } else {
-            // dologicss(candle, stringId, candleVictoriesFive);
-            //         // console.log(candleVictoriesFive);
-            //     }
 
         }
 
-        // horario.horariossss = horariossss
-        // fs.writeFile('horarios.json', JSON.stringify(horario, null, 4), err => {
-        //     // console.log(err || 'Arquivo salvo');
-        // });
 
         console.log('aaaaaaaaaaaa');
-        // to = null
         canfoagain = true
 
     }
-    // process.stdout.cursorTo(0);
-    // process.stdout.write(counttt.toString());
-    // setTimeout(() => {
-    //     process.stdout.clearLine();
-    // }, 200);
-    // console.log(counttt);
 }
 
 let onstart = []
@@ -2111,7 +2090,7 @@ async function profileStuf1(message, name) {
         console.log('===============');
         console.log(key);
         if (!key.includes('OTC'))
-            for (let indexj = 0; indexj < 80; indexj++) {
+            for (let indexj = 0; indexj < 40; indexj++) {
                 console.log("==================");
                 if (!to) {
                     to = parseInt(moment(moment().format("YYYY-MM-DD ") + "17:00").subtract(indexj, 'days').utcOffset(0).format('X'))
@@ -2130,6 +2109,30 @@ async function profileStuf1(message, name) {
             }
         to = null
     }
+    timeeactual = 15
+    for (var [key, value] of activesDigitalMapStringaaa.entries()) {
+        console.log('===============');
+        console.log(key);
+        if (!key.includes('OTC'))
+            for (let indexj = 0; indexj < 14; indexj++) {
+                console.log("==================");
+                if (!to) {
+                    to = parseInt(moment(moment().format("YYYY-MM-DD ") + "17:00").subtract(indexj, 'days').utcOffset(0).format('X'))
+                    console.log('tooooooo');
+                }
+
+                console.log(to);
+                // currentTimehh = moment.unix(currentTime / 1000).utcOffset(-3).add(2, 'seconds').format("HH")
+                // console.log(to);
+                // if (hoo.time == 5)
+                //     timeeactual = 5
+
+                getCandle(value, 900, 1000, to);
+                await awaittt()
+
+            }
+        to = null
+    }
 
     for (let index = 0; index < horariossss.length; index++) {
         const horario = horariossss[index];
@@ -2141,6 +2144,10 @@ async function profileStuf1(message, name) {
         lougitics(horario, candleVictoriesFive);
     }
 
+    for (let index = 0; index < horariossFifteen.length; index++) {
+        const horario = horariossFifteen[index];
+        lougitics(horario, candleVictoriesFifteen);
+    }
 
 
     for (var [key, value] of candleVictories.entries()) {
@@ -2175,6 +2182,25 @@ async function profileStuf1(message, name) {
     }
     console.log('horariosachouFIVE');
     console.log(horariosachouFive);
+
+    for (var [key, value] of candleVictoriesFifteen.entries()) {
+
+        let tudo = value.green + value.red
+        let media
+        if (value.green > value.red) {
+            media = value.green * 100 / tudo
+            if (media > 65)
+                horariosachouFifteen.push(key + '=' + media + "=" + value.green + ' ' + value.red + "=CALL")
+        } else if (value.green < value.red) {
+            media = value.red * 100 / tudo
+            if (media > 65)
+                horariosachouFifteen.push(key + '=' + media + "=" + value.green + ' ' + value.red + "=PUT")
+        }
+    }
+    console.log('horariosachouFifteen');
+    console.log(horariosachouFifteen);
+
+
     let horarrrr = []
     for (let index = 0; index < horariosachou.length; index++) {
         const horariosadddd = horariosachou[index];
@@ -2183,6 +2209,25 @@ async function profileStuf1(message, name) {
         let direction = horariosadddd.split(' ')[2].split('=')[1]
 
         horarrrr.push(hora + " - " + par + " - " + direction)
+
+    }
+    for (let index = 0; index < horariosachouFive.length; index++) {
+        const horariosadddd = horariosachouFive[index];
+        let hora = horariosadddd.split(' ')[1].split('=')[0]
+        let par = horariosadddd.split(' ')[0]
+        let direction = horariosadddd.split(' ')[2].split('=')[1]
+
+        horarrrr.push(hora + " - " + par + " - " + direction + " - M5")
+
+    }
+
+    for (let index = 0; index < horariosachouFifteen.length; index++) {
+        const horariosadddd = horariosachouFifteen[index];
+        let hora = horariosadddd.split(' ')[1].split('=')[0]
+        let par = horariosadddd.split(' ')[0]
+        let direction = horariosadddd.split(' ')[2].split('=')[1]
+
+        horarrrr.push(hora + " - " + par + " - " + direction + " - M15")
 
     }
 

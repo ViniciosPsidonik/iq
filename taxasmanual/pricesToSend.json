@@ -1,0 +1,61 @@
+[
+    {
+        "moeda": "GBPJPY",
+        "taxa": {
+            "res": 0,
+            "resd": 0
+        }
+    },
+    {
+        "moeda": "USDCAD",
+        "taxa": {
+            "res": 1.3519867857029233,
+            "resd": 0,
+            "sup": 0,
+            "supd": 0
+        }
+    },
+    {
+        "moeda": "AUDJPY",
+        "taxa": {
+            "res": 96.45105993943473,
+            "resd": 0,
+            "sup": 0,
+            "supd": 0
+        }
+    },
+    {
+        "moeda": "USDJPY",
+        "taxa": {
+            "res": 148.5935037012113,
+            "resd": 0,
+            "sup": 148.4713637281292,
+            "supd": 0
+        }
+    },
+    {
+        "moeda": "EURUSD",
+        "taxa": {
+            "res": 1.0750130955585464,
+            "resd": 0,
+            "sup": 0,
+            "supd": 0
+        }
+    },
+    {
+        "moeda": "AUDUSD",
+        "taxa": {
+            "res": 0.6491424764468372,
+            "resd": 0,
+            "sup": 0,
+            "supd": 0
+        }
+    },
+    {
+        "moeda": "AUDCAD",
+        "taxa": {
+            "sup": 0,
+            "supd": 0
+        }
+    }
+]

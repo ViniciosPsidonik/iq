@@ -1,5 +1,3 @@
-
-const fs = require('fs')
 const WebSocket = require('ws');
 const DerivAPI = require('@deriv/deriv-api/dist/DerivAPI');
 
@@ -9,18 +7,13 @@ const { log } = require('pkg/lib-es5/log');
 var workbook = XLSX.readFile('./Massanielloderiv.xlsx');
 var worksheet = workbook.Sheets['Calculadora']
 let amount = 0.35
-let fsConfig = fs.readFileSync('deriv.json')
-let config = JSON.parse(fsConfig)
-let veefe = config.veefe
-let lastTake = config.lastTake
-
 const colors = require('colors')
 // change some cell value
 // console.log(getCell('F4'));
 
 let countMass = 3
 // console.log(amount);
-let profitSession = config.profitSession
+let profitSession = 0
 
 // basic.ping().then(console.log);
 let balancesss = false
@@ -29,7 +22,6 @@ let win = 0
 let loss = 0
 let meta = 100
 let bancaVirtual = 0
-let waiting = false
 
 function getCell(cellString) {
     if (typeof worksheet[cellString] != "undefined") {
@@ -42,7 +34,6 @@ function getCell(cellString) {
 function lossMass(winloss) {
     if (winloss == 'L') {
         hasloss = true
-        veefe += 'L'
     }
     // barrier = 6
     modifyCell('C' + countMass, winloss);
@@ -52,37 +43,22 @@ function lossMass(winloss) {
     amount = parseFloat(getCell('D' + countMass)) > 0 ? parseFloat(getCell('D' + countMass)) : parseFloat(getCell('D' + countMass)) * -1;
     if (amount < 0.35) {
         console.log("LOSSSSSSS".red);
-        veefe = ''
         take();
-    }
-
-    if (winloss == 'L') {
-        // config.veefe = veefe
-        // config.profitSession = profitSession
-        // fs.writeFile('deriv.json', JSON.stringify(config, null, 4), err => {
-        //     // console.log(err || 'Arquivo salvo');
-        // });
     }
 }
 let bancaAtual = 0
 let hasloss = false
 function winMass() {
     lossMass('W')
-    veefe += 'W'
     console.log('Balance=', getCell('F' + (countMass - 1)));
     // console.log('Cicle=', getCell('N12') - getCell('F' + (countMass - 1)));
     // || getCell('N12') - getCell('F' + countMass) <= 1
-    if (getCell('F' + (countMass - 1)) > getCell('N12') || profitSession >= lastTake) {
+    if (getCell('F' + (countMass - 1)) > getCell('N12')) {
         console.log(`Takeeee `.green)
-        veefe = ''
         take();
-        lastTake = profitSession
     }
 
-    // config.veefe = veefe
-    // fs.writeFile('deriv.json', JSON.stringify(config, null, 4), err => {
-    //     // console.log(err || 'Arquivo salvo');
-    // });
+
 }
 
 function take() {
@@ -134,43 +110,12 @@ const openDigitDiff = async (api) => {
     // })
 }
 
-const getamount = async () => {
-
-    for (let index = 0; index < veefe.length; index++) {
-        const element = veefe[index];
-
-        // console.log(element);
-        modifyCell('C' + countMass, element);
-
-        countMass++
-        if (element == 'L') {
-            loss++
-            hasloss = true
-        } else {
-            win++
-        }
-
-        // if (index % 10 == 0) {
-        //     XLSX_CALC(workbook, { continue_after_error: true, log_error: false });
-        //     console.log('xlsss');
-        // }
-        // console.log(element);
-    }
-    XLSX_CALC(workbook, { continue_after_error: true, log_error: false });
-    amount = parseFloat(getCell('D' + countMass))
-    console.log('Banca=', getCell('N12'));
-    console.log(amount);
-
-    // console.log(getCell('I' + 3))
-    // console.log(getCell('F' + 3))
-    // console.log(getCell('N' + 12))
-
-}
 
 
 let ganhaTrade = 0
 let canTrade = false
 let ativaTicks = false
+let veefe = ""
 let counterNine = 0
 let lastDigits = [0, 1]
 let lasttrywin = false
@@ -192,9 +137,9 @@ async function buyRec() {
         // console.log('aaaaaaaa');
         ticks.onUpdate().subscribe(async tick => {
             let digit = parseInt(tick.raw.quote.toString().slice(-1))
-            // lastDigits[1] = lastDigits[0]
+            lastDigits[1] = lastDigits[0]
 
-            // lastDigits[0] = parseInt(tick.raw.quote.toString().slice(-1))
+            lastDigits[0] = parseInt(tick.raw.quote.toString().slice(-1))
             // if ((digit == 0 || digit == 1 || digit == 2) && (lastDigits[1] == 0 || lastDigits[1] == 1 || lastDigits[1] == 2)) {
             //     lasttrywin = false
             // } else if ((digit != 0 && digit != 1 && digit != 2) && (lastDigits[1] == 0 || lastDigits[1] == 1 || lastDigits[1] == 2)) {
@@ -202,17 +147,27 @@ async function buyRec() {
             // }
             if (ativaTicks) {
                 console.log(digit);
-                if (digit == 0 || digit == 1 || digit == 2) {
-                    counterNine++
-                    if (counterNine >= 1) {
-                        counterNine = 0
-                        ativaTicks = false
-                        canTrade = true
-                    }
-                }
-                else {
+                if ((digit == 0 || digit == 1 || digit == 2) && lasttrywin) {
                     counterNine = 0
-                }
+                    ativaTicks = false
+                    canTrade = true
+                    lasttrywin = false
+                } else
+                    if ((digit == 0 || digit == 1 || digit == 2) && (lastDigits[1] == 0 || lastDigits[1] == 1 || lastDigits[1] == 2)) {
+                        counterNine++
+                        if (counterNine >= 1) {
+                            // lasttrywin = true
+                            console.log('lasttrywin');
+                            counterNine = 0
+                            ativaTicks = false
+                            canTrade = true
+                            lasttrywin = false
+                        }
+                    }
+
+                // else {
+                //     counterNine = 0
+                // }
             }
         })
 
@@ -222,17 +177,15 @@ async function buyRec() {
         cicleSession = 0;
         // XLSX_CALC(workbook, { continue_after_error: true, log_error: false });
         amount = parseFloat(getCell('D' + countMass)).toFixed(2)
-        getamount()
         // console.log('amount=', amount);
     }
 
 
     let contract = await contracts();
     // 
-    // if (loss + win > 0) {
-    if (loss - win > 1 || loss + win >= 10) {
-        // ativaTicks = true
-        // await esperaPoderEntrar()
+    if (loss + win > 10) {
+        ativaTicks = true
+        await esperaPoderEntrar()
         // setTimeout(async () => {
         // let contract = await contracts();
         // startContract(contract, api, connection);
@@ -266,13 +219,13 @@ async function buyRec() {
 }
 let conn = false
 setInterval(() => {
-    if (conn) {
+    if (conn && !ativaTicks) {
         console.log('conn ====== false');
         conn = false
-    } else {
+    } else if (!ativaTicks) {
         buyRec()
     }
-}, 90000);
+}, 30000);
 const esperaPoderEntrar = (type) => {
     return new Promise((resolve, reject) => {
         const intt = setInterval(() => {
@@ -312,13 +265,11 @@ function startContract(contract, api, connection) {
                 } else if (!ganhaTrade) {
                     ganhaTrade = contract.profit.value;
                     console.log('ganhaTrade=', ganhaTrade);
-                } else {
-                    lastTake = profitSession
                 }
                 // if (ganhaTrade) {
                 // }
                 let falta = (meta - bancaAtual) / ganhaTrade;
-                // console.log(`WIIN - falta = ${parseInt(falta)}`.green);
+                console.log(`WIIN - falta = ${parseInt(falta)}`.green);
                 console.log(`Wins: ${win} || Loss: ${loss}`);
                 console.log(`Profit Session = ${profitSession}`.green);
                 // 9981
@@ -328,7 +279,7 @@ function startContract(contract, api, connection) {
                 // connection.terminate();
                 // clearInterval(intttt);
                 // setTimeout(() => {
-                if (profitSession > 25) {
+                if (profitSession > 40) {
                     console.log(`STOP WIIN`.green);
                     process.exit()
                 } else {
@@ -352,23 +303,11 @@ function startContract(contract, api, connection) {
                 // connection.terminate();
                 // clearInterval(intttt);
                 // setTimeout(() => {
-                if (profitSession <= -25) {
-                    console.log(`STOP WIIN`.green);
-                    process.exit()
-                } else {
-                    buyRec(api, connection);
-                }
+                buyRec(api, connection);
                 // }, 1000);
                 // }
             }
             // }, 750);
-
-            config.veefe = veefe
-            config.profitSession = profitSession
-            config.lastTake = lastTake
-            fs.writeFile('deriv.json', JSON.stringify(config, null, 4), err => {
-                // console.log(err || 'Arquivo salvo');
-            });
         } else {
             if (typeof contract.validation_error != "undefined") {
 

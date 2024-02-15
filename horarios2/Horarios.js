@@ -14,6 +14,7 @@ let fsConfig = fs.readFileSync('config.json')
 let config = JSON.parse(fsConfig)
 let openedMap = new Map()
 let openedMapDigital = new Map()
+let verao = false
 
 //55099058
 const url = 'wss://ws.trade.capitalbear.com/echo/websocket'
@@ -120,6 +121,7 @@ var XLSX_CALC = require('xlsx-calc');
 // XLSX_CALC(workbook, { continue_after_error: true, log_error: false });
 
 const getamount = async () => {
+
 
     modifyCell('N' + 12, config.lastAmount);
     for (let index = 0; index < veefe.length; index++) {
@@ -321,7 +323,7 @@ const buy = (amount, active_id, direction, expired, type, msg) => {
                 }
                 , "name": "binary-options.open-option", "version": "1.0"
             },
-            "request_id": `${active_id}/INFINITY`
+            "request_id": `${active_id}/INFINITY/${direction}`
         }
     } else {
 
@@ -339,7 +341,7 @@ const buy = (amount, active_id, direction, expired, type, msg) => {
                     "instrument_id": instrumentId,
                     "amount": amount.toString()
                 }
-            }, "request_id": `${active_id}/INFINITY`
+            }, "request_id": `${active_id}/INFINITY/${direction}`
         }
         // console.log(instrumentId);
         orderopenned.push(instrumentId)
@@ -633,6 +635,8 @@ const onMessage = e => {
             // process.exit()
         }
 
+
+
         if (message.name == 'position-changed') {
             // console.log('RES = ' + e.data);
             positionChangedStuff(message)
@@ -663,7 +667,7 @@ const onMessage = e => {
                 const horario = horariosObj[index];
 
                 if (!indexesss.includes(index)) {
-                    if (moment(moment().format("YYYY-MM-DD ") + currentTimehhmmss).isAfter(moment(moment().format("YYYY-MM-DD ") + horario.horario))) {
+                    if (moment(moment().format("YYYY-MM-DD ") + currentTimehhmmss).isAfter(verao ? moment(moment().format("YYYY-MM-DD ") + horario.horario).add(1, 'hours') : moment(moment().format("YYYY-MM-DD ") + horario.horario))) {
                         buyBefor(horario.direction, activesDigitalMapString.has(horario.par) ? activesDigitalMapString.get(horario.par) : activesMapString.get(horario.par), horario.time, activesDigitalMapString.has(horario.par))
                         // indexesss.push(index)
                         horariosObj.splice(index, 1)
@@ -703,6 +707,7 @@ const onMessage = e => {
         if (message.name == 'digital-option-placed' && message.status != 2000) {
             totalOrderss--
             const active = parseInt(message.request_id.split('/')[0])
+            const direction = message.request_id.split('/')[2]
             parError.push[active]
             setTimeout(() => {
                 parError = []
@@ -717,6 +722,10 @@ const onMessage = e => {
             if (gale)
                 positionOpenedGale = false
             buysss = []
+
+            if (message.status == 5000) {
+                buyBefor(direction, active, 1, '', true);
+            }
 
         } else if (message.name == 'digital-option-placed') {
             // console.log('RES = ' + e.data)
@@ -1141,7 +1150,7 @@ setTimeout(() => {
 
 }, 3000);
 
-function buyBefor(direction, parInt, type, gatilho) {
+function buyBefor(direction, parInt, type, gatilho, binary) {
 
     let timeFrameL = null
     let timeFrame = type
@@ -1190,21 +1199,23 @@ function buyBefor(direction, parInt, type, gatilho) {
         if (parseInt(currentTimess) >= 31 && (minute == 14 || minute == 29 || minute == 44 || minute == 59)) {
             hourmm = moment.unix(currentTime / 1000).utcOffset(-3).add(3, 'seconds').add(16, 'm').format("HH:mm");
         } else {
-            hourmm = moment.unix(currentTime / 1000).utcOffset(-3).add(3, 'seconds').add(timeFrameL, 'm').format("HH:mm");
+            hourmm = moment.unix(currentTime / 1000).utcOffset(-3).add(3, 'seconds').add(type, 'm').format("HH:mm");
         }
         // }
     }
     // console.log(hourmm);
-    checkOpenedPayoutBeforeBuy(parInt, direction, hourmm, type);
+    checkOpenedPayoutBeforeBuy(parInt, direction, hourmm, type, binary);
 }
 
 let notOrder = []
 
-function checkOpenedPayoutBeforeBuy(parInt, direction, hourmm, timeFrame) {
+function checkOpenedPayoutBeforeBuy(parInt, direction, hourmm, timeFrame, binary) {
     let turboPayout = null;
     let digitalPayout = null;
 
-    if (activesDigitalMapString.has(getActiveString(parInt, activesMapString))) {
+    if (typeof binary != "undefined") {
+        openOrderBinary(direction, parInt, hourmm);
+    } else if (activesDigitalMapString.has(getActiveString(parInt, activesMapString))) {
         openOrderDigital(direction, parInt, hourmm, timeFrame);
     } else {
         openOrderBinary(direction, parInt, hourmm);
@@ -2003,9 +2014,9 @@ function startttt(taxasss, id, edit) {
 
             if (linha.includes('M5')) {
                 time = 5
-            }
-
-            if (linha.includes('M1')) {
+            } else if (linha.includes('M15')) {
+                time = 15
+            } else {
                 time = 1
             }
 
@@ -2029,7 +2040,6 @@ function startttt(taxasss, id, edit) {
                         break
                     }
                 }
-
                 if (!achoutimee) {
                     if (typeof currentTimehhmmss != 'undefined') {
                         if (moment(moment().format("YYYY-MM-DD ") + currentTimehhmmss).isBefore(moment(moment().format("YYYY-MM-DD ") + horario))) {
@@ -2180,10 +2190,27 @@ async function eventPrintD(event) {
 })();
 
 
-let day = '2023-10-14 '
 
 // let paresVer = []
-let horarios = ``
+let horarios = `
+09:02 - EURUSD - CALL
+06:13 - EURGBP - CALL
+04:30 - EURGBP - CALL
+12:57 - AUDCAD - PUT
+06:58 - AUDCAD - PUT
+09:09 - USDCHF - CALL
+07:49 - USDCHF - CALL
+07:00 - USDCHF - PUT
+12:57 - USDCAD - PUT
+08:58 - USDCAD - CALL
+06:00 - USDJPY - CALL
+10:50 - EURJPY - CALL - M5
+14:00 - AUDCAD - CALL - M5
+12:45 - GBPJPY - CALL - M5
+10:50 - GBPJPY - CALL - M5
+05:20 - USDCHF - PUT - M5
+12:55 - USDCAD - PUT - M5
+`
 
 
 
@@ -2195,12 +2222,13 @@ if (horarios) {
         let dateAfter = moment(moment(strdate).add(1, 'days').format("YYYY-MM-DD ") + "00:01")
         console.log('dateAfter=', dateAfter);
         const inrtt = setInterval(() => {
-            if (typeof currentTime != "undefined" && moment(moment().format("YYYY-MM-DD ") + currentTimehhmm).isAfter(dateAfter)) {
-                startttt(horarios)
-                clearInterval(inrtt)
-            }
+            // if (typeof currentTime != "undefined" && moment(moment().format("YYYY-MM-DD ") + currentTimehhmm).isAfter(dateAfter)) {
+            startttt(horarios)
+            clearInterval(inrtt)
+            // }
         }, 10000);
     }, 10000);
+    console.log(horariosObj);
 } else {
     console.log(horariosObj);
     // moment().add(1, 'days').format("YYYY-MM-DD ") + "00:01")
