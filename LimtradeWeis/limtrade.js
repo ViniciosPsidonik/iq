@@ -14,6 +14,100 @@ let openedMapDigital = new Map()
 
 
 
+Tail = require('tail').Tail;
+
+
+var robot = require("robotjs");
+
+const func = (time) => {
+    return new Promise((resolve, reject) => {
+        setTimeout(() => {
+            resolve()
+
+        }, time);
+
+    })
+}
+// Get mouse position.
+
+
+
+
+tail = new Tail("C:/Users/vinícios.psidonik/AppData/Roaming/MetaQuotes/Terminal/BCB8523932010D63DC37EF4343BEC73C/MQL4/Logs/" + moment().format('YYYYMMDD') + '.log', "\n", {}, true);
+
+tail.on("line", function (data) {
+    let dataSplited = data.split(" ")
+
+    console.log(data);
+    return
+    let parInt = activesMapString.get(dataSplited[1])
+
+    let achouu = false
+    for (let index = 0; index < checkCandle.length; index++) {
+        const element = checkCandle[index];
+        if (element.parInt == parInt) {
+            achouu = true
+            break
+        }
+    }
+
+    if (!achouu && !openedOrders.includes(parInt) && parseInt(currentTimess) <= 5) {
+        // console.log(`${currentTimehhmmss} || GATILHO / ${dataSplited[2]} / ${getActiveString(parInt, activesMapString)}`);
+        // notify('[GATILHO]', `${dataSplited[2]} / ${getActiveString(parInt, activesMapString)}`);
+
+        let isStopedPar = false
+        for (let index = 0; index < stopOrdersPares.length; index++) {
+            const stopOrdersPar = stopOrdersPares[index];
+            if (getActiveString(element.parInt, activesMapString).includes(stopOrdersPar)) {
+                isStopedPar = true
+                break
+            }
+        }
+
+        if (!stopOrders && !isStopedPar && (!doispraum || doispraum && openedOrders.length == 0)) {
+            buyBefor(dataSplited[2], parInt, 5)
+        }
+    } else {
+        console.log(`${currentTimehhmmss} || ${dataSplited}`);
+    }
+});
+
+async function faz() {
+    robot.moveMouse(352, 640);
+    robot.mouseClick("right");
+    await func(50)
+    // robot.moveMouse(449, 646);
+    // robot.mouseClick();
+    // await func(75)
+    // robot.moveMouse(1262, 266);
+    // robot.mouseClick();
+    // await func(1000)
+
+    robot.moveMouse(385, 696);
+    robot.mouseClick();
+    await func(75)
+    robot.moveMouse(722, 359);
+    robot.mouseClick();
+    await func(75)
+    robot.moveMouse(1249, 666);
+    robot.mouseClick();
+    await func(75)
+
+}
+
+setInterval(() => {
+    faz()
+}, 500);
+
+setInterval(() => {
+
+    var mouse = robot.getMousePos();
+    var hex = robot.getPixelColor(mouse.x, mouse.y);
+    // console.log("#" + hex + " at x:" + mouse.x + " y:" + mouse.y);
+}, 2000);
+
+
+
 //55099058
 const url = 'wss://ws.trade.xoption.com/echo/websocket'
 // const url = 'wss://iqoption.com/echo/websocket'
