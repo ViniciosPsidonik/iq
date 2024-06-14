@@ -1,0 +1,91 @@
+{
+    "amount": 2,
+    "veefe": "WLLWWWWWWWLWLLLWWWLLWLWLLLLLLW",
+    "lastAmount": 144.45,
+    "conta": "demo",
+    "contarPlacar": true,
+    "paresparaver": "EURUSD-OTC",
+    "cores": 1,
+    "noticias": "USD,09:00;USD,11:30;USD,11:00",
+    "infinity": 14,
+    "notifyy": 0,
+    "toCloseM15": "",
+    "text": "",
+    "StopLoss": 999999,
+    "StopWin": 41,
+    "verpar": "",
+    "taxas": "",
+    "pares": "",
+    "amountGustavo": "2.0",
+    "horariosJowJow": "03:10 EURUSD PUT;03:45 GBPJPY CALL;05:00",
+    "taxasM15": "",
+    "taxasM5": "",
+    "toCloseM5": ";;;;;;;;;;;;;;;;",
+    "stopWinInfinity": 1000,
+    "sorosNoSoros": 1,
+    "timeFrame": 5,
+    "cincoum": 1,
+    "doispraum": 0,
+    "gale": 0,
+    "percentageScalper": 10,
+    "copyy": 1,
+    "payout": 0,
+    "log": 1,
+    "logg": 0,
+    "loggg": 0,
+    "bestIdsLog": 0,
+    "valorMinimo": 0,
+    "filtroPorPais": "Worldwide",
+    "topTradersRange": 0,
+    "kill": 0,
+    "schedules": "",
+    "galeLevel": 2,
+    "galeFactor": 2.2,
+    "soros": 0,
+    "sorosLevel": 1,
+    "showSchedules": 0,
+    "invertTrades": 0,
+    "delaySeconds": 1,
+    "copyIds": "70421908,1111",
+    "tradesPerActive": 25,
+    "binarias": 1,
+    "binariasTimes": "",
+    "digital": 1,
+    "digitalTimes": "M1,M5,M15",
+    "login": "carol.davila14@outlook.com",
+    "password": "gc896426",
+    "copyBestIdsRange": 0,
+    "pass": "senhaloka",
+    "cleanUp": 0,
+    "ssid": "63d8e28d95fca9cf495a1d84a1323848",
+    "paresRank": {
+        "EURJPY": {
+            "wins": 1,
+            "losses": 5
+        },
+        "AUDJPY": {
+            "wins": 4,
+            "losses": 2
+        },
+        "USDJPY": {
+            "wins": 0,
+            "losses": 1
+        },
+        "GBPUSD": {
+            "wins": 1,
+            "losses": 1
+        },
+        "EURUSD": {
+            "wins": 1,
+            "losses": 1
+        },
+        "AUDCAD": {
+            "wins": 1,
+            "losses": 4
+        },
+        "GBPJPY": {
+            "wins": 0,
+            "losses": 1
+        }
+    }
+}
