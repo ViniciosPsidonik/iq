@@ -1,3 +1,6 @@
+
+// "paresparaver": "EURJPY,AUDCAD,GBPUSD,USDJPY,AUDUSD",
+EURUSD,EURJPY,AUDUSD,GBPJPY
 instrument {
     name = 'GO',
     short_name = 'super',

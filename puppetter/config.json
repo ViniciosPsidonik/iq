@@ -1,12 +1,10 @@
 {
-    "amount": 5,
-    "veefe": "LWWWWLLWWLLL",
+    "amount": 2,
+    "veefe": "WLLWWWWWWWLWLLLWWWLLWLWLLLLLLW",
     "lastAmount": 144.45,
     "conta": "demo",
     "contarPlacar": true,
-    "paresparaver": "EURUSD,USDJPY,GBPUSD,AUDCAD,AUDJPY",
     "cores": 1,
-    "mesmaVela": 0,
     "noticias": "USD,09:00;USD,11:30;USD,11:00",
     "infinity": 14,
     "notifyy": 0,
@@ -21,7 +19,7 @@
     "horariosJowJow": "03:10 EURUSD PUT;03:45 GBPJPY CALL;05:00",
     "taxasM15": "",
     "taxasM5": "",
-    "toCloseM5": ";;;;;;;;;;;;;;;",
+    "toCloseM5": ";;;;;;;;;;;;;;;;",
     "stopWinInfinity": 1000,
     "sorosNoSoros": 1,
     "timeFrame": 5,
@@ -58,35 +56,43 @@
     "copyBestIdsRange": 0,
     "pass": "senhaloka",
     "cleanUp": 0,
-    "ssid": "6f170134d911c1b73bb90c3551e6a485",
+    "ssid": "7ec457726a01739846bf2d0a39fd6b84",
     "paresRank": {
         "EURJPY": {
-            "wins": 2,
-            "losses": 6
+            "wins": 1,
+            "losses": 5
         },
         "AUDJPY": {
             "wins": 4,
             "losses": 2
         },
         "USDJPY": {
-            "wins": 1,
-            "losses": 3
+            "wins": 0,
+            "losses": 1
         },
         "GBPUSD": {
             "wins": 1,
             "losses": 1
         },
         "EURUSD": {
-            "wins": 1,
+            "wins": 2,
             "losses": 1
         },
         "AUDCAD": {
-            "wins": 2,
-            "losses": 6
+            "wins": 1,
+            "losses": 4
         },
         "GBPJPY": {
+            "wins": 0,
+            "losses": 1
+        },
+        "EURGBP": {
             "wins": 1,
-            "losses": 2
+            "losses": 0
+        },
+        "USDCAD": {
+            "wins": 0,
+            "losses": 1
         }
     }
 }
