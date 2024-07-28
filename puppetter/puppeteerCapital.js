@@ -47,7 +47,7 @@ let jaSubscribe = [];
     page.on('response', async response => {
         const request = response.request();
         // console.log(response.url());
-        if (response.url() === 'https://auth.trade.capitalbear.com/api/v4/check-session' && response.status() === 200) {
+        if (response.url() === 'https://auth.trade.xoption.com/api/v4/check-session' && response.status() === 200) {
             console.log(await response.text());
             console.log(response.url());
 
@@ -147,9 +147,9 @@ let jaSubscribe = [];
 
     let urll
     if (fazlogin) {
-        urll = 'https://trade.capitalbear.com/pt/login'
+        urll = 'https://trade.xoption.com/pt/login'
     } else {
-        urll = 'https://trade.capitalbear.com/pt/login'
+        urll = 'https://trade.xoption.com/pt/login'
     }
 
     await page.goto(urll, { timeout: 0, waitUntil: "domcontentloaded", executablePath: 'C:/Program Files/Google/Chrome/Application/chrome.exe' });
@@ -250,7 +250,8 @@ const func = (time) => {
 }
 // Get mouse position.
 //55099058
-const url = 'wss://ws.trade.capitalbear.com/echo/websockett'
+// const url = 'wss://ws.trade.capitalbear.com/echo/websockett'
+const url = 'wss://ws.trade.xoption.com/echo/websocket'
 // const url = 'wss://iqoption.com/echo/websocket'
 let userBalanceId = 0
 let userBalanceIdGustavo = 0
@@ -354,7 +355,7 @@ for (let index = 4; index < 10; index++) {
 }
 var XLSX_CALC = require('xlsx-calc');
 // XLSX_CALC(workbook, { continue_after_error: true, log_error: false });
-
+config.conta = 'real'
 const getamount = async () => {
 
     modifyCell('N' + 12, config.lastAmount);
@@ -853,12 +854,12 @@ const onMessage = async e => {
         const message = JSON.parse(e.data)
         // console.log('data=' + e.data);
 
-        if (sessionBalance >= 18) {
+        if (sessionBalance >= 9) {
             console.log(`${currentTimehhmmss} || wiiin alcançado / Digital`.green)
             process.exit()
         }
 
-        if (sessionBalance <= -60) {
+        if (sessionBalance <= -10) {
             console.log(`${currentTimehhmmss} || LOSS alcançado / Digital`.red)
             process.exit()
         }

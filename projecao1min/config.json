@@ -1,8 +1,8 @@
 {
     "amount": 2,
-    "veefe": "LLLLWLWLLWWLWLWWLWLLWLWWLLLLLLL",
+    "veefe": "",
     "lastAmount": 178.41832290689825,
-    "conta": "real",
+    "conta": "demo",
     "contarPlacar": true,
     "cores": 1,
     "infinity": 14,
@@ -56,47 +56,47 @@
     "copyBestIdsRange": 0,
     "pass": "senhaloka",
     "cleanUp": 0,
-    "ssid": "dee5600f9494d4ca2fe5079c0c271880",
+    "ssid": "688128969e3e4d9488aa18ac060f3f4d",
     "paresRank": {
         "EURUSD": {
-            "wins": 4,
-            "losses": 7
+            "wins": 23,
+            "losses": 19
         },
         "EURGBP": {
             "wins": 2,
             "losses": 0
         },
         "GBPUSD": {
-            "wins": 4,
-            "losses": 5
+            "wins": 5,
+            "losses": 13
         },
         "GBPJPY": {
-            "wins": 3,
-            "losses": 4
-        },
-        "AUDCAD": {
-            "wins": 7,
-            "losses": 5
-        },
-        "EURJPY": {
-            "wins": 7,
-            "losses": 3
-        },
-        "AUDJPY": {
-            "wins": 9,
-            "losses": 5
-        },
-        "USDJPY": {
-            "wins": 3,
+            "wins": 4,
             "losses": 9
         },
+        "AUDCAD": {
+            "wins": 10,
+            "losses": 6
+        },
+        "EURJPY": {
+            "wins": 16,
+            "losses": 17
+        },
+        "AUDJPY": {
+            "wins": 14,
+            "losses": 8
+        },
+        "USDJPY": {
+            "wins": 7,
+            "losses": 16
+        },
         "AUDUSD": {
-            "wins": 4,
-            "losses": 3
+            "wins": 9,
+            "losses": 6
         },
         "USDCHF": {
             "wins": 2,
-            "losses": 0
+            "losses": 1
         }
     }
 }

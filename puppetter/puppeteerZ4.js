@@ -24,159 +24,159 @@ let fazlogin = false;
 let jaSubscribe = [];
 
 
-(async () => {
+// (async () => {
 
-    const browser = await puppeteer.launch({
-        headless: false, args: [
-            '--start-maximized' // Inicia o navegador maximizado
-        ],
-        defaultViewport: null,
-        // devtools: true,
-    });
-    const page = await browser.newPage();
+//     const browser = await puppeteer.launch({
+//         headless: false, args: [
+//             '--start-maximized' // Inicia o navegador maximizado
+//         ],
+//         defaultViewport: null,
+//         // devtools: true,
+//     });
+//     const page = await browser.newPage();
 
-    // Conectar ao DevTools Protocol
-    const client = await page.target().createCDPSession();
-    await client.send('Network.enable');
+//     // Conectar ao DevTools Protocol
+//     const client = await page.target().createCDPSession();
+//     await client.send('Network.enable');
 
-    // Array para armazenar as mensagens WebSocket
-    const webSocketMessages = [];
+//     // Array para armazenar as mensagens WebSocket
+//     const webSocketMessages = [];
 
 
 
-    page.on('response', async response => {
-        const request = response.request();
-        // console.log(response.url());
-        if (response.url() === 'https://auth.trade.exnova.com/api/v4/check-session' && response.status() === 200) {
-            console.log(await response.text());
-            console.log(response.url());
+//     page.on('response', async response => {
+//         const request = response.request();
+//         // console.log(response.url());
+//         if (response.url() === 'https://auth.trade.capitalbear.com/api/v4/check-session' && response.status() === 200) {
+//             console.log(await response.text());
+//             console.log(response.url());
 
-            ssid = JSON.parse(await response.text()).id
-            ws.terminate()
-            ws = new WebSocket(url)
-            start()
-            canlook = true
-            const tryconnect = setInterval(() => {
-                if (!connectedd && canlook) {
-                    console.log('CAIU CONEXAO');
-                    ws.terminate()
-                    ws = new WebSocket(url)
+//             ssid = JSON.parse(await response.text()).id
+//             ws.terminate()
+//             ws = new WebSocket(url)
+//             start()
+//             canlook = true
+//             const tryconnect = setInterval(() => {
+//                 if (!connectedd && canlook) {
+//                     console.log('CAIU CONEXAO');
+//                     ws.terminate()
+//                     ws = new WebSocket(url)
 
-                    start()
-                    timeeessa = 30000
-                    // clearInterval(tryconnect)
-                } else {
-                    timeeessa = 5000
-                }
-                connectedd = false
-            }, 30000);
+//                     start()
+//                     timeeessa = 30000
+//                     // clearInterval(tryconnect)
+//                 } else {
+//                     timeeessa = 5000
+//                 }
+//                 connectedd = false
+//             }, 30000);
 
-        }
-        // requests.push({
-        //     type: 'response',
-        //     url: response.url(),
-        //     status: response.status(),
-        //     statusText: response.statusText(),
-        //     headers: response.headers(),
-        //     body: await response.text()
-        // });
-    });
+//         }
+//         // requests.push({
+//         //     type: 'response',
+//         //     url: response.url(),
+//         //     status: response.status(),
+//         //     statusText: response.statusText(),
+//         //     headers: response.headers(),
+//         //     body: await response.text()
+//         // });
+//     });
 
-    // Event listener para mensagens WebSocket
-    client.on('Network.webSocketFrameSent', ({ requestId, timestamp, response }) => {
-        let data = JSON.parse(response.payloadData)
-        // console.log(data.payloadData?.msg?.name);
+//     // Event listener para mensagens WebSocket
+//     client.on('Network.webSocketFrameSent', ({ requestId, timestamp, response }) => {
+//         let data = JSON.parse(response.payloadData)
+//         // console.log(data.payloadData?.msg?.name);
 
-        if (data?.name == 'unsubscribeMessage' && data?.msg?.name == 'candle-generated') {
-            // console.log(response.payloadData);
+//         if (data?.name == 'unsubscribeMessage' && data?.msg?.name == 'candle-generated') {
+//             // console.log(response.payloadData);
 
-        }
+//         }
 
-        if (data?.msg?.body?.name?.includes("drawings-asset-")) {
-            let key = data?.msg?.body?.name.split('-')[2]
-            let arrayobj = []
-            data.msg.body.config.data[0].figures.map((item) => {
-                // console.log(item.p[0].y);
+//         if (data?.msg?.body?.name?.includes("drawings-asset-")) {
+//             let key = data?.msg?.body?.name.split('-')[2]
+//             let arrayobj = []
+//             data.msg.body.config.data[0].figures.map((item) => {
+//                 // console.log(item.p[0].y);
 
-                arrayobj.push({
-                    color: item.color == callColor ? 'call' : item.color == putColor
-                        ? 'put' : item.color == colorYellow1min ? 'yellow' : '', price: item.p[0].y
-                })
-                // console.log(item.color);
-            })
-            // { "name": "unsubscribeMessage", "request_id": "s_210", "local_time": 340965, "msg": { "name": "traders-mood-changed", "params": { "routingFilters": { "instrument": "turbo-option", "asset_id": "6" } } } }
+//                 arrayobj.push({
+//                     color: item.color == callColor ? 'call' : item.color == putColor
+//                         ? 'put' : item.color == colorYellow1min ? 'yellow' : '', price: item.p[0].y
+//                 })
+//                 // console.log(item.color);
+//             })
+//             // { "name": "unsubscribeMessage", "request_id": "s_210", "local_time": 340965, "msg": { "name": "traders-mood-changed", "params": { "routingFilters": { "instrument": "turbo-option", "asset_id": "6" } } } }
 
-            linesObj[key] = arrayobj
+//             linesObj[key] = arrayobj
 
-            // if(arrayobj.length <= 0){
-            // ws.send(JSON.stringify({ "name": "unsubscribeMessage", "msg": { "name": "candle-generated", "params": { "routingFilters": { "active_id": key } } }, "request_id": "" }))
-            if (!jaSubscribe.includes(key) && linesObj[key].length > 0) {
-                // console.log('entrou');
-                ws.send(JSON.stringify({ "name": "subscribeMessage", "msg": { "name": "candles-generated", "params": { "routingFilters": { "active_id": key } } }, "request_id": "" }))
-                jaSubscribe.push(key)
-            }
-            // }
+//             // if(arrayobj.length <= 0){
+//             // ws.send(JSON.stringify({ "name": "unsubscribeMessage", "msg": { "name": "candle-generated", "params": { "routingFilters": { "active_id": key } } }, "request_id": "" }))
+//             if (!jaSubscribe.includes(key) && linesObj[key].length > 0) {
+//                 // console.log('entrou');
+//                 ws.send(JSON.stringify({ "name": "subscribeMessage", "msg": { "name": "candles-generated", "params": { "routingFilters": { "active_id": key } } }, "request_id": "" }))
+//                 jaSubscribe.push(key)
+//             }
+//             // }
 
-            // console.log(linesObj);
-            // console.log(data.msg.body.config.data[0].figures[0].p[0].y);
+//             // console.log(linesObj);
+//             // console.log(data.msg.body.config.data[0].figures[0].p[0].y);
 
-        }
-        // webSocketMessages.push({
-        //     type: 'sent',
-        //     requestId,
-        //     timestamp,
-        //     data: response.payloadData
-        // });
-    });
+//         }
+//         // webSocketMessages.push({
+//         //     type: 'sent',
+//         //     requestId,
+//         //     timestamp,
+//         //     data: response.payloadData
+//         // });
+//     });
 
-    client.on('Network.webSocketFrameReceived', ({ requestId, timestamp, response }) => {
-        // console.log(`WebSocket Frame Received: ${response.payloadData}`);
-        // webSocketMessages.push({
-        //     type: 'received',
-        //     requestId,
-        //     timestamp,
-        //     data: response.payloadData
-        // });
-    });
+//     client.on('Network.webSocketFrameReceived', ({ requestId, timestamp, response }) => {
+//         // console.log(`WebSocket Frame Received: ${response.payloadData}`);
+//         // webSocketMessages.push({
+//         //     type: 'received',
+//         //     requestId,
+//         //     timestamp,
+//         //     data: response.payloadData
+//         // });
+//     });
 
-    if (fs.existsSync('session1.json')) {
-        const session = JSON.parse(fs.readFileSync('session1.json', 'utf8'));
-        await page.setCookie(...session.cookies);
-    }
-    // Navegar até a página desejada
+//     if (fs.existsSync('session1.json')) {
+//         const session = JSON.parse(fs.readFileSync('session1.json', 'utf8'));
+//         await page.setCookie(...session.cookies);
+//     }
+//     // Navegar até a página desejada
 
-    let urll
-    if (fazlogin) {
-        urll = 'https://trade.exnova.com/pt/login'
-    } else {
-        urll = 'https://trade.exnova.com/pt/login'
-    }
+//     let urll
+//     if (fazlogin) {
+//         urll = 'https://trade.capitalbear.com/pt/login'
+//     } else {
+//         urll = 'https://trade.capitalbear.com/pt/login'
+//     }
 
-    await page.goto(urll, { timeout: 0, waitUntil: "domcontentloaded", executablePath: 'C:/Program Files/Google/Chrome/Application/chrome.exe' });
+//     await page.goto(urll, { timeout: 0, waitUntil: "domcontentloaded", executablePath: 'C:/Program Files/Google/Chrome/Application/chrome.exe' });
 
-    // Seu código de automação aqui
-    if (fazlogin)
-        await loginFirst(page, webSocketMessages)
+//     // Seu código de automação aqui
+//     if (fazlogin)
+//         await loginFirst(page, webSocketMessages)
 
-    setTimeout(async () => {
-        const cookies = await page.cookies();
-        const localStorage = await page.evaluate(() => {
-            let json = {};
-            for (let i = 0; i < localStorage.length; i++) {
-                let key = localStorage.key(i);
-                json[key] = localStorage.getItem(key);
-            }
-            return json;
-        });
+//     setTimeout(async () => {
+//         const cookies = await page.cookies();
+//         const localStorage = await page.evaluate(() => {
+//             let json = {};
+//             for (let i = 0; i < localStorage.length; i++) {
+//                 let key = localStorage.key(i);
+//                 json[key] = localStorage.getItem(key);
+//             }
+//             return json;
+//         });
 
-        // Salva cookies e localStorage em um arquivo
-        fs.writeFileSync('session1.json', JSON.stringify({ cookies, localStorage }));
+//         // Salva cookies e localStorage em um arquivo
+//         fs.writeFileSync('session1.json', JSON.stringify({ cookies, localStorage }));
 
-        console.log('WebSocket Messages:', webSocketMessages);
-    }, 60000 * 2);
+//         console.log('WebSocket Messages:', webSocketMessages);
+//     }, 60000 * 2);
 
-    // await browser.close();
-})();
+//     // await browser.close();
+// })();
 
 const loginFirst = async (page, webSocketMessages) => {
 
@@ -250,9 +250,11 @@ const func = (time) => {
 }
 // Get mouse position.
 //55099058
-const url = 'wss://ws.trade.exnova.com/echo/websocket'
+// const url = 'wss://ws.trade.exnova.com/echo/websocket'
 // const url = 'wss://ws.trade.capitalbear.com/echo/websockett'
 // const url = 'wss://iqoption.com/echo/websocket'
+// const url = 'wss://ws.trade.xoption.com/echo/websocket'
+const url = 'wss://ws.trade.capitalbear.com/echo/websockett'
 let userBalanceId = 0
 let userBalanceIdGustavo = 0
 let userBalanceReal = 0
@@ -280,7 +282,7 @@ let dataFim = config.dataFim
 let topTradersRange = config.topTradersRange
 let copyIds = !isNaN(config.copyIds.split(',')[0]) && !isNaN(config.copyIds.split(',')[1]) ? config.copyIds.split(',') : []
 let leadersArray = []
-let sessionBalance = 0
+let sessionBalance = config.sessionBalance
 let runningActives = []
 let showSchedules = config.showSchedules
 let amountSesion = parseFloat(config.amount)
@@ -356,7 +358,10 @@ for (let index = 4; index < 10; index++) {
 var XLSX_CALC = require('xlsx-calc');
 // XLSX_CALC(workbook, { continue_after_error: true, log_error: false });
 
-const getamount = async () => {
+let proxWin = 0
+let proxLoss = 0
+
+const getamount = () => {
 
     modifyCell('N' + 12, config.lastAmount);
     let w = 0
@@ -382,18 +387,20 @@ const getamount = async () => {
     XLSX_CALC(workbook, { continue_after_error: true, log_error: false });
 
     amount = parseFloat(getCell('D' + countMass))
-    if (amount <= 5) {
-        amount = 5
+    if (amount <= 2) {
+        amount = 2
     }
     console.log('Banca=', getCell('N12'));
     console.log(amount);
+
+    getNextAmount();
 
     // console.log(getCell('I' + 3))
     // console.log(getCell('F' + 3))
     // console.log(getCell('N' + 12))
 
 }
-// getamount()
+getamount()
 
 if (config.pass != 'senhaloka')
     process.exit()
@@ -794,6 +801,27 @@ const notifier = require('node-notifier');
 const path = require('path');
 const { Console } = require('console');
 
+function getNextAmount() {
+    // countMass++;
+    // console.log(countMass);
+    modifyCell('C' + countMass, 'W');
+    XLSX_CALC(workbook, { continue_after_error: true, log_error: false });
+    countMass++
+    proxWin = parseFloat(getCell('D' + countMass));
+    countMass--
+    modifyCell('C' + countMass, 'L');
+    XLSX_CALC(workbook, { continue_after_error: true, log_error: false });
+    countMass++
+    proxLoss = parseFloat(getCell('D' + countMass));
+    modifyCell('C' + countMass, '');
+    XLSX_CALC(workbook, { continue_after_error: true, log_error: false });
+    countMass--;
+
+    console.log('Win:', proxWin, 'Loss:', proxLoss);
+
+    // console.log(countMass);
+}
+
 function modifyCell(cellString, value) {
     if (value == undefined) {
         worksheet[cellString] = value;
@@ -854,12 +882,22 @@ const onMessage = async e => {
         const message = JSON.parse(e.data)
         // console.log('data=' + e.data);
 
-        if (sessionBalance >= 18) {
+        // if (sessionBalance >= lastAmount) {
+        //     console.log(`${currentTimehhmmss} || wiiin alcançado / Digital`.green)
+        //     process.exit()
+        // }
+
+        // if (sessionBalance <= lastAmount * -1) {
+        //     console.log(`${currentTimehhmmss} || LOSS alcançado / Digital`.red)
+        //     process.exit()
+        // }
+
+        if (countResult >= 6) {
             console.log(`${currentTimehhmmss} || wiiin alcançado / Digital`.green)
             process.exit()
         }
 
-        if (sessionBalance <= -60) {
+        if (los >= 5) {
             console.log(`${currentTimehhmmss} || LOSS alcançado / Digital`.red)
             process.exit()
         }
@@ -1456,6 +1494,21 @@ const onMessageGustavo = e => {
 //         connecteddGustavo = false
 // }, 5000);
 
+const tryconnect = setInterval(() => {
+    if (!connectedd) {
+        console.log('CAIU CONEXAO');
+        ws.terminate()
+        ws = new WebSocket(url)
+
+        start()
+        timeeessa = 30000
+        // clearInterval(tryconnect)
+    } else {
+        timeeessa = 5000
+    }
+    connectedd = false
+}, 15000);
+
 let pricesMap = new Map()
 let pricesOpenedMap = new Map()
 
@@ -1521,26 +1574,33 @@ const serverPort = 7684; // Porta do servidor WebSocket
 
 // Criar o servidor WebSocket
 const server = new WebSocket.Server({ port: serverPort });
-
+let stringorder = []
 // Evento de conexão de cliente
 server.on('connection', (socket) => {
     // console.log('Novo cliente conectado');
 
     // Evento de recebimento de mensagem do cliente
     socket.on('message', (message) => {
-        console.log(`${currentTimehhmmss} || ${message}`)
         // Processar a mensagem recebida, se necessário...
+        if (message == "Conectar-se") {
+            console.log(`${currentTimehhmmss} || ${message}`)
+        }
         if (message !== "Conectar-se") {
             let direction = message.split('/')[0]
             let parInt = activesMapString.get(message.split('/')[1])
             // if (typeof currentTimehhmmss != "undefined" && moment(moment().format("YYYY-MM-DD ") + currentTimehhmmss).isAfter(moment(moment().format("YYYY-MM-DD 00:01"))) && moment(moment().format("YYYY-MM-DD ") + currentTimehhmmss).isBefore(moment(moment().format("YYYY-MM-DD 17:00")))) {
-            // if (openedOrders.length == 0 || config.conta == "demo") {
-            // setTimeout(() => {
-            buyBefor(direction, parInt, 2, amountInitial);
-            // buyBefor(direction == 'call' ? 'put' : 'call', parInt, 1);
-            openedOrders.push(parInt);
-            // }, 300);
-            // }
+            if (openedOrders.length == 0) {
+                // setTimeout(() => {
+                if (!stringorder.includes(message)) {
+                    console.log(`${currentTimehhmmss} || ${message}`)
+                    setTimeout(() => {
+                        buyBefor(direction, parInt, 2, amount);
+                    }, 750);
+                    openedOrders.push(parInt);
+                    stringorder.push(message);
+                }
+                // }, 300);
+            }
             // } else {
             //     console.log(`${currentTimehhmmss} || Entrada fora do horario - ${message.split('/')[1]}`)
             // }
@@ -2016,13 +2076,12 @@ function optionClosed(message) {
     let active = message.msg.active_id
     let direction = message.msg.direction
     let parInt = parseInt(active)
-    if (openedOrders.includes(active)) {
-        let index = openedOrders.indexOf(parseInt(active))
-        openedOrders.splice(index, 1)
+
+
+    if (message.msg.result == 'win') {
+        // console.log(message);
     }
-
-
-    profitAmount = message.msg.result == 'win' ? message.msg.profit_amount - message.msg.amount : message.msg.amount * -1
+    profitAmount = message.msg.result != 'win' && message.msg.result != 'loose' ? 0 : message.msg.result == 'win' ? message.msg.profit_amount - message.msg.amount : message.msg.amount * -1
     sessionBalance += profitAmount
 
     if (profitAmount < 0) {
@@ -2051,7 +2110,12 @@ function optionClosed(message) {
             } else {
                 config.paresRank[getActiveString(active, activesMapString)].losses++
             }
-        // lossMass('L');
+        amount = proxLoss
+        if (openedOrders.includes(active)) {
+            let index = openedOrders.indexOf(parseInt(active))
+            openedOrders.splice(index, 1)
+        }
+        lossMass('L');
         console.log(`${currentTimehhmmss} || ${profitAmount < 0 ? "Loss" : "Win"} ${profitAmount.toFixed(2)} / Balance: ${parseFloat(sessionBalance.toFixed(2))} / ${getActiveString(active, activesMapString) ? getActiveString(active, activesMapString) : active} / Digital`.red)
         notify('Loss', `${profitAmount < 0 ? "Loss" : "Win"} ${profitAmount.toFixed(2)} / Balance: ${parseFloat(sessionBalance.toFixed(2))} / ${getActiveString(active, activesMapString) ? getActiveString(active, activesMapString) : active} / Digital`);
 
@@ -2061,8 +2125,12 @@ function optionClosed(message) {
 
         positionOpenedSoros = false
     } else if (profitAmount == 0) {
-        console.log(`${currentTimehhmmss} || ${profitAmount < 0 ? "Loss" : "Win"} ${profitAmount.toFixed(2)} / Balance: ${parseFloat(sessionBalance.toFixed(2))} / ${getActiveString(active, activesMapString) ? getActiveString(active, activesMapString) : active} / Digital`.red)
+        console.log(`${currentTimehhmmss} || ${profitAmount < 0 ? "Loss" : "Win"} ${profitAmount.toFixed(2)} / Balance: ${parseFloat(sessionBalance.toFixed(2))} / ${getActiveString(active, activesMapString) ? getActiveString(active, activesMapString) : active} / Digital`)
         notify('Empate', `Empate ${profitAmount.toFixed(2)} / Balance: ${parseFloat(sessionBalance.toFixed(2))} / ${getActiveString(active, activesMapString) ? getActiveString(active, activesMapString) : active} / Digital`);
+        if (openedOrders.includes(active)) {
+            let index = openedOrders.indexOf(parseInt(active))
+            openedOrders.splice(index, 1)
+        }
     } else {
         winss++
         countResult++
@@ -2080,14 +2148,19 @@ function optionClosed(message) {
             } else {
                 config.paresRank[getActiveString(active, activesMapString)].wins++
             }
-        // winMass()
+        amount = proxWin
+        if (openedOrders.includes(active)) {
+            let index = openedOrders.indexOf(parseInt(active))
+            openedOrders.splice(index, 1)
+        }
+        winMass()
         // StopWin++
         // console.log(`${currentTimehhmmss} || StopWin = ${StopWin}`)
         console.log(`${currentTimehhmmss} || ${profitAmount < 0 ? "Loss" : "Win"} ${profitAmount.toFixed(2)} / Balance: ${parseFloat(sessionBalance.toFixed(2))} / ${getActiveString(active, activesMapString) ? getActiveString(active, activesMapString) : active} / Digital`.green)
         notify('Wiiin!!', `${profitAmount < 0 ? "Loss" : "Win"} ${profitAmount.toFixed(2)} / Balance: ${parseFloat(sessionBalance.toFixed(2))} / ${getActiveString(active, activesMapString) ? getActiveString(active, activesMapString) : active} / Digital`);
-
         positionOpenedSoros = false
     }
+
 }
 
 function setWinss(amount) {
@@ -2301,29 +2374,52 @@ async function winMass() {
 
     // if (getCell('I' + countMass) == '◄◄') {
 
-    //     for (let index = countMass; index >= 0; index--) {
-    //         modifyCell('C' + countMass, '');
-    //     }
-
-    //     modifyCell('N' + 12, getCell('F' + countMass));
-    //     await XLSX_CALC(workbook, { continue_after_error: true, log_error: false });
-    //     cicleSession = 0;
-    //     countMass = 3;
-    //     // countMass++;
-    //     if (config.conta == "real")
-    //         veefe = ""
-    //     amount = parseFloat(getCell('D' + countMass)) > 0 ? parseFloat(getCell('D' + countMass)) : parseFloat(getCell('D' + countMass)) * -1;
-    //     console.log(`${currentTimehhmmss} || Ciclo com Ganhoo!! `.green)
-    // } else {
-    countMass++;
-    amount = parseFloat(getCell('D' + countMass)) > 0 ? parseFloat(getCell('D' + countMass)) : parseFloat(getCell('D' + countMass)) * -1;
-    if (amount <= 5) {
-        amount = 5
-    }
+    // for (let index = countMass; index >= 0; index--) {
+    //     modifyCell('C' + countMass, '');
     // }
+
+    // // modifyCell('N' + 12, getCell('F' + countMass));
+    // await XLSX_CALC(workbook, { continue_after_error: true, log_error: false });
+    // cicleSession = 0;
+    // countMass = 3;
+    // // countMass++;
+    // if (config.conta == "real")
+    //     veefe = ""
+    // amount = parseFloat(getCell('D' + countMass)) > 0 ? parseFloat(getCell('D' + countMass)) : parseFloat(getCell('D' + countMass)) * -1;
+    // console.log(`${currentTimehhmmss} || Ciclo com Ganhoo!! `.green)
+    // } else {
+
+    // amount = parseFloat(getCell('D' + countMass)) > 0 ? parseFloat(getCell('D' + countMass)) : parseFloat(getCell('D' + countMass)) * -1;
+    // if (amount <= 0) {
+    //     console.log(`${currentTimehhmmss} || ${amount} - LOSS alcançado / Digital`.red)
+    //     process.exit()
+
+    // }
+
+    if (amount <= 0) {
+        // console.log(`${currentTimehhmmss} || ${amount} - LOSS alcançado / Digital`.red)
+        // process.exit()
+        // countMass--;
+        // amount = parseFloat(getCell('F' + countMass))
+        // countMass++;
+
+        amount = lastAmount + sessionBalance
+    }
+    if (amount <= 2) {
+        amount = 2
+    }
+
+    countMass++;
+    // if (amount <= 2) {
+    //     amount = 2
+    // }
+    // }
+
+    // getNextAmount()
 
     config.veefe = veefe
     console.log(veefe);
+    config.sessionBalance = sessionBalance
     // if (config.conta == "real")
     //     config.lastAmount = parseFloat(getCell('N12'))
 
@@ -2345,6 +2441,7 @@ async function winMass() {
 
 
     console.log(amount);
+    console.log('==============================================');
 
 }
 
@@ -2353,13 +2450,27 @@ function lossMass(winloss) {
     XLSX_CALC(workbook, { continue_after_error: true, log_error: false });
     countMass++;
     amount = parseFloat(getCell('D' + countMass)) > 0 ? parseFloat(getCell('D' + countMass)) : parseFloat(getCell('D' + countMass)) * -1;
-    if (amount <= 5) {
-        amount = 5
+    if (amount <= 0) {
+        // console.log(`${currentTimehhmmss} || ${amount} - LOSS alcançado / Digital`.red)
+        // process.exit()
+        // countMass--;
+        // amount = parseFloat(getCell('F' + countMass))
+        // countMass++;
+
+        amount = lastAmount + sessionBalance
     }
+    if (amount <= 2) {
+        amount = 2
+    }
+    // if () {
+    //     amount = 2
+    // }
+    // getNextAmount()
+    console.log(veefe);
     console.log(amount);
 
-    console.log(veefe);
     config.veefe = veefe
+    config.sessionBalance = sessionBalance
     fs.writeFile('config.json', JSON.stringify(config, null, 4), err => {
         // console.log(err || 'Arquivo salvo');
         // if (countResult <= -3 && config.conta == "real") {
@@ -2375,7 +2486,7 @@ function lossMass(winloss) {
         //     process.exit(1)
         // }
     });
-
+    console.log('==============================================');
 
 }
 
@@ -2934,7 +3045,7 @@ const start = (force) => {
         }, 10000);
     }
 }
-// start(false)
+start(false)
 
 // axios.post('https://auth.trade.exnova.com/api/v2/login', {
 //     // identifier: config.login,

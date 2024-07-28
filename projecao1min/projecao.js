@@ -1222,7 +1222,7 @@ function candleStuff(message) {
 
 let onstart = []
 
-const serverPort = 7682; // Porta do servidor WebSocket
+const serverPort = 7685; // Porta do servidor WebSocket
 
 // Criar o servidor WebSocket
 const server = new WebSocket.Server({ port: serverPort });
@@ -1977,7 +1977,7 @@ async function winMass() {
             modifyCell('C' + countMass, '');
         }
 
-        modifyCell('N' + 12, getCell('F' + countMass));
+        // modifyCell('N' + 12, getCell('F' + countMass));
         await XLSX_CALC(workbook, { continue_after_error: true, log_error: false });
         cicleSession = 0;
         countMass = 3;
