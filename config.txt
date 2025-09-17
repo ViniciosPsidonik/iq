@@ -1,0 +1,16 @@
+[GERAL]
+valor_entrada = 10
+log = 0
+martingale = N
+sorosgale = N
+niveis = 2
+type = PRACTICE
+
+stop_loss = 1000
+stop_win = 100
+
+valor_minimo = 499
+filtro_pais = Worldwide
+filtro_top_traders = 200
+filtro_diferenca_sinal = 2
+seguir_ids =

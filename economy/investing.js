@@ -46,7 +46,7 @@ async function buscarEventos() {
                     // Substituir &nbsp; por um espaço normal e remover espaços extras
                     atual = atual.replace(/\u00A0/g, "").trim();
 
-                    return nome === 'Encomendas à Indústria - Alemanha (Mensal) (Jan)' && atual !== '';
+                    return nome === 'PMI Industrial (Mar)' && atual !== '';
                 });
         }, { timeout: 600000 });
 
@@ -57,7 +57,7 @@ async function buscarEventos() {
             console.log('chamaaaa');
             document.querySelectorAll(".js-event-item").forEach((event) => {
                 const nome = event.querySelector(".event")?.innerText.trim() || "";
-                if ('Encomendas à Indústria - Alemanha (Mensal) (Jan)' == nome) {
+                if ('PMI Industrial (Mar)' == nome) {
                     const horario = event.querySelector(".time")?.innerText.trim() || "";
                     const moeda = event.querySelector(".left.flagCur .ceFlags")?.getAttribute("title") || "";
                     const impacto = event.querySelectorAll(".left.cur .grayFullBullishIcon").length;
@@ -90,7 +90,7 @@ async function buscarEventos() {
 
         await browser.close();
 
-        const direction = eventos['Encomendas à Indústria - Alemanha (Mensal) (Jan)'].corTexto == corCall ? 'call' : 'put';
+        const direction = eventos['PMI Industrial (Mar)'].corTexto == corCall ? 'call' : eventos['PMI Industrial (Mar)'].corTexto == corPut ? 'put' : '';
 
         axios.get(`http://localhost:1234/${direction}/${ativo}/${time}`)
 
@@ -129,10 +129,10 @@ async function agendarFuncao(dataHoraDefinida) {
 // }
 
 // 🕒 Defina o horário e dia desejado
-const dataHoraDefinida = "2025-03-07 04:00"; // Formato: YYYY-MM-DD HH:mm
+const dataHoraDefinida = "2025-04-01 10:45"; // Formato: YYYY-MM-DD HH:mm
 agendarFuncao(dataHoraDefinida);
 
-const ativo = 'EURJPY'
+const ativo = 'USDJPY'
 const time = 5
 
 

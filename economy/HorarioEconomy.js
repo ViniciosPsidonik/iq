@@ -13,7 +13,7 @@ let openedMap = new Map()
 let openedMapDigital = new Map()
 let horariosObj = config.horariosObj
 let amountEconomy = config.amountEconomy
-let usarmass = false
+let usarmass = true
 
 const puppeteer = require('puppeteer');
 let profileeee = false
@@ -24,7 +24,7 @@ const colorYellow1min = 4293796863
 let linesObj = {};
 let fazlogin = false;
 let jaSubscribe = [];
-//   "18:53 EURUSD-OTC FLUXO M1"
+//   "18:53 EURUSD FLUXO M1"
 // setTimeout(() => {
 //     console.log('BUYYYY');
 
@@ -592,6 +592,9 @@ const buy = (amount, active_id, direction, expired, type, msg) => {
             "request_id": `${instrumentId}/${active_id}`
         }
 
+        console.log(data);
+
+
     } else {
 
 
@@ -915,6 +918,10 @@ setInterval(() => {
     // console.log(candleVictories);
     // console.log(candleVictories.size);
 }, 30000);
+
+let openOrdersMap = new Map();
+let idUltimaOrder = 0;
+
 // let moedas = [1,4,2]
 const onMessage = async e => {
     if (ws.readyState === WebSocket.OPEN) {
@@ -985,13 +992,16 @@ const onMessage = async e => {
 
             const horariooo = horario.split(' ')[0];
             const par = horario.split(' ')[1];
-            let direction = horario.includes('CALL') ? 'call' : 'put';
+            let direction = horario.includes('CALL') || horario.includes('COMPRA') ? 'call' : 'put';
             let size = horario.includes('M15') ? 60 * 15 : horario.includes('M5') ? 60 * 5 : 60;
             let time = horario.includes('M15') ? 15 : horario.includes('M5') ? 5 : 1;
             let parInt = activesDigitalMapString.has(par) ? activesDigitalMapString.get(par) : activesMapString.get(par);
 
-            if (!indexInstrumentsMap.has(parInt))
+            if (!indexInstrumentsMap.has(parInt)) {
                 indexInstrumentsMap.set(parInt, { size })
+                console.log('aqui');
+                console.log(indexInstrumentsMap);
+            }
 
             if (typeof currentTimehhmmss != "undefined" && profileeee) {
 
@@ -1021,10 +1031,20 @@ const onMessage = async e => {
                             direction = 'call'
                         }
                     }
+
+
+
+                    if (openedOrders.length > 0 && openOrdersMap.get(idUltimaOrder) > 0) {
+                        amount = proxWin
+                    } else if (openedOrders.length > 0) {
+                        amount = proxLoss
+                    }
+
                     buyBefor(direction, parInt, time, usarmass ? amount : amountEconomy)
                     // indexesss.push(index)
                     horariosObj.splice(index, 1)
                     config.horariosObj = horariosObj
+                    openedOrders.push(parInt)
 
                     // console.log(config.horariosObj);
                     fs.writeFile('config.json', JSON.stringify(config, null, 4), err => {
@@ -1044,15 +1064,28 @@ const onMessage = async e => {
             // const mssg = JSON.stringify({ "name": "subscribeMessage", "msg": { "name": "price-splitter.client-price-generated", "version": "1.0", "params": { "routingFilters": { "instrument_type": "digital-option", "asset_id": message.msg.instruments[0].asset_id, "instrument_index": message.msg.instruments[0].index } } } })
             // console.log(mssg);
             // ws.send(mssg)
-            if (message?.msg?.instruments && message?.msg?.instruments[0])
-                indexInstrumentsMap.set(message?.msg?.instruments[0].asset_id, { ...indexInstrumentsMap.get(message.msg.active_id), instrument_index: message.msg.instruments[0].index })
-            console.log(indexInstrumentsMap);
-            console.log('aaaa');
+            if (message?.msg?.instruments && message?.msg?.instruments[0]) {
+                // console.log(indexInstrumentsMap);
+
+                const existingObj = indexInstrumentsMap.get(message?.msg?.instruments[0]?.asset_id) || {};
+                const newObj = {
+                    ...existingObj,
+                    instrument_index: message?.msg?.instruments[0]?.index
+                };
+                indexInstrumentsMap.set(message?.msg?.instruments[0].asset_id, newObj)
+            }
+            // console.log(indexInstrumentsMap);
+            // console.log('aaaa');
 
         }
 
         if (message.name == 'instrument-generated') {
-            indexInstrumentsMap.set(message?.msg.asset_id, { ...indexInstrumentsMap.get(message.msg.active_id), instrument_index: message?.msg?.index })
+            const existingObj = indexInstrumentsMap.get(message?.msg.asset_id) || {};
+            const newObj = {
+                ...existingObj,
+                instrument_index: message?.msg?.index
+            };
+            indexInstrumentsMap.set(message?.msg.asset_id, newObj)
             // console.log(indexInstrumentsMap);
 
         }
@@ -1069,6 +1102,12 @@ const onMessage = async e => {
             positionChangedStuff(message)
         }
 
+        if (message.name == 'positions-state') {
+            // console.log('RES = ' + e.data);
+            // console.log(message.msg.positions[0]);
+            openOrdersMap.set(message.msg.positions[0].id, message.msg.positions[0].expected_profit)
+        }
+
 
         if (message.name == 'option-closed') {
             // console.log('RES = ' + e.data);
@@ -1076,7 +1115,11 @@ const onMessage = async e => {
         }
 
         if (message.name == 'candles-generated') {
-            // console.log(message.msg)
+            // console.log(message.msg.candles)
+            // console.log('candles-generated');
+
+            // console.log(indexInstrumentsMap.get(message.msg.active_id));
+
             let price = message.msg.value
             const candle = message.msg.candles[`${indexInstrumentsMap.get(message.msg.active_id).size}`]
             if (candle?.open > price) {
@@ -1224,6 +1267,7 @@ const onMessage = async e => {
             currentTimemmssDate = moment.unix(currentTime / 1000).utcOffset(-3).add(3, 'seconds').format("YYYY-MM-DD HH:mm:ss")
             currentTimehhmmss = moment.unix(currentTime / 1000).utcOffset(-3).add(3, 'seconds').format("HH:mm:ss")
             connectedd = true
+            // tentaForca = false
             // process.stdout.write("Esta é a linha atual. "); // Imprime sem quebra de linha
             process.stdout.clearLine(); // Limpa a linha atual
             process.stdout.cursorTo(0); // Move o cursor para a coluna 0
@@ -1374,20 +1418,28 @@ let porcentagensMap = new Map()
 //         connecteddGustavo = false
 // }, 5000);
 
+let tentaForca = false
+
 const tryconnect = setInterval(() => {
     if (!connectedd && iniciouStart) {
         console.log('CAIU CONEXAO');
         ws.terminate()
         ws = new WebSocket(url)
 
-        start()
+        if (!tentaForca) {
+            start(false)
+            tentaForca = true
+        } else {
+            start(true)
+            tentaForca = false
+        }
         timeeessa = 30000
-        clearInterval(tryconnect)
+        // clearInterval(tryconnect)
     } else {
         timeeessa = 5000
     }
     connectedd = false
-}, 15000);
+}, 10000);
 
 let pricesMap = new Map()
 let pricesOpenedMap = new Map()
@@ -1927,7 +1979,7 @@ function openOrderBinary(direction, parInt, hourmm, amount) {
     console.log(`${currentTimehhmmss} || ${direction} / ${getActiveString(parInt, activesMapString)} / ${amount}`);
     notify('[Order Binaria]', `${direction} / ${getActiveString(parInt, activesMapString)} / ${amount}`);
     let timeeee = parseInt(moment(moment().format("YYYY-MM-DD ") + hourmm).utcOffset(0).format('X'))
-    console.log('timeeee=', timeeee);
+    // console.log('timeeee=', timeeee);
     buy(amount, parInt, direction, timeeee, 3);
     totalOrderss++;
 
@@ -2010,7 +2062,7 @@ function optionClosed(message) {
             } else {
                 config.paresRank[getActiveString(active, activesMapString)].losses++
             }
-        amount = proxLoss
+        // amount = proxLoss
         if (openedOrders.includes(active)) {
             let index = openedOrders.indexOf(parseInt(active))
             openedOrders.splice(index, 1)
@@ -2047,7 +2099,7 @@ function optionClosed(message) {
             } else {
                 config.paresRank[getActiveString(active, activesMapString)].wins++
             }
-        amount = proxWin
+        // amount = proxWin
         if (openedOrders.includes(active)) {
             let index = openedOrders.indexOf(parseInt(active))
             openedOrders.splice(index, 1)
@@ -2059,6 +2111,8 @@ function optionClosed(message) {
         notify('Wiiin!!', `${profitAmount < 0 ? "Loss" : "Win"} ${profitAmount.toFixed(2)} / Balance: ${parseFloat(sessionBalance.toFixed(2))} / ${getActiveString(active, activesMapString) ? getActiveString(active, activesMapString) : active} / Digital`);
         positionOpenedSoros = false
     }
+
+    // getNextAmount()
 
 }
 
@@ -2251,11 +2305,23 @@ function positionChangedStuff(message) {
             positionOpenedSoros = false
         }
 
+
         // if (!positionOpenedSoros)
         //  buyBefor('put', 76, 1)
 
+    } else {
+        // console.log("SUBSCRIBE POSITIONS= ", message.msg.id);
+
+        if (!subscribePosition) {
+            ws.send(JSON.stringify({ "name": "subscribeMessage", "msg": { "name": "positions-state" } }))
+            subscribePosition = true
+        }
+        idUltimaOrder = message.msg.id
+        ws.send(JSON.stringify({ "name": "sendMessage", "msg": { "name": "subscribe-positions", "version": "1.0", "body": { "frequency": "frequent", "ids": [`${message.msg.id}`] } } }))
     }
 }
+
+let subscribePosition = false;
 
 async function winMass() {
     modifyCell('C' + countMass, 'W');
@@ -2318,6 +2384,7 @@ async function winMass() {
 
     console.log(amount);
     console.log('==============================================');
+    getNextAmount()
 
 }
 
@@ -2363,7 +2430,7 @@ function lossMass(winloss) {
         // }
     });
     console.log('==============================================');
-
+    getNextAmount()
 }
 
 function profileStufGustavo(message, name) {
@@ -2725,12 +2792,12 @@ const activesMapString = new Map([
     ['GBPAUD', 104],
     ['CADJPY', 945],
     ['GBPCAD', 102],
-    ['GBPCHF', 103],
+    ['GBPCHF', 1898],
     ['GBPJPY', 1866],
     ['GBPNZD', 947],
     ['GBPUSD', 1867],
     ['NZDUSD', 8],
-    ['USDCAD', 100],
+    ['USDCAD', 1878],
     ['USDCHF', 72],
     ['USDJPY', 1865],
     ['USDNOK', 168],
@@ -2758,7 +2825,7 @@ const activesDigitalMapStringaaa = [
 ]
 
 const activesDigitalMapStringDD = new Map([
-    ['USDCAD', 100],
+    // ['USDCAD', 1878],
     ['USDJPY', 1865],
 ])
 const activesDigitalMapString = new Map([
@@ -2769,9 +2836,10 @@ const activesDigitalMapString = new Map([
     ['AUDCAD', 7],
     ['GBPJPY', 1866],
     ['GBPUSD', 1867],
-    ['USDCAD', 100],
+    ['USDCAD', 1878],
     ['USDCHF', 72],
     ['AUDJPY', 101],
+    ['GBPCHF', 1898],
     ['EURUSD-OTC', 76],
     ['EURGBP-OTC', 77],
     ['USDCHF-OTC', 78],
@@ -3031,7 +3099,7 @@ async function agendarFuncao(dataHoraDefinida) {
 // }
 
 // 🕒 Defina o horário e dia desejado
-const dataHoraDefinida = "2025-03-07 04:00"; // Formato: YYYY-MM-DD HH:mm
+const dataHoraDefinida = "2025-04-01 10:45"; // Formato: YYYY-MM-DD HH:mm
 agendarFuncao(dataHoraDefinida);
 
 

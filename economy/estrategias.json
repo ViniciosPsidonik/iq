@@ -1,1 +1,1775 @@
-{}
+{
+    "./planilhas/Cúpula da Zona do Euro.xlsx": {
+        "GBPUSD": {
+            "estrategias": [
+                "FLUXO/COMPRA - 0.8181818181818182 - FLUXO OU REVERSÃO M3 PARA M5 ",
+                "REVERSAO/VENDA - 0.8181818181818182 - PROBABILIDADE PARA PRIMEIRA VELA M5",
+                "REVERSAO/VENDA - 0.8181818181818182 - PROBABILIDADE PARA PRIMEIRA VELA M15"
+            ]
+        },
+        "EURGBP": {
+            "estrategias": [
+                "FLUXO/COMPRA - 0.8181818181818182 - FLUXO OU REVERSÃO M2 PARA M4",
+                "FLUXO/COMPRA - 0.8181818181818182 - PROBABILIDADE PARA PRIMEIRA VELA M5",
+                "FLUXO/COMPRA - 0.8181818181818182 - PROBABILIDADE PARA PRIMEIRA VELA M15"
+            ]
+        },
+        "EURUSD": {
+            "estrategias": []
+        },
+        "USDJPY": {
+            "estrategias": []
+        },
+        "GBPJPY": {
+            "estrategias": [
+                "REVERSAO/VENDA - 0.8181818181818182 - PROBABILIDADE PARA PRIMEIRA VELA M5"
+            ]
+        },
+        "USDCAD": {
+            "estrategias": []
+        },
+        "AUDCAD": {
+            "estrategias": []
+        },
+        "EURJPY": {
+            "estrategias": [
+                "FLUXO/COMPRA - 0.8181818181818182 - FLUXO OU REVERSÃO M5 E M1",
+                "FLUXO/COMPRA - 0.8181818181818182 - PROBABILIDADE PARA TERCEIRA VELA M5"
+            ]
+        },
+        "EURCAD": {
+            "estrategias": [
+                "REVERSAO/VENDA - 0.8181818181818182 - FLUXO OU REVERSÃO 1° VELA DE M5 P/ 2° VELA DE M5 "
+            ]
+        },
+        "GBPCHF": {
+            "estrategias": [
+                "FLUXO/COMPRA - 0.8181818181818182 - FLUXO OU REVERSÃO M3 PARA M5 ",
+                "REVERSAO/VENDA - 0.8181818181818182 - PROBABILIDADE PARA PRIMEIRA VELA M5"
+            ]
+        }
+    },
+    "./planilhas/Coletiva de Imprensa do BCE.xlsx": {
+        "GBPUSD": {
+            "estrategias": [
+                "FLUXO/COMPRA - 0.8 - PROBABILIDADE PARA TERCEIRA VELA M5"
+            ]
+        },
+        "EURGBP": {
+            "estrategias": []
+        },
+        "EURUSD": {
+            "estrategias": [
+                "REVERSAO/VENDA - 0.8 - PROBABILIDADE PARA QUINTA VELA M1"
+            ]
+        },
+        "USDJPY": {
+            "estrategias": [
+                "REVERSAO/VENDA - 0.8 - FLUXO OU REVERSÃO 2° VELA DE M5 P/ 3° VELA DE M5"
+            ]
+        },
+        "GBPJPY": {
+            "estrategias": [
+                "REVERSAO/VENDA - 0.8 - FLUXO OU REVERSÃO 1° VELA DE M5 P/ 2° VELA DE M5 "
+            ]
+        },
+        "USDCAD": {
+            "estrategias": [
+                "REVERSAO/VENDA - 0.8 - PROBABILIDADE PARA QUARTA VELA M1",
+                "FLUXO/COMPRA - 0.8 - PROBABILIDADE PARA QUINTA VELA M1"
+            ]
+        },
+        "AUDCAD": {
+            "estrategias": []
+        },
+        "EURJPY": {
+            "estrategias": []
+        },
+        "EURCAD": {
+            "estrategias": [
+                "FLUXO/COMPRA - 0.8666666666666667 - FLUXO OU REVERSÃO 1° VELA DE M5 P/ 2° VELA DE M5 "
+            ]
+        },
+        "GBPCHF": {
+            "estrategias": []
+        }
+    },
+    "./planilhas/Discurso de Trump, Presidente dos EUA.xlsx": {
+        "GBPUSD": {
+            "estrategias": [
+                "FLUXO/COMPRA - 0.8333333333333334 - FLUXO OU REVERSÃO M2 PARA M3",
+                "REVERSAO/VENDA - 0.8333333333333334 - FLUXO OU REVERSÃO M3 PARA M4 ",
+                "FLUXO/COMPRA - 0.8333333333333334 - FLUXO OU REVERSÃO M3 PARA M5 ",
+                "REVERSAO/VENDA - 0.8333333333333334 - FLUXO OU REVERSÃO 1° VELA DE M5 P/ 2° VELA DE M5 ",
+                "FLUXO/COMPRA - 0.8333333333333334 - FLUXO OU REVERSÃO 1° VELA DE M15 P/ 2° VELA DE M15",
+                "REVERSAO/VENDA - 0.8333333333333334 - FLUXO OU REVERSÃO 1° VELA DE M15 P/ 3° VELA DE M15",
+                "REVERSAO/VENDA - 0.8333333333333334 - PROBABILIDADE PARA QUINTA VELA M1"
+            ]
+        },
+        "EURGBP": {
+            "estrategias": [
+                "FLUXO/COMPRA - 0.8333333333333334 - FLUXO OU REVERSÃO DE M2",
+                "FLUXO/COMPRA - 0.8333333333333334 - FLUXO OU REVERSÃO M3 E M1",
+                "FLUXO/COMPRA - 0.8333333333333334 - FLUXO OU REVERSÃO M2 PARA M4",
+                "REVERSAO/VENDA - 0.8333333333333334 - FLUXO OU REVERSÃO M4 PARA M5",
+                "FLUXO/COMPRA - 0.8333333333333334 - FLUXO OU REVERSÃO 1° VELA DE M15 P/ 3° VELA DE M15",
+                "FLUXO/COMPRA - 0.8333333333333334 - PROBABILIDADE PARA QUARTA VELA M1",
+                "REVERSAO/VENDA - 0.8333333333333334 - PROBABILIDADE PARA SEGUNDA VELA M15"
+            ]
+        },
+        "EURUSD": {
+            "estrategias": [
+                "FLUXO/COMPRA - 0.8333333333333334 - PROBABILIDADE PARA PRIMEIRA VELA M1",
+                "REVERSAO/VENDA - 0.8333333333333334 - PROBABILIDADE PARA QUINTA VELA M1"
+            ]
+        },
+        "USDJPY": {
+            "estrategias": [
+                "FLUXO/COMPRA - 0.8333333333333334 - FLUXO OU REVERSÃO DE M2",
+                "FLUXO/COMPRA - 0.8333333333333334 - FLUXO OU REVERSÃO M4 E M1 ",
+                "REVERSAO/VENDA - 0.8333333333333334 - FLUXO OU REVERSÃO M5 E M1",
+                "FLUXO/COMPRA - 0.8333333333333334 - FLUXO OU REVERSÃO 1° VELA DE M5 P/ 2° VELA DE M5 ",
+                "FLUXO/COMPRA - 1 - FLUXO OU REVERSÃO 2° VELA DE M15 P/ 3° VELA DE M15",
+                "REVERSAO/VENDA - 0.8333333333333334 - PROBABILIDADE PARA PRIMEIRA VELA M1",
+                "FLUXO/COMPRA - 1 - PROBABILIDADE PARA QUINTA VELA M1",
+                "REVERSAO/VENDA - 0.8333333333333334 - PROBABILIDADE PARA SEGUNDA VELA M15"
+            ]
+        },
+        "GBPJPY": {
+            "estrategias": [
+                "FLUXO/COMPRA - 0.8333333333333334 - FLUXO OU REVERSÃO M2 PARA M3",
+                "REVERSAO/VENDA - 0.8333333333333334 - FLUXO OU REVERSÃO M3 PARA M4 ",
+                "REVERSAO/VENDA - 0.8333333333333334 - FLUXO OU REVERSÃO 2° VELA DE M5 P/ 3° VELA DE M5",
+                "REVERSAO/VENDA - 0.8333333333333334 - PROBABILIDADE PARA QUARTA VELA M1",
+                "FLUXO/COMPRA - 0.8333333333333334 - PROBABILIDADE PARA QUINTA VELA M1"
+            ]
+        },
+        "USDCAD": {
+            "estrategias": [
+                "FLUXO/COMPRA - 0.8333333333333334 - FLUXO OU REVERSÃO M5 E M1",
+                "FLUXO/COMPRA - 0.8333333333333334 - FLUXO OU REVERSÃO 1° VELA DE M5 P/ 3° VELA DE M5",
+                "REVERSAO/VENDA - 0.8333333333333334 - FLUXO OU REVERSÃO 1° VELA DE M15 P/ 3° VELA DE M15",
+                "FLUXO/COMPRA - 0.8333333333333334 - PROBABILIDADE PARA PRIMEIRA VELA M1",
+                "FLUXO/COMPRA - 0.8333333333333334 - PROBABILIDADE PARA PRIMEIRA VELA M5"
+            ]
+        },
+        "AUDCAD": {
+            "estrategias": [
+                "REVERSAO/VENDA - 0.8333333333333334 - FLUXO OU REVERSÃO M5 E M1",
+                "FLUXO/COMPRA - 0.8333333333333334 - FLUXO OU REVERSÃO 2° VELA DE M15 P/ 3° VELA DE M15",
+                "FLUXO/COMPRA - 0.8333333333333334 - PROBABILIDADE PARA PRIMEIRA VELA M1",
+                "REVERSAO/VENDA - 0.8333333333333334 - PROBABILIDADE PARA PRIMEIRA VELA M5",
+                "FLUXO/COMPRA - 0.8333333333333334 - PROBABILIDADE PARA SEGUNDA VELA M15"
+            ]
+        },
+        "EURJPY": {
+            "estrategias": [
+                "FLUXO/COMPRA - 0.8333333333333334 - FLUXO OU REVERSÃO M5 E M1",
+                "FLUXO/COMPRA - 0.8333333333333334 - FLUXO OU REVERSÃO M2 PARA M3",
+                "REVERSAO/VENDA - 0.8333333333333334 - FLUXO OU REVERSÃO M3 PARA M5 ",
+                "REVERSAO/VENDA - 0.8333333333333334 - PROBABILIDADE PARA PRIMEIRA VELA M1",
+                "REVERSAO/VENDA - 0.8333333333333334 - PROBABILIDADE PARA QUARTA VELA M1",
+                "REVERSAO/VENDA - 0.8333333333333334 - PROBABILIDADE PARA PRIMEIRA VELA M5",
+                "REVERSAO/VENDA - 0.8333333333333334 - PROBABILIDADE PARA TERCEIRA VELA M5"
+            ]
+        },
+        "EURCAD": {
+            "estrategias": [
+                "FLUXO/COMPRA - 0.8333333333333334 - PROBABILIDADE PARA SEGUNDA VELA M1"
+            ]
+        },
+        "GBPCHF": {
+            "estrategias": [
+                "REVERSAO/VENDA - 0.8333333333333334 - FLUXO OU REVERSÃO M3 PARA M4 ",
+                "FLUXO/COMPRA - 0.8333333333333334 - FLUXO OU REVERSÃO 1° VELA DE M5 P/ 2° VELA DE M5 ",
+                "REVERSAO/VENDA - 0.8333333333333334 - FLUXO OU REVERSÃO 1° VELA DE M5 P/ 3° VELA DE M5",
+                "REVERSAO/VENDA - 1 - FLUXO OU REVERSÃO 2° VELA DE M5 P/ 3° VELA DE M5",
+                "FLUXO/COMPRA - 0.8333333333333334 - FLUXO OU REVERSÃO 1° VELA DE M15 P/ 2° VELA DE M15"
+            ]
+        }
+    },
+    "./planilhas/Discurso de Powell, Presidente do Fed.xlsx": {
+        "GBPUSD": {
+            "estrategias": [
+                "FLUXO/COMPRA - 0.7857142857142857 - FLUXO OU REVERSÃO M3 PARA M5 ",
+                "FLUXO/COMPRA - 0.7857142857142857 - FLUXO OU REVERSÃO 1° VELA DE M5 P/ 3° VELA DE M5",
+                "REVERSAO/VENDA - 0.7857142857142857 - PROBABILIDADE PARA PRIMEIRA VELA M1",
+                "REVERSAO/VENDA - 0.7857142857142857 - PROBABILIDADE PARA SEGUNDA VELA M1"
+            ]
+        },
+        "EURGBP": {
+            "estrategias": [
+                "FLUXO/COMPRA - 0.7857142857142857 - FLUXO OU REVERSÃO 1° VELA DE M5 P/ 3° VELA DE M5",
+                "FLUXO/COMPRA - 0.7857142857142857 - PROBABILIDADE PARA QUARTA VELA M1"
+            ]
+        },
+        "EURUSD": {
+            "estrategias": [
+                "REVERSAO/VENDA - 0.8571428571428571 - PROBABILIDADE PARA SEGUNDA VELA M1"
+            ]
+        },
+        "USDJPY": {
+            "estrategias": []
+        },
+        "GBPJPY": {
+            "estrategias": [
+                "REVERSAO/VENDA - 0.7857142857142857 - FLUXO OU REVERSÃO M3 E M1",
+                "REVERSAO/VENDA - 0.7857142857142857 - FLUXO OU REVERSÃO M3 PARA M4 "
+            ]
+        },
+        "USDCAD": {
+            "estrategias": [
+                "FLUXO/COMPRA - 0.8571428571428571 - PROBABILIDADE PARA SEGUNDA VELA M1"
+            ]
+        },
+        "AUDCAD": {
+            "estrategias": []
+        },
+        "EURJPY": {
+            "estrategias": [
+                "REVERSAO/VENDA - 0.7857142857142857 - FLUXO OU REVERSÃO 1° VELA DE M15 P/ 2° VELA DE M15"
+            ]
+        },
+        "EURCAD": {
+            "estrategias": []
+        },
+        "GBPCHF": {
+            "estrategias": [
+                "FLUXO/COMPRA - 0.7857142857142857 - FLUXO OU REVERSÃO 1° VELA DE M15 P/ 3° VELA DE M15",
+                "REVERSAO/VENDA - 0.7857142857142857 - FLUXO OU REVERSÃO 2° VELA DE M15 P/ 3° VELA DE M15"
+            ]
+        }
+    },
+    "./planilhas/Discurso de Nagel, Presidente do Bundesbank.xlsx": {
+        "GBPUSD": {
+            "estrategias": []
+        },
+        "EURGBP": {
+            "estrategias": []
+        },
+        "EURUSD": {
+            "estrategias": []
+        },
+        "USDJPY": {
+            "estrategias": []
+        },
+        "GBPJPY": {
+            "estrategias": []
+        },
+        "USDCAD": {
+            "estrategias": []
+        },
+        "AUDCAD": {
+            "estrategias": []
+        },
+        "EURJPY": {
+            "estrategias": []
+        },
+        "EURCAD": {
+            "estrategias": [
+                "FLUXO/COMPRA - 0.8260869565217391 - PROBABILIDADE PARA SEGUNDA VELA M15"
+            ]
+        },
+        "GBPCHF": {
+            "estrategias": [
+                "FLUXO/COMPRA - 0.782608695652174 - PROBABILIDADE PARA SEGUNDA VELA M5"
+            ]
+        }
+    },
+    "./planilhas/Encontro do Eurogrupo.xlsx": {
+        "GBPUSD": {
+            "estrategias": [
+                "FLUXO/COMPRA - 0.7857142857142857 - PROBABILIDADE PARA QUINTA VELA M1"
+            ]
+        },
+        "EURGBP": {
+            "estrategias": [
+                "FLUXO/COMPRA - 0.7857142857142857 - PROBABILIDADE PARA PRIMEIRA VELA M15"
+            ]
+        },
+        "EURUSD": {
+            "estrategias": [
+                "FLUXO/COMPRA - 0.7857142857142857 - PROBABILIDADE PARA PRIMEIRA VELA M1",
+                "FLUXO/COMPRA - 0.7857142857142857 - PROBABILIDADE PARA QUINTA VELA M1",
+                "FLUXO/COMPRA - 0.7857142857142857 - PROBABILIDADE PARA PRIMEIRA VELA M5"
+            ]
+        },
+        "USDJPY": {
+            "estrategias": [
+                "REVERSAO/VENDA - 0.8571428571428571 - PROBABILIDADE PARA SEGUNDA VELA M5"
+            ]
+        },
+        "GBPJPY": {
+            "estrategias": [
+                "FLUXO/COMPRA - 0.7857142857142857 - FLUXO OU REVERSÃO M5 E M1"
+            ]
+        },
+        "USDCAD": {
+            "estrategias": [
+                "REVERSAO/VENDA - 0.7857142857142857 - PROBABILIDADE PARA PRIMEIRA VELA M1"
+            ]
+        },
+        "AUDCAD": {
+            "estrategias": []
+        },
+        "EURJPY": {
+            "estrategias": [
+                "FLUXO/COMPRA - 0.8571428571428571 - FLUXO OU REVERSÃO 1° VELA DE M5 P/ 3° VELA DE M5",
+                "FLUXO/COMPRA - 0.7857142857142857 - PROBABILIDADE PARA PRIMEIRA VELA M5"
+            ]
+        },
+        "EURCAD": {
+            "estrategias": []
+        },
+        "GBPCHF": {
+            "estrategias": []
+        }
+    },
+    "./planilhas/Produção Industrial - Alemanha (Mensal).xlsx": {
+        "GBPUSD": {
+            "estrategias": []
+        },
+        "EURGBP": {
+            "estrategias": []
+        },
+        "EURUSD": {
+            "estrategias": []
+        },
+        "USDJPY": {
+            "estrategias": [
+                "REVERSAO/VENDA - 0.8666666666666667 - FLUXO OU REVERSÃO M4 E M1 ",
+                "REVERSAO/VENDA - 0.8 - PROBABILIDADE PARA TERCEIRA VELA M5"
+            ]
+        },
+        "GBPJPY": {
+            "estrategias": [
+                "REVERSAO/VENDA - 0.8 - FLUXO OU REVERSÃO M4 PARA M5",
+                "FLUXO/COMPRA - 0.8 - PROBABILIDADE PARA PRIMEIRA VELA M5"
+            ]
+        },
+        "USDCAD": {
+            "estrategias": []
+        },
+        "AUDCAD": {
+            "estrategias": [
+                "REVERSAO/VENDA - 0.8 - PROBABILIDADE PARA PRIMEIRA VELA M1"
+            ]
+        },
+        "EURJPY": {
+            "estrategias": []
+        },
+        "EURCAD": {
+            "estrategias": []
+        },
+        "GBPCHF": {
+            "estrategias": [
+                "FLUXO/COMPRA - 0.8666666666666667 - PROBABILIDADE PARA QUINTA VELA M1"
+            ]
+        }
+    },
+    "./planilhas/Índice SECO de Confiança do Consumidor.xlsx": {
+        "GBPUSD": {
+            "estrategias": []
+        },
+        "EURGBP": {
+            "estrategias": [
+                "FLUXO/COMPRA - 0.8 - PROBABILIDADE PARA SEGUNDA VELA M15"
+            ]
+        },
+        "EURUSD": {
+            "estrategias": [
+                "REVERSAO/VENDA - 0.8 - FLUXO OU REVERSÃO M4 PARA M5"
+            ]
+        },
+        "USDJPY": {
+            "estrategias": [
+                "FLUXO/COMPRA - 0.8 - FLUXO OU REVERSÃO M2 PARA M4",
+                "REVERSAO/VENDA - 0.8666666666666667 - PROBABILIDADE PARA PRIMEIRA VELA M5"
+            ]
+        },
+        "GBPJPY": {
+            "estrategias": []
+        },
+        "USDCAD": {
+            "estrategias": [
+                "FLUXO/COMPRA - 0.8 - FLUXO OU REVERSÃO 1° VELA DE M15 P/ 3° VELA DE M15",
+                "REVERSAO/VENDA - 0.8 - PROBABILIDADE PARA PRIMEIRA VELA M1"
+            ]
+        },
+        "AUDCAD": {
+            "estrategias": [
+                "REVERSAO/VENDA - 0.8 - FLUXO OU REVERSÃO DE M2",
+                "REVERSAO/VENDA - 0.8666666666666667 - FLUXO OU REVERSÃO 2° VELA DE M5 P/ 3° VELA DE M5"
+            ]
+        },
+        "EURJPY": {
+            "estrategias": [
+                "REVERSAO/VENDA - 0.8 - FLUXO OU REVERSÃO 1° VELA DE M15 P/ 2° VELA DE M15"
+            ]
+        },
+        "EURCAD": {
+            "estrategias": []
+        },
+        "GBPCHF": {
+            "estrategias": [
+                "REVERSAO/VENDA - 0.8666666666666667 - FLUXO OU REVERSÃO 1° VELA DE M15 P/ 2° VELA DE M15"
+            ]
+        }
+    },
+    "./planilhas/Variação de Empregos Privados ADP.xlsx": {
+        "GBPUSD": {
+            "estrategias": []
+        },
+        "EURGBP": {
+            "estrategias": []
+        },
+        "EURUSD": {
+            "estrategias": [
+                "FLUXO/COMPRA - 0.9333333333333333 - FLUXO OU REVERSÃO DE M2"
+            ]
+        },
+        "USDJPY": {
+            "estrategias": []
+        },
+        "GBPJPY": {
+            "estrategias": []
+        },
+        "USDCAD": {
+            "estrategias": [
+                "REVERSAO/VENDA - 0.8 - FLUXO OU REVERSÃO 2° VELA DE M5 P/ 3° VELA DE M5"
+            ]
+        },
+        "AUDCAD": {
+            "estrategias": [
+                "REVERSAO/VENDA - 0.8 - PROBABILIDADE PARA SEGUNDA VELA M1"
+            ]
+        },
+        "EURJPY": {
+            "estrategias": []
+        },
+        "EURCAD": {
+            "estrategias": [
+                "FLUXO/COMPRA - 0.8666666666666667 - FLUXO OU REVERSÃO 1° VELA DE M5 P/ 2° VELA DE M5 ",
+                "FLUXO/COMPRA - 0.8 - PROBABILIDADE PARA QUARTA VELA M1"
+            ]
+        },
+        "GBPCHF": {
+            "estrategias": [
+                "REVERSAO/VENDA - 0.8 - FLUXO OU REVERSÃO M2 PARA M3"
+            ]
+        }
+    },
+    "./planilhas/Livro Bege.xlsx": {
+        "GBPUSD": {
+            "estrategias": [
+                "REVERSAO/VENDA - 0.8 - FLUXO OU REVERSÃO M3 PARA M4 ",
+                "FLUXO/COMPRA - 0.8 - FLUXO OU REVERSÃO M4 PARA M5",
+                "FLUXO/COMPRA - 0.8 - FLUXO OU REVERSÃO 1° VELA DE M5 P/ 3° VELA DE M5",
+                "FLUXO/COMPRA - 0.8666666666666667 - PROBABILIDADE PARA SEGUNDA VELA M5"
+            ]
+        },
+        "EURGBP": {
+            "estrategias": [
+                "REVERSAO/VENDA - 0.8 - PROBABILIDADE PARA QUARTA VELA M1"
+            ]
+        },
+        "EURUSD": {
+            "estrategias": [
+                "FLUXO/COMPRA - 0.8666666666666667 - PROBABILIDADE PARA SEGUNDA VELA M5"
+            ]
+        },
+        "USDJPY": {
+            "estrategias": []
+        },
+        "GBPJPY": {
+            "estrategias": [
+                "FLUXO/COMPRA - 0.8 - PROBABILIDADE PARA PRIMEIRA VELA M15",
+                "REVERSAO/VENDA - 0.8 - PROBABILIDADE PARA SEGUNDA VELA M15"
+            ]
+        },
+        "USDCAD": {
+            "estrategias": [
+                "REVERSAO/VENDA - 0.9333333333333333 - PROBABILIDADE PARA SEGUNDA VELA M5"
+            ]
+        },
+        "AUDCAD": {
+            "estrategias": [
+                "REVERSAO/VENDA - 0.8 - FLUXO OU REVERSÃO 1° VELA DE M5 P/ 3° VELA DE M5",
+                "REVERSAO/VENDA - 0.8 - PROBABILIDADE PARA QUARTA VELA M1"
+            ]
+        },
+        "EURJPY": {
+            "estrategias": [
+                "FLUXO/COMPRA - 0.8 - PROBABILIDADE PARA SEGUNDA VELA M1"
+            ]
+        },
+        "EURCAD": {
+            "estrategias": [
+                "FLUXO/COMPRA - 0.8 - PROBABILIDADE PARA QUINTA VELA M1"
+            ]
+        },
+        "GBPCHF": {
+            "estrategias": []
+        }
+    },
+    "./planilhas/Taxa de Desemprego na Zona Euro.xlsx": {
+        "GBPUSD": {
+            "estrategias": [
+                "FLUXO/COMPRA - 0.8 - FLUXO OU REVERSÃO M3 E M1"
+            ]
+        },
+        "EURGBP": {
+            "estrategias": []
+        },
+        "EURUSD": {
+            "estrategias": [
+                "REVERSAO/VENDA - 0.8 - FLUXO OU REVERSÃO 2° VELA DE M15 P/ 3° VELA DE M15"
+            ]
+        },
+        "USDJPY": {
+            "estrategias": []
+        },
+        "GBPJPY": {
+            "estrategias": [
+                "REVERSAO/VENDA - 0.8 - FLUXO OU REVERSÃO M3 PARA M5 ",
+                "FLUXO/COMPRA - 0.8 - FLUXO OU REVERSÃO 2° VELA DE M5 P/ 3° VELA DE M5"
+            ]
+        },
+        "USDCAD": {
+            "estrategias": []
+        },
+        "AUDCAD": {
+            "estrategias": []
+        },
+        "EURJPY": {
+            "estrategias": [
+                "REVERSAO/VENDA - 0.8 - PROBABILIDADE PARA PRIMEIRA VELA M5"
+            ]
+        },
+        "EURCAD": {
+            "estrategias": [
+                "FLUXO/COMPRA - 0.8 - FLUXO OU REVERSÃO M2 PARA M3",
+                "REVERSAO/VENDA - 0.9333333333333333 - PROBABILIDADE PARA QUARTA VELA M1"
+            ]
+        },
+        "GBPCHF": {
+            "estrategias": [
+                "FLUXO/COMPRA - 0.8 - PROBABILIDADE PARA TERCEIRA VELA M5"
+            ]
+        }
+    },
+    "./planilhas/Discurso de Williams, membro do FOMC.xlsx": {
+        "GBPUSD": {
+            "estrategias": [
+                "REVERSAO/VENDA - 0.8 - FLUXO OU REVERSÃO M2 PARA M5"
+            ]
+        },
+        "EURGBP": {
+            "estrategias": [
+                "REVERSAO/VENDA - 0.8 - FLUXO OU REVERSÃO 1° VELA DE M5 P/ 3° VELA DE M5"
+            ]
+        },
+        "EURUSD": {
+            "estrategias": []
+        },
+        "USDJPY": {
+            "estrategias": [
+                "REVERSAO/VENDA - 0.8666666666666667 - FLUXO OU REVERSÃO 1° VELA DE M5 P/ 3° VELA DE M5",
+                "FLUXO/COMPRA - 0.8 - PROBABILIDADE PARA QUARTA VELA M1"
+            ]
+        },
+        "GBPJPY": {
+            "estrategias": []
+        },
+        "USDCAD": {
+            "estrategias": [
+                "FLUXO/COMPRA - 0.8 - FLUXO OU REVERSÃO M3 PARA M4 ",
+                "REVERSAO/VENDA - 0.8 - FLUXO OU REVERSÃO M3 PARA M5 ",
+                "REVERSAO/VENDA - 0.8 - PROBABILIDADE PARA QUARTA VELA M1"
+            ]
+        },
+        "AUDCAD": {
+            "estrategias": [
+                "FLUXO/COMPRA - 0.9333333333333333 - PROBABILIDADE PARA QUINTA VELA M1"
+            ]
+        },
+        "EURJPY": {
+            "estrategias": []
+        },
+        "EURCAD": {
+            "estrategias": [
+                "REVERSAO/VENDA - 0.8 - FLUXO OU REVERSÃO 1° VELA DE M5 P/ 3° VELA DE M5"
+            ]
+        },
+        "GBPCHF": {
+            "estrategias": []
+        }
+    },
+    "./planilhas/Cúpula de Líderes da UE.xlsx": {
+        "GBPUSD": {
+            "estrategias": [
+                "REVERSAO/VENDA - 0.8666666666666667 - FLUXO OU REVERSÃO M3 PARA M5 "
+            ]
+        },
+        "EURGBP": {
+            "estrategias": [
+                "REVERSAO/VENDA - 0.8 - FLUXO OU REVERSÃO M2 PARA M5"
+            ]
+        },
+        "EURUSD": {
+            "estrategias": []
+        },
+        "USDJPY": {
+            "estrategias": []
+        },
+        "GBPJPY": {
+            "estrategias": []
+        },
+        "USDCAD": {
+            "estrategias": [
+                "FLUXO/COMPRA - 0.8 - PROBABILIDADE PARA PRIMEIRA VELA M15"
+            ]
+        },
+        "AUDCAD": {
+            "estrategias": [
+                "FLUXO/COMPRA - 0.8 - PROBABILIDADE PARA QUARTA VELA M1"
+            ]
+        },
+        "EURJPY": {
+            "estrategias": []
+        },
+        "EURCAD": {
+            "estrategias": [
+                "REVERSAO/VENDA - 0.8666666666666667 - FLUXO OU REVERSÃO M2 PARA M5",
+                "FLUXO/COMPRA - 0.8 - FLUXO OU REVERSÃO M3 PARA M4 "
+            ]
+        },
+        "GBPCHF": {
+            "estrategias": []
+        }
+    },
+    "./planilhas/BCE Publica Atas da Reunião de Política Monetária.xlsx": {
+        "GBPUSD": {
+            "estrategias": []
+        },
+        "EURGBP": {
+            "estrategias": []
+        },
+        "EURUSD": {
+            "estrategias": [
+                "FLUXO/COMPRA - 0.8666666666666667 - FLUXO OU REVERSÃO M4 E M1 ",
+                "FLUXO/COMPRA - 0.8 - FLUXO OU REVERSÃO M2 PARA M3",
+                "FLUXO/COMPRA - 0.8666666666666667 - FLUXO OU REVERSÃO 1° VELA DE M5 P/ 2° VELA DE M5 "
+            ]
+        },
+        "USDJPY": {
+            "estrategias": []
+        },
+        "GBPJPY": {
+            "estrategias": [
+                "REVERSAO/VENDA - 0.8666666666666667 - FLUXO OU REVERSÃO DE M2",
+                "REVERSAO/VENDA - 0.8 - PROBABILIDADE PARA SEGUNDA VELA M1"
+            ]
+        },
+        "USDCAD": {
+            "estrategias": []
+        },
+        "AUDCAD": {
+            "estrategias": []
+        },
+        "EURJPY": {
+            "estrategias": [
+                "REVERSAO/VENDA - 0.8666666666666667 - FLUXO OU REVERSÃO DE M2",
+                "FLUXO/COMPRA - 0.8666666666666667 - FLUXO OU REVERSÃO M2 PARA M5"
+            ]
+        },
+        "EURCAD": {
+            "estrategias": [
+                "REVERSAO/VENDA - 0.8 - PROBABILIDADE PARA SEGUNDA VELA M5",
+                "REVERSAO/VENDA - 0.8 - PROBABILIDADE PARA PRIMEIRA VELA M15"
+            ]
+        },
+        "GBPCHF": {
+            "estrategias": []
+        }
+    },
+    "./planilhas/Declaração de Política Monetária do BCE.xlsx": {
+        "GBPUSD": {
+            "estrategias": [
+                "REVERSAO/VENDA - 0.9333333333333333 - PROBABILIDADE PARA SEGUNDA VELA M1",
+                "REVERSAO/VENDA - 0.8 - PROBABILIDADE PARA SEGUNDA VELA M5"
+            ]
+        },
+        "EURGBP": {
+            "estrategias": [
+                "REVERSAO/VENDA - 0.8 - FLUXO OU REVERSÃO M2 PARA M4"
+            ]
+        },
+        "EURUSD": {
+            "estrategias": []
+        },
+        "USDJPY": {
+            "estrategias": [
+                "REVERSAO/VENDA - 0.9333333333333333 - FLUXO OU REVERSÃO DE M2",
+                "FLUXO/COMPRA - 0.8 - FLUXO OU REVERSÃO M2 PARA M5",
+                "REVERSAO/VENDA - 0.8 - PROBABILIDADE PARA PRIMEIRA VELA M5"
+            ]
+        },
+        "GBPJPY": {
+            "estrategias": []
+        },
+        "USDCAD": {
+            "estrategias": []
+        },
+        "AUDCAD": {
+            "estrategias": [
+                "FLUXO/COMPRA - 0.8 - PROBABILIDADE PARA PRIMEIRA VELA M5",
+                "FLUXO/COMPRA - 0.8666666666666667 - PROBABILIDADE PARA PRIMEIRA VELA M15"
+            ]
+        },
+        "EURJPY": {
+            "estrategias": [
+                "REVERSAO/VENDA - 0.8 - FLUXO OU REVERSÃO M2 PARA M4"
+            ]
+        },
+        "EURCAD": {
+            "estrategias": [
+                "FLUXO/COMPRA - 0.8 - PROBABILIDADE PARA QUINTA VELA M1"
+            ]
+        },
+        "GBPCHF": {
+            "estrategias": [
+                "REVERSAO/VENDA - 0.8 - PROBABILIDADE PARA SEGUNDA VELA M1"
+            ]
+        }
+    },
+    "./planilhas/BCE Facilidade Permanente de Cedência de Liquidez.xlsx": {
+        "GBPUSD": {
+            "estrategias": [
+                "REVERSAO/VENDA - 0.9333333333333333 - PROBABILIDADE PARA SEGUNDA VELA M1",
+                "REVERSAO/VENDA - 0.8 - PROBABILIDADE PARA SEGUNDA VELA M5"
+            ]
+        },
+        "EURGBP": {
+            "estrategias": [
+                "REVERSAO/VENDA - 0.8 - FLUXO OU REVERSÃO M2 PARA M4"
+            ]
+        },
+        "EURUSD": {
+            "estrategias": []
+        },
+        "USDJPY": {
+            "estrategias": [
+                "REVERSAO/VENDA - 0.9333333333333333 - FLUXO OU REVERSÃO DE M2",
+                "FLUXO/COMPRA - 0.8 - FLUXO OU REVERSÃO M2 PARA M5",
+                "REVERSAO/VENDA - 0.8 - PROBABILIDADE PARA PRIMEIRA VELA M5"
+            ]
+        },
+        "GBPJPY": {
+            "estrategias": []
+        },
+        "USDCAD": {
+            "estrategias": []
+        },
+        "AUDCAD": {
+            "estrategias": [
+                "FLUXO/COMPRA - 0.8 - PROBABILIDADE PARA PRIMEIRA VELA M5",
+                "FLUXO/COMPRA - 0.8666666666666667 - PROBABILIDADE PARA PRIMEIRA VELA M15"
+            ]
+        },
+        "EURJPY": {
+            "estrategias": [
+                "REVERSAO/VENDA - 0.8 - FLUXO OU REVERSÃO M2 PARA M4"
+            ]
+        },
+        "EURCAD": {
+            "estrategias": [
+                "FLUXO/COMPRA - 0.8 - PROBABILIDADE PARA QUINTA VELA M1"
+            ]
+        },
+        "GBPCHF": {
+            "estrategias": [
+                "REVERSAO/VENDA - 0.8 - PROBABILIDADE PARA SEGUNDA VELA M1"
+            ]
+        }
+    },
+    "./planilhas/Discurso de Harker, membro do FOMC.xlsx": {
+        "GBPUSD": {
+            "estrategias": []
+        },
+        "EURGBP": {
+            "estrategias": [
+                "REVERSAO/VENDA - 0.8 - FLUXO OU REVERSÃO 1° VELA DE M15 P/ 2° VELA DE M15"
+            ]
+        },
+        "EURUSD": {
+            "estrategias": [
+                "REVERSAO/VENDA - 0.8 - FLUXO OU REVERSÃO 1° VELA DE M15 P/ 2° VELA DE M15"
+            ]
+        },
+        "USDJPY": {
+            "estrategias": [
+                "REVERSAO/VENDA - 0.8 - PROBABILIDADE PARA PRIMEIRA VELA M1",
+                "FLUXO/COMPRA - 0.8 - PROBABILIDADE PARA SEGUNDA VELA M15"
+            ]
+        },
+        "GBPJPY": {
+            "estrategias": [
+                "REVERSAO/VENDA - 0.8 - FLUXO OU REVERSÃO 2° VELA DE M15 P/ 3° VELA DE M15",
+                "FLUXO/COMPRA - 0.8 - PROBABILIDADE PARA SEGUNDA VELA M15"
+            ]
+        },
+        "USDCAD": {
+            "estrategias": []
+        },
+        "AUDCAD": {
+            "estrategias": [
+                "REVERSAO/VENDA - 0.8 - FLUXO OU REVERSÃO 1° VELA DE M5 P/ 2° VELA DE M5 "
+            ]
+        },
+        "EURJPY": {
+            "estrategias": [
+                "FLUXO/COMPRA - 0.8 - FLUXO OU REVERSÃO M4 PARA M5"
+            ]
+        },
+        "EURCAD": {
+            "estrategias": [
+                "REVERSAO/VENDA - 0.8 - PROBABILIDADE PARA TERCEIRA VELA M5"
+            ]
+        },
+        "GBPCHF": {
+            "estrategias": []
+        }
+    },
+    "./planilhas/PMI de Construção.xlsx": {
+        "GBPUSD": {
+            "estrategias": [
+                "REVERSAO/VENDA - 1 - FLUXO OU REVERSÃO DE M2",
+                "FLUXO/COMPRA - 1 - FLUXO OU REVERSÃO M3 PARA M4 ",
+                "FLUXO/COMPRA - 1 - FLUXO OU REVERSÃO M3 PARA M5 ",
+                "FLUXO/COMPRA - 1 - FLUXO OU REVERSÃO M4 PARA M5",
+                "FLUXO/COMPRA - 1 - FLUXO OU REVERSÃO 1° VELA DE M5 P/ 2° VELA DE M5 ",
+                "FLUXO/COMPRA - 1 - FLUXO OU REVERSÃO 1° VELA DE M15 P/ 2° VELA DE M15",
+                "REVERSAO/VENDA - 1 - PROBABILIDADE PARA PRIMEIRA VELA M1",
+                "FLUXO/COMPRA - 1 - PROBABILIDADE PARA SEGUNDA VELA M1",
+                "REVERSAO/VENDA - 1 - PROBABILIDADE PARA PRIMEIRA VELA M5",
+                "REVERSAO/VENDA - 1 - PROBABILIDADE PARA SEGUNDA VELA M5",
+                "REVERSAO/VENDA - 1 - PROBABILIDADE PARA PRIMEIRA VELA M15",
+                "REVERSAO/VENDA - 1 - PROBABILIDADE PARA SEGUNDA VELA M15"
+            ]
+        },
+        "EURGBP": {
+            "estrategias": [
+                "REVERSAO/VENDA - 1 - FLUXO OU REVERSÃO DE M2",
+                "FLUXO/COMPRA - 1 - FLUXO OU REVERSÃO M3 E M1",
+                "REVERSAO/VENDA - 1 - FLUXO OU REVERSÃO M5 E M1",
+                "REVERSAO/VENDA - 1 - FLUXO OU REVERSÃO M2 PARA M3",
+                "FLUXO/COMPRA - 1 - FLUXO OU REVERSÃO M2 PARA M5",
+                "REVERSAO/VENDA - 1 - FLUXO OU REVERSÃO M3 PARA M5 ",
+                "FLUXO/COMPRA - 1 - FLUXO OU REVERSÃO 1° VELA DE M5 P/ 2° VELA DE M5 ",
+                "FLUXO/COMPRA - 1 - FLUXO OU REVERSÃO 1° VELA DE M5 P/ 3° VELA DE M5",
+                "FLUXO/COMPRA - 1 - FLUXO OU REVERSÃO 2° VELA DE M5 P/ 3° VELA DE M5",
+                "FLUXO/COMPRA - 1 - FLUXO OU REVERSÃO 1° VELA DE M15 P/ 2° VELA DE M15",
+                "FLUXO/COMPRA - 1 - PROBABILIDADE PARA PRIMEIRA VELA M1",
+                "REVERSAO/VENDA - 1 - PROBABILIDADE PARA SEGUNDA VELA M1",
+                "FLUXO/COMPRA - 1 - PROBABILIDADE PARA TERCEIRA VELA M1",
+                "REVERSAO/VENDA - 1 - PROBABILIDADE PARA QUINTA VELA M1",
+                "FLUXO/COMPRA - 1 - PROBABILIDADE PARA PRIMEIRA VELA M5",
+                "FLUXO/COMPRA - 1 - PROBABILIDADE PARA SEGUNDA VELA M5",
+                "FLUXO/COMPRA - 1 - PROBABILIDADE PARA TERCEIRA VELA M5",
+                "FLUXO/COMPRA - 1 - PROBABILIDADE PARA PRIMEIRA VELA M15",
+                "FLUXO/COMPRA - 1 - PROBABILIDADE PARA SEGUNDA VELA M15"
+            ]
+        },
+        "EURUSD": {
+            "estrategias": [
+                "REVERSAO/VENDA - 1 - FLUXO OU REVERSÃO M4 E M1 ",
+                "FLUXO/COMPRA - 1 - FLUXO OU REVERSÃO M5 E M1",
+                "REVERSAO/VENDA - 1 - FLUXO OU REVERSÃO M2 PARA M3",
+                "REVERSAO/VENDA - 1 - FLUXO OU REVERSÃO M4 PARA M5",
+                "FLUXO/COMPRA - 1 - FLUXO OU REVERSÃO 1° VELA DE M5 P/ 2° VELA DE M5 ",
+                "REVERSAO/VENDA - 1 - FLUXO OU REVERSÃO 1° VELA DE M5 P/ 3° VELA DE M5",
+                "REVERSAO/VENDA - 1 - FLUXO OU REVERSÃO 2° VELA DE M5 P/ 3° VELA DE M5",
+                "FLUXO/COMPRA - 1 - FLUXO OU REVERSÃO 1° VELA DE M15 P/ 2° VELA DE M15",
+                "REVERSAO/VENDA - 1 - FLUXO OU REVERSÃO 1° VELA DE M15 P/ 3° VELA DE M15",
+                "REVERSAO/VENDA - 1 - FLUXO OU REVERSÃO 2° VELA DE M15 P/ 3° VELA DE M15",
+                "REVERSAO/VENDA - 1 - PROBABILIDADE PARA PRIMEIRA VELA M1",
+                "FLUXO/COMPRA - 1 - PROBABILIDADE PARA QUARTA VELA M1",
+                "REVERSAO/VENDA - 1 - PROBABILIDADE PARA QUINTA VELA M1"
+            ]
+        },
+        "USDJPY": {
+            "estrategias": [
+                "REVERSAO/VENDA - 1 - FLUXO OU REVERSÃO M3 E M1",
+                "REVERSAO/VENDA - 1 - FLUXO OU REVERSÃO M2 PARA M4",
+                "FLUXO/COMPRA - 1 - FLUXO OU REVERSÃO M2 PARA M5",
+                "REVERSAO/VENDA - 1 - FLUXO OU REVERSÃO M4 PARA M5",
+                "FLUXO/COMPRA - 1 - FLUXO OU REVERSÃO 1° VELA DE M5 P/ 2° VELA DE M5 ",
+                "REVERSAO/VENDA - 1 - FLUXO OU REVERSÃO 1° VELA DE M5 P/ 3° VELA DE M5",
+                "REVERSAO/VENDA - 1 - FLUXO OU REVERSÃO 2° VELA DE M5 P/ 3° VELA DE M5",
+                "FLUXO/COMPRA - 1 - FLUXO OU REVERSÃO 1° VELA DE M15 P/ 2° VELA DE M15",
+                "FLUXO/COMPRA - 1 - PROBABILIDADE PARA SEGUNDA VELA M1",
+                "REVERSAO/VENDA - 1 - PROBABILIDADE PARA QUARTA VELA M1",
+                "FLUXO/COMPRA - 1 - PROBABILIDADE PARA QUINTA VELA M1"
+            ]
+        },
+        "GBPJPY": {
+            "estrategias": [
+                "REVERSAO/VENDA - 1 - FLUXO OU REVERSÃO DE M2",
+                "REVERSAO/VENDA - 1 - FLUXO OU REVERSÃO M3 PARA M4 ",
+                "REVERSAO/VENDA - 1 - FLUXO OU REVERSÃO M3 PARA M5 ",
+                "FLUXO/COMPRA - 1 - FLUXO OU REVERSÃO M4 PARA M5",
+                "FLUXO/COMPRA - 1 - FLUXO OU REVERSÃO 1° VELA DE M5 P/ 2° VELA DE M5 ",
+                "FLUXO/COMPRA - 1 - FLUXO OU REVERSÃO 1° VELA DE M15 P/ 2° VELA DE M15",
+                "FLUXO/COMPRA - 1 - FLUXO OU REVERSÃO 1° VELA DE M15 P/ 3° VELA DE M15",
+                "FLUXO/COMPRA - 1 - FLUXO OU REVERSÃO 2° VELA DE M15 P/ 3° VELA DE M15",
+                "REVERSAO/VENDA - 1 - PROBABILIDADE PARA PRIMEIRA VELA M1",
+                "FLUXO/COMPRA - 1 - PROBABILIDADE PARA SEGUNDA VELA M1",
+                "REVERSAO/VENDA - 1 - PROBABILIDADE PARA PRIMEIRA VELA M5",
+                "REVERSAO/VENDA - 1 - PROBABILIDADE PARA SEGUNDA VELA M5",
+                "REVERSAO/VENDA - 1 - PROBABILIDADE PARA PRIMEIRA VELA M15",
+                "REVERSAO/VENDA - 1 - PROBABILIDADE PARA SEGUNDA VELA M15"
+            ]
+        },
+        "USDCAD": {
+            "estrategias": [
+                "REVERSAO/VENDA - 1 - FLUXO OU REVERSÃO DE M2",
+                "FLUXO/COMPRA - 1 - FLUXO OU REVERSÃO M5 E M1",
+                "REVERSAO/VENDA - 1 - FLUXO OU REVERSÃO M2 PARA M5",
+                "FLUXO/COMPRA - 1 - FLUXO OU REVERSÃO M3 PARA M4 ",
+                "REVERSAO/VENDA - 1 - FLUXO OU REVERSÃO 2° VELA DE M5 P/ 3° VELA DE M5",
+                "REVERSAO/VENDA - 1 - FLUXO OU REVERSÃO 1° VELA DE M15 P/ 2° VELA DE M15",
+                "REVERSAO/VENDA - 1 - PROBABILIDADE PARA TERCEIRA VELA M1",
+                "REVERSAO/VENDA - 1 - PROBABILIDADE PARA QUARTA VELA M1",
+                "REVERSAO/VENDA - 1 - PROBABILIDADE PARA PRIMEIRA VELA M5",
+                "REVERSAO/VENDA - 1 - PROBABILIDADE PARA PRIMEIRA VELA M15",
+                "FLUXO/COMPRA - 1 - PROBABILIDADE PARA SEGUNDA VELA M15"
+            ]
+        },
+        "AUDCAD": {
+            "estrategias": [
+                "REVERSAO/VENDA - 1 - FLUXO OU REVERSÃO M4 E M1 ",
+                "FLUXO/COMPRA - 1 - FLUXO OU REVERSÃO M5 E M1",
+                "REVERSAO/VENDA - 1 - FLUXO OU REVERSÃO M2 PARA M3",
+                "REVERSAO/VENDA - 1 - FLUXO OU REVERSÃO M4 PARA M5",
+                "REVERSAO/VENDA - 1 - FLUXO OU REVERSÃO 1° VELA DE M5 P/ 2° VELA DE M5 ",
+                "REVERSAO/VENDA - 1 - FLUXO OU REVERSÃO 1° VELA DE M15 P/ 2° VELA DE M15",
+                "REVERSAO/VENDA - 1 - FLUXO OU REVERSÃO 1° VELA DE M15 P/ 3° VELA DE M15",
+                "FLUXO/COMPRA - 1 - FLUXO OU REVERSÃO 2° VELA DE M15 P/ 3° VELA DE M15",
+                "REVERSAO/VENDA - 1 - PROBABILIDADE PARA PRIMEIRA VELA M1",
+                "FLUXO/COMPRA - 1 - PROBABILIDADE PARA QUARTA VELA M1",
+                "REVERSAO/VENDA - 1 - PROBABILIDADE PARA QUINTA VELA M1",
+                "REVERSAO/VENDA - 1 - PROBABILIDADE PARA PRIMEIRA VELA M5",
+                "FLUXO/COMPRA - 1 - PROBABILIDADE PARA SEGUNDA VELA M5",
+                "REVERSAO/VENDA - 1 - PROBABILIDADE PARA PRIMEIRA VELA M15",
+                "FLUXO/COMPRA - 1 - PROBABILIDADE PARA SEGUNDA VELA M15"
+            ]
+        },
+        "EURJPY": {
+            "estrategias": [
+                "REVERSAO/VENDA - 1 - FLUXO OU REVERSÃO DE M2",
+                "REVERSAO/VENDA - 1 - FLUXO OU REVERSÃO M3 E M1",
+                "FLUXO/COMPRA - 1 - FLUXO OU REVERSÃO M2 PARA M3",
+                "FLUXO/COMPRA - 1 - FLUXO OU REVERSÃO M4 PARA M5",
+                "FLUXO/COMPRA - 1 - FLUXO OU REVERSÃO 2° VELA DE M5 P/ 3° VELA DE M5",
+                "FLUXO/COMPRA - 1 - FLUXO OU REVERSÃO 1° VELA DE M15 P/ 2° VELA DE M15",
+                "REVERSAO/VENDA - 1 - PROBABILIDADE PARA QUARTA VELA M1",
+                "REVERSAO/VENDA - 1 - PROBABILIDADE PARA QUINTA VELA M1",
+                "REVERSAO/VENDA - 1 - PROBABILIDADE PARA PRIMEIRA VELA M5"
+            ]
+        },
+        "EURCAD": {
+            "estrategias": [
+                "FLUXO/COMPRA - 1 - FLUXO OU REVERSÃO DE M2",
+                "REVERSAO/VENDA - 1 - FLUXO OU REVERSÃO M4 E M1 ",
+                "FLUXO/COMPRA - 1 - FLUXO OU REVERSÃO M5 E M1",
+                "REVERSAO/VENDA - 1 - FLUXO OU REVERSÃO M2 PARA M4",
+                "FLUXO/COMPRA - 1 - FLUXO OU REVERSÃO M2 PARA M5",
+                "REVERSAO/VENDA - 1 - FLUXO OU REVERSÃO M4 PARA M5",
+                "FLUXO/COMPRA - 1 - FLUXO OU REVERSÃO 1° VELA DE M5 P/ 2° VELA DE M5 ",
+                "REVERSAO/VENDA - 1 - FLUXO OU REVERSÃO 1° VELA DE M15 P/ 2° VELA DE M15",
+                "FLUXO/COMPRA - 1 - FLUXO OU REVERSÃO 1° VELA DE M15 P/ 3° VELA DE M15",
+                "REVERSAO/VENDA - 1 - FLUXO OU REVERSÃO 2° VELA DE M15 P/ 3° VELA DE M15",
+                "REVERSAO/VENDA - 1 - PROBABILIDADE PARA PRIMEIRA VELA M1",
+                "REVERSAO/VENDA - 1 - PROBABILIDADE PARA SEGUNDA VELA M1",
+                "FLUXO/COMPRA - 1 - PROBABILIDADE PARA QUARTA VELA M1",
+                "REVERSAO/VENDA - 1 - PROBABILIDADE PARA QUINTA VELA M1",
+                "REVERSAO/VENDA - 1 - PROBABILIDADE PARA PRIMEIRA VELA M5",
+                "REVERSAO/VENDA - 1 - PROBABILIDADE PARA SEGUNDA VELA M5",
+                "REVERSAO/VENDA - 1 - PROBABILIDADE PARA PRIMEIRA VELA M15",
+                "FLUXO/COMPRA - 1 - PROBABILIDADE PARA SEGUNDA VELA M15"
+            ]
+        },
+        "GBPCHF": {
+            "estrategias": [
+                "REVERSAO/VENDA - 1 - FLUXO OU REVERSÃO DE M2",
+                "FLUXO/COMPRA - 1 - FLUXO OU REVERSÃO M3 E M1",
+                "FLUXO/COMPRA - 1 - FLUXO OU REVERSÃO M4 E M1 ",
+                "REVERSAO/VENDA - 1 - FLUXO OU REVERSÃO M5 E M1",
+                "REVERSAO/VENDA - 1 - FLUXO OU REVERSÃO M2 PARA M3",
+                "REVERSAO/VENDA - 1 - FLUXO OU REVERSÃO M2 PARA M4",
+                "FLUXO/COMPRA - 1 - FLUXO OU REVERSÃO M2 PARA M5",
+                "FLUXO/COMPRA - 1 - FLUXO OU REVERSÃO M3 PARA M4 ",
+                "REVERSAO/VENDA - 1 - FLUXO OU REVERSÃO M3 PARA M5 ",
+                "REVERSAO/VENDA - 1 - FLUXO OU REVERSÃO M4 PARA M5",
+                "FLUXO/COMPRA - 1 - FLUXO OU REVERSÃO 1° VELA DE M5 P/ 3° VELA DE M5",
+                "FLUXO/COMPRA - 1 - FLUXO OU REVERSÃO 1° VELA DE M15 P/ 2° VELA DE M15",
+                "REVERSAO/VENDA - 1 - PROBABILIDADE PARA PRIMEIRA VELA M1",
+                "FLUXO/COMPRA - 1 - PROBABILIDADE PARA SEGUNDA VELA M1",
+                "REVERSAO/VENDA - 1 - PROBABILIDADE PARA TERCEIRA VELA M1",
+                "REVERSAO/VENDA - 1 - PROBABILIDADE PARA QUARTA VELA M1",
+                "FLUXO/COMPRA - 1 - PROBABILIDADE PARA QUINTA VELA M1",
+                "REVERSAO/VENDA - 1 - PROBABILIDADE PARA PRIMEIRA VELA M5",
+                "REVERSAO/VENDA - 1 - PROBABILIDADE PARA TERCEIRA VELA M5",
+                "REVERSAO/VENDA - 1 - PROBABILIDADE PARA PRIMEIRA VELA M15",
+                "REVERSAO/VENDA - 1 - PROBABILIDADE PARA SEGUNDA VELA M15"
+            ]
+        }
+    },
+    "./planilhas/Discurso de Mann, membro do CPM do BoE.xlsx": {
+        "GBPUSD": {
+            "estrategias": []
+        },
+        "EURGBP": {
+            "estrategias": []
+        },
+        "EURUSD": {
+            "estrategias": []
+        },
+        "USDJPY": {
+            "estrategias": []
+        },
+        "GBPJPY": {
+            "estrategias": []
+        },
+        "USDCAD": {
+            "estrategias": [
+                "FLUXO/COMPRA - 0.8 - PROBABILIDADE PARA SEGUNDA VELA M1"
+            ]
+        },
+        "AUDCAD": {
+            "estrategias": []
+        },
+        "EURJPY": {
+            "estrategias": []
+        },
+        "EURCAD": {
+            "estrategias": [
+                "REVERSAO/VENDA - 0.9333333333333333 - PROBABILIDADE PARA QUINTA VELA M1",
+                "REVERSAO/VENDA - 0.8 - PROBABILIDADE PARA PRIMEIRA VELA M5"
+            ]
+        },
+        "GBPCHF": {
+            "estrategias": [
+                "FLUXO/COMPRA - 0.8 - FLUXO OU REVERSÃO M3 PARA M4 ",
+                "FLUXO/COMPRA - 0.8 - PROBABILIDADE PARA TERCEIRA VELA M1",
+                "FLUXO/COMPRA - 0.8666666666666667 - PROBABILIDADE PARA PRIMEIRA VELA M5"
+            ]
+        }
+    },
+    "./planilhas/Discurso de Christine Lagarde, Presidente do BCE.xlsx": {
+        "GBPUSD": {
+            "estrategias": []
+        },
+        "EURGBP": {
+            "estrategias": []
+        },
+        "EURUSD": {
+            "estrategias": [
+                "FLUXO/COMPRA - 0.7894736842105263 - FLUXO OU REVERSÃO M2 PARA M4"
+            ]
+        },
+        "USDJPY": {
+            "estrategias": []
+        },
+        "GBPJPY": {
+            "estrategias": []
+        },
+        "USDCAD": {
+            "estrategias": []
+        },
+        "AUDCAD": {
+            "estrategias": []
+        },
+        "EURJPY": {
+            "estrategias": []
+        },
+        "EURCAD": {
+            "estrategias": []
+        },
+        "GBPCHF": {
+            "estrategias": []
+        }
+    },
+    "./planilhas/Pronunciamento de Buch, vice-presidente do BC alemão.xlsx": {
+        "GBPUSD": {
+            "estrategias": [
+                "REVERSAO/VENDA - 0.8 - FLUXO OU REVERSÃO M3 E M1",
+                "FLUXO/COMPRA - 0.8 - FLUXO OU REVERSÃO M5 E M1"
+            ]
+        },
+        "EURGBP": {
+            "estrategias": []
+        },
+        "EURUSD": {
+            "estrategias": []
+        },
+        "USDJPY": {
+            "estrategias": []
+        },
+        "GBPJPY": {
+            "estrategias": []
+        },
+        "USDCAD": {
+            "estrategias": []
+        },
+        "AUDCAD": {
+            "estrategias": []
+        },
+        "EURJPY": {
+            "estrategias": []
+        },
+        "EURCAD": {
+            "estrategias": []
+        },
+        "GBPCHF": {
+            "estrategias": []
+        }
+    },
+    "./planilhas/Encomendas à Indústria - Alemanha (Mensal).xlsx": {
+        "GBPUSD": {
+            "estrategias": []
+        },
+        "EURGBP": {
+            "estrategias": [
+                "REVERSAO/VENDA - 0.8 - FLUXO OU REVERSÃO M5 E M1",
+                "FLUXO/COMPRA - 0.8 - PROBABILIDADE PARA SEGUNDA VELA M5"
+            ]
+        },
+        "EURUSD": {
+            "estrategias": [
+                "FLUXO/COMPRA - 0.8 - PROBABILIDADE PARA SEGUNDA VELA M5"
+            ]
+        },
+        "USDJPY": {
+            "estrategias": []
+        },
+        "GBPJPY": {
+            "estrategias": [
+                "FLUXO/COMPRA - 0.8 - FLUXO OU REVERSÃO DE M2"
+            ]
+        },
+        "USDCAD": {
+            "estrategias": [
+                "FLUXO/COMPRA - 0.8 - FLUXO OU REVERSÃO M3 E M1"
+            ]
+        },
+        "AUDCAD": {
+            "estrategias": []
+        },
+        "EURJPY": {
+            "estrategias": [
+                "REVERSAO/VENDA - 0.8 - FLUXO OU REVERSÃO M3 PARA M5 "
+            ]
+        },
+        "EURCAD": {
+            "estrategias": [
+                "FLUXO/COMPRA - 0.9333333333333333 - PROBABILIDADE PARA SEGUNDA VELA M5"
+            ]
+        },
+        "GBPCHF": {
+            "estrategias": [
+                "FLUXO/COMPRA - 0.8 - FLUXO OU REVERSÃO 1° VELA DE M15 P/ 3° VELA DE M15"
+            ]
+        }
+    },
+    "./planilhas/Índice de Preços de Imóveis Halifax (Mensal).xlsx": {
+        "GBPUSD": {
+            "estrategias": [
+                "FLUXO/COMPRA - 0.8 - PROBABILIDADE PARA PRIMEIRA VELA M15",
+                "FLUXO/COMPRA - 0.8 - PROBABILIDADE PARA SEGUNDA VELA M15"
+            ]
+        },
+        "EURGBP": {
+            "estrategias": [
+                "FLUXO/COMPRA - 0.8 - FLUXO OU REVERSÃO 1° VELA DE M5 P/ 2° VELA DE M5 ",
+                "REVERSAO/VENDA - 0.9333333333333333 - PROBABILIDADE PARA QUINTA VELA M1",
+                "REVERSAO/VENDA - 0.8 - PROBABILIDADE PARA PRIMEIRA VELA M5"
+            ]
+        },
+        "EURUSD": {
+            "estrategias": []
+        },
+        "USDJPY": {
+            "estrategias": []
+        },
+        "GBPJPY": {
+            "estrategias": [
+                "FLUXO/COMPRA - 0.8 - PROBABILIDADE PARA QUINTA VELA M1"
+            ]
+        },
+        "USDCAD": {
+            "estrategias": [
+                "FLUXO/COMPRA - 0.8 - FLUXO OU REVERSÃO M3 E M1"
+            ]
+        },
+        "AUDCAD": {
+            "estrategias": []
+        },
+        "EURJPY": {
+            "estrategias": []
+        },
+        "EURCAD": {
+            "estrategias": [
+                "FLUXO/COMPRA - 0.8 - FLUXO OU REVERSÃO M2 PARA M3",
+                "FLUXO/COMPRA - 0.8 - FLUXO OU REVERSÃO 2° VELA DE M15 P/ 3° VELA DE M15",
+                "FLUXO/COMPRA - 0.8666666666666667 - PROBABILIDADE PARA SEGUNDA VELA M5"
+            ]
+        },
+        "GBPCHF": {
+            "estrategias": []
+        }
+    },
+    "./planilhas/Variação no Emprego.xlsx": {
+        "GBPUSD": {
+            "estrategias": [
+                "REVERSAO/VENDA - 0.8 - FLUXO OU REVERSÃO M2 PARA M5"
+            ]
+        },
+        "EURGBP": {
+            "estrategias": [
+                "REVERSAO/VENDA - 0.8 - FLUXO OU REVERSÃO DE M2",
+                "FLUXO/COMPRA - 0.8 - PROBABILIDADE PARA TERCEIRA VELA M1"
+            ]
+        },
+        "EURUSD": {
+            "estrategias": [
+                "REVERSAO/VENDA - 0.8 - FLUXO OU REVERSÃO M5 E M1",
+                "REVERSAO/VENDA - 0.8 - FLUXO OU REVERSÃO 1° VELA DE M15 P/ 2° VELA DE M15"
+            ]
+        },
+        "USDJPY": {
+            "estrategias": []
+        },
+        "GBPJPY": {
+            "estrategias": []
+        },
+        "USDCAD": {
+            "estrategias": []
+        },
+        "AUDCAD": {
+            "estrategias": [
+                "REVERSAO/VENDA - 0.8 - FLUXO OU REVERSÃO M2 PARA M4"
+            ]
+        },
+        "EURJPY": {
+            "estrategias": [
+                "REVERSAO/VENDA - 0.8 - FLUXO OU REVERSÃO 1° VELA DE M5 P/ 2° VELA DE M5 "
+            ]
+        },
+        "EURCAD": {
+            "estrategias": []
+        },
+        "GBPCHF": {
+            "estrategias": []
+        }
+    },
+    "./planilhas/Relatório de Política Monetária do Fed.xlsx": {
+        "GBPUSD": {
+            "estrategias": [
+                "REVERSAO/VENDA - 0.8 - FLUXO OU REVERSÃO M3 PARA M5 ",
+                "FLUXO/COMPRA - 0.8666666666666667 - PROBABILIDADE PARA TERCEIRA VELA M5"
+            ]
+        },
+        "EURGBP": {
+            "estrategias": []
+        },
+        "EURUSD": {
+            "estrategias": [
+                "REVERSAO/VENDA - 0.8666666666666667 - FLUXO OU REVERSÃO 2° VELA DE M15 P/ 3° VELA DE M15"
+            ]
+        },
+        "USDJPY": {
+            "estrategias": [
+                "FLUXO/COMPRA - 0.8 - PROBABILIDADE PARA SEGUNDA VELA M5"
+            ]
+        },
+        "GBPJPY": {
+            "estrategias": [
+                "FLUXO/COMPRA - 0.8 - PROBABILIDADE PARA TERCEIRA VELA M5"
+            ]
+        },
+        "USDCAD": {
+            "estrategias": [
+                "REVERSAO/VENDA - 0.8 - FLUXO OU REVERSÃO M2 PARA M5"
+            ]
+        },
+        "AUDCAD": {
+            "estrategias": [
+                "REVERSAO/VENDA - 0.8 - FLUXO OU REVERSÃO 1° VELA DE M15 P/ 3° VELA DE M15"
+            ]
+        },
+        "EURJPY": {
+            "estrategias": []
+        },
+        "EURCAD": {
+            "estrategias": [
+                "FLUXO/COMPRA - 0.8 - FLUXO OU REVERSÃO 1° VELA DE M5 P/ 2° VELA DE M5 ",
+                "FLUXO/COMPRA - 0.8 - FLUXO OU REVERSÃO 1° VELA DE M15 P/ 2° VELA DE M15",
+                "REVERSAO/VENDA - 0.8666666666666667 - PROBABILIDADE PARA QUINTA VELA M1"
+            ]
+        },
+        "GBPCHF": {
+            "estrategias": []
+        }
+    },
+    "./planilhas/Discurso de Bowman, Membro do FOMC.xlsx": {
+        "GBPUSD": {
+            "estrategias": []
+        },
+        "EURGBP": {
+            "estrategias": []
+        },
+        "EURUSD": {
+            "estrategias": []
+        },
+        "USDJPY": {
+            "estrategias": []
+        },
+        "GBPJPY": {
+            "estrategias": [
+                "FLUXO/COMPRA - 0.8 - PROBABILIDADE PARA SEGUNDA VELA M1",
+                "FLUXO/COMPRA - 0.8 - PROBABILIDADE PARA QUARTA VELA M1"
+            ]
+        },
+        "USDCAD": {
+            "estrategias": []
+        },
+        "AUDCAD": {
+            "estrategias": [
+                "FLUXO/COMPRA - 0.8 - PROBABILIDADE PARA SEGUNDA VELA M15"
+            ]
+        },
+        "EURJPY": {
+            "estrategias": [
+                "FLUXO/COMPRA - 0.8 - PROBABILIDADE PARA SEGUNDA VELA M1"
+            ]
+        },
+        "EURCAD": {
+            "estrategias": []
+        },
+        "GBPCHF": {
+            "estrategias": [
+                "REVERSAO/VENDA - 0.8666666666666667 - FLUXO OU REVERSÃO M2 PARA M5"
+            ]
+        }
+    },
+    "./planilhas/Perspectiva Energética de Curto Prazo da EIA.xlsx": {
+        "GBPUSD": {
+            "estrategias": [
+                "REVERSAO/VENDA - 0.7857142857142857 - FLUXO OU REVERSÃO 1° VELA DE M15 P/ 2° VELA DE M15",
+                "REVERSAO/VENDA - 0.7857142857142857 - PROBABILIDADE PARA PRIMEIRA VELA M5"
+            ]
+        },
+        "EURGBP": {
+            "estrategias": []
+        },
+        "EURUSD": {
+            "estrategias": [
+                "FLUXO/COMPRA - 0.7857142857142857 - FLUXO OU REVERSÃO M3 PARA M5 ",
+                "REVERSAO/VENDA - 0.8571428571428571 - FLUXO OU REVERSÃO 1° VELA DE M15 P/ 2° VELA DE M15",
+                "REVERSAO/VENDA - 0.8571428571428571 - PROBABILIDADE PARA QUINTA VELA M1",
+                "FLUXO/COMPRA - 0.7857142857142857 - PROBABILIDADE PARA TERCEIRA VELA M5"
+            ]
+        },
+        "USDJPY": {
+            "estrategias": [
+                "FLUXO/COMPRA - 0.7857142857142857 - FLUXO OU REVERSÃO M2 PARA M3",
+                "FLUXO/COMPRA - 0.7857142857142857 - FLUXO OU REVERSÃO 2° VELA DE M5 P/ 3° VELA DE M5"
+            ]
+        },
+        "GBPJPY": {
+            "estrategias": []
+        },
+        "USDCAD": {
+            "estrategias": [
+                "REVERSAO/VENDA - 0.7857142857142857 - FLUXO OU REVERSÃO M3 PARA M4 "
+            ]
+        },
+        "AUDCAD": {
+            "estrategias": [
+                "REVERSAO/VENDA - 0.7857142857142857 - FLUXO OU REVERSÃO 1° VELA DE M15 P/ 2° VELA DE M15",
+                "FLUXO/COMPRA - 0.9285714285714286 - PROBABILIDADE PARA TERCEIRA VELA M5",
+                "FLUXO/COMPRA - 0.8571428571428571 - PROBABILIDADE PARA PRIMEIRA VELA M15"
+            ]
+        },
+        "EURJPY": {
+            "estrategias": []
+        },
+        "EURCAD": {
+            "estrategias": [
+                "FLUXO/COMPRA - 0.7857142857142857 - PROBABILIDADE PARA PRIMEIRA VELA M15"
+            ]
+        },
+        "GBPCHF": {
+            "estrategias": []
+        }
+    },
+    "./planilhas/Relatório WASDE.xlsx": {
+        "GBPUSD": {
+            "estrategias": [
+                "REVERSAO/VENDA - 0.7857142857142857 - FLUXO OU REVERSÃO 1° VELA DE M15 P/ 2° VELA DE M15"
+            ]
+        },
+        "EURGBP": {
+            "estrategias": [
+                "REVERSAO/VENDA - 0.7857142857142857 - FLUXO OU REVERSÃO M4 E M1 ",
+                "REVERSAO/VENDA - 0.7857142857142857 - FLUXO OU REVERSÃO M5 E M1"
+            ]
+        },
+        "EURUSD": {
+            "estrategias": []
+        },
+        "USDJPY": {
+            "estrategias": []
+        },
+        "GBPJPY": {
+            "estrategias": [
+                "FLUXO/COMPRA - 0.7857142857142857 - PROBABILIDADE PARA PRIMEIRA VELA M1"
+            ]
+        },
+        "USDCAD": {
+            "estrategias": [
+                "FLUXO/COMPRA - 0.7857142857142857 - PROBABILIDADE PARA SEGUNDA VELA M5",
+                "REVERSAO/VENDA - 0.7857142857142857 - PROBABILIDADE PARA TERCEIRA VELA M5"
+            ]
+        },
+        "AUDCAD": {
+            "estrategias": []
+        },
+        "EURJPY": {
+            "estrategias": [
+                "FLUXO/COMPRA - 0.7857142857142857 - PROBABILIDADE PARA PRIMEIRA VELA M1"
+            ]
+        },
+        "EURCAD": {
+            "estrategias": [
+                "FLUXO/COMPRA - 0.7857142857142857 - FLUXO OU REVERSÃO 1° VELA DE M5 P/ 2° VELA DE M5 ",
+                "REVERSAO/VENDA - 0.8571428571428571 - FLUXO OU REVERSÃO 1° VELA DE M15 P/ 2° VELA DE M15",
+                "REVERSAO/VENDA - 0.8571428571428571 - FLUXO OU REVERSÃO 1° VELA DE M15 P/ 3° VELA DE M15",
+                "FLUXO/COMPRA - 0.8571428571428571 - FLUXO OU REVERSÃO 2° VELA DE M15 P/ 3° VELA DE M15",
+                "FLUXO/COMPRA - 0.7857142857142857 - PROBABILIDADE PARA SEGUNDA VELA M5"
+            ]
+        },
+        "GBPCHF": {
+            "estrategias": [
+                "FLUXO/COMPRA - 0.7857142857142857 - PROBABILIDADE PARA SEGUNDA VELA M15"
+            ]
+        }
+    },
+    "./planilhas/Leilão Americano Note a 3 anos.xlsx": {
+        "GBPUSD": {
+            "estrategias": [
+                "REVERSAO/VENDA - 0.7857142857142857 - FLUXO OU REVERSÃO DE M2"
+            ]
+        },
+        "EURGBP": {
+            "estrategias": []
+        },
+        "EURUSD": {
+            "estrategias": [
+                "FLUXO/COMPRA - 0.7857142857142857 - FLUXO OU REVERSÃO M2 PARA M4"
+            ]
+        },
+        "USDJPY": {
+            "estrategias": [
+                "REVERSAO/VENDA - 0.7857142857142857 - FLUXO OU REVERSÃO M2 PARA M5",
+                "FLUXO/COMPRA - 0.7857142857142857 - PROBABILIDADE PARA QUINTA VELA M1"
+            ]
+        },
+        "GBPJPY": {
+            "estrategias": [
+                "REVERSAO/VENDA - 0.7857142857142857 - FLUXO OU REVERSÃO 2° VELA DE M15 P/ 3° VELA DE M15",
+                "FLUXO/COMPRA - 0.8571428571428571 - PROBABILIDADE PARA QUINTA VELA M1"
+            ]
+        },
+        "USDCAD": {
+            "estrategias": [
+                "FLUXO/COMPRA - 0.7857142857142857 - PROBABILIDADE PARA PRIMEIRA VELA M1"
+            ]
+        },
+        "AUDCAD": {
+            "estrategias": [
+                "REVERSAO/VENDA - 0.7857142857142857 - FLUXO OU REVERSÃO M3 PARA M4 ",
+                "REVERSAO/VENDA - 0.7857142857142857 - FLUXO OU REVERSÃO 2° VELA DE M5 P/ 3° VELA DE M5"
+            ]
+        },
+        "EURJPY": {
+            "estrategias": [
+                "FLUXO/COMPRA - 0.7857142857142857 - PROBABILIDADE PARA QUINTA VELA M1"
+            ]
+        },
+        "EURCAD": {
+            "estrategias": []
+        },
+        "GBPCHF": {
+            "estrategias": []
+        }
+    },
+    "./planilhas/Leilão Alemão Bund a 10 anos.xlsx": {
+        "GBPUSD": {
+            "estrategias": []
+        },
+        "EURGBP": {
+            "estrategias": []
+        },
+        "EURUSD": {
+            "estrategias": [
+                "FLUXO/COMPRA - 0.7894736842105263 - FLUXO OU REVERSÃO 2° VELA DE M5 P/ 3° VELA DE M5"
+            ]
+        },
+        "USDJPY": {
+            "estrategias": []
+        },
+        "GBPJPY": {
+            "estrategias": []
+        },
+        "USDCAD": {
+            "estrategias": []
+        },
+        "AUDCAD": {
+            "estrategias": []
+        },
+        "EURJPY": {
+            "estrategias": []
+        },
+        "EURCAD": {
+            "estrategias": [
+                "REVERSAO/VENDA - 0.8421052631578947 - FLUXO OU REVERSÃO DE M2"
+            ]
+        },
+        "GBPCHF": {
+            "estrategias": [
+                "REVERSAO/VENDA - 0.7894736842105263 - FLUXO OU REVERSÃO M3 PARA M5 "
+            ]
+        }
+    },
+    "./planilhas/Coletiva de Imprensa do BoC.xlsx": {
+        "GBPUSD": {
+            "estrategias": [
+                "FLUXO/COMPRA - 0.7894736842105263 - FLUXO OU REVERSÃO M4 PARA M5",
+                "FLUXO/COMPRA - 0.7894736842105263 - FLUXO OU REVERSÃO 1° VELA DE M5 P/ 2° VELA DE M5 "
+            ]
+        },
+        "EURGBP": {
+            "estrategias": []
+        },
+        "EURUSD": {
+            "estrategias": []
+        },
+        "USDJPY": {
+            "estrategias": []
+        },
+        "GBPJPY": {
+            "estrategias": []
+        },
+        "USDCAD": {
+            "estrategias": []
+        },
+        "AUDCAD": {
+            "estrategias": [
+                "FLUXO/COMPRA - 0.7894736842105263 - FLUXO OU REVERSÃO M3 PARA M4 "
+            ]
+        },
+        "EURJPY": {
+            "estrategias": []
+        },
+        "EURCAD": {
+            "estrategias": [
+                "REVERSAO/VENDA - 0.7894736842105263 - PROBABILIDADE PARA PRIMEIRA VELA M15"
+            ]
+        },
+        "GBPCHF": {
+            "estrategias": [
+                "FLUXO/COMPRA - 0.7894736842105263 - FLUXO OU REVERSÃO M2 PARA M3",
+                "FLUXO/COMPRA - 0.8421052631578947 - PROBABILIDADE PARA SEGUNDA VELA M1"
+            ]
+        }
+    },
+    "./planilhas/Pronunciamento de Lane, do BCE.xlsx": {
+        "GBPUSD": {
+            "estrategias": []
+        },
+        "EURGBP": {
+            "estrategias": []
+        },
+        "EURUSD": {
+            "estrategias": [
+                "FLUXO/COMPRA - 0.7894736842105263 - FLUXO OU REVERSÃO 1° VELA DE M15 P/ 2° VELA DE M15"
+            ]
+        },
+        "USDJPY": {
+            "estrategias": []
+        },
+        "GBPJPY": {
+            "estrategias": []
+        },
+        "USDCAD": {
+            "estrategias": [
+                "FLUXO/COMPRA - 0.7894736842105263 - FLUXO OU REVERSÃO 2° VELA DE M5 P/ 3° VELA DE M5"
+            ]
+        },
+        "AUDCAD": {
+            "estrategias": [
+                "FLUXO/COMPRA - 0.8421052631578947 - PROBABILIDADE PARA SEGUNDA VELA M5"
+            ]
+        },
+        "EURJPY": {
+            "estrategias": [
+                "FLUXO/COMPRA - 0.7894736842105263 - FLUXO OU REVERSÃO 1° VELA DE M15 P/ 3° VELA DE M15"
+            ]
+        },
+        "EURCAD": {
+            "estrategias": []
+        },
+        "GBPCHF": {
+            "estrategias": []
+        }
+    },
+    "./planilhas/Relatório Mensal da OPEP.xlsx": {
+        "GBPUSD": {
+            "estrategias": []
+        },
+        "EURGBP": {
+            "estrategias": []
+        },
+        "EURUSD": {
+            "estrategias": []
+        },
+        "USDJPY": {
+            "estrategias": [
+                "REVERSAO/VENDA - 0.85 - FLUXO OU REVERSÃO 1° VELA DE M15 P/ 3° VELA DE M15"
+            ]
+        },
+        "GBPJPY": {
+            "estrategias": [
+                "REVERSAO/VENDA - 0.8 - FLUXO OU REVERSÃO 1° VELA DE M15 P/ 3° VELA DE M15"
+            ]
+        },
+        "USDCAD": {
+            "estrategias": []
+        },
+        "AUDCAD": {
+            "estrategias": [
+                "REVERSAO/VENDA - 0.8 - FLUXO OU REVERSÃO 2° VELA DE M15 P/ 3° VELA DE M15"
+            ]
+        },
+        "EURJPY": {
+            "estrategias": []
+        },
+        "EURCAD": {
+            "estrategias": []
+        },
+        "GBPCHF": {
+            "estrategias": []
+        }
+    },
+    "./planilhas/Relatório Mensal da IEA.xlsx": {
+        "GBPUSD": {
+            "estrategias": []
+        },
+        "EURGBP": {
+            "estrategias": []
+        },
+        "EURUSD": {
+            "estrategias": []
+        },
+        "USDJPY": {
+            "estrategias": []
+        },
+        "GBPJPY": {
+            "estrategias": []
+        },
+        "USDCAD": {
+            "estrategias": []
+        },
+        "AUDCAD": {
+            "estrategias": []
+        },
+        "EURJPY": {
+            "estrategias": []
+        },
+        "EURCAD": {
+            "estrategias": []
+        },
+        "GBPCHF": {
+            "estrategias": []
+        }
+    },
+    "./planilhas/Discurso de Luis de Guindos, do BCE.xlsx": {
+        "GBPUSD": {
+            "estrategias": []
+        },
+        "EURGBP": {
+            "estrategias": []
+        },
+        "EURUSD": {
+            "estrategias": []
+        },
+        "USDJPY": {
+            "estrategias": []
+        },
+        "GBPJPY": {
+            "estrategias": []
+        },
+        "USDCAD": {
+            "estrategias": []
+        },
+        "AUDCAD": {
+            "estrategias": []
+        },
+        "EURJPY": {
+            "estrategias": []
+        },
+        "EURCAD": {
+            "estrategias": []
+        },
+        "GBPCHF": {
+            "estrategias": []
+        }
+    },
+    "./planilhas/Discurso de Balz do Buba, Alemanha.xlsx": {
+        "GBPUSD": {
+            "estrategias": [
+                "FLUXO/COMPRA - 0.782608695652174 - FLUXO OU REVERSÃO 1° VELA DE M5 P/ 3° VELA DE M5"
+            ]
+        },
+        "EURGBP": {
+            "estrategias": []
+        },
+        "EURUSD": {
+            "estrategias": []
+        },
+        "USDJPY": {
+            "estrategias": []
+        },
+        "GBPJPY": {
+            "estrategias": []
+        },
+        "USDCAD": {
+            "estrategias": []
+        },
+        "AUDCAD": {
+            "estrategias": []
+        },
+        "EURJPY": {
+            "estrategias": []
+        },
+        "EURCAD": {
+            "estrategias": []
+        },
+        "GBPCHF": {
+            "estrategias": []
+        }
+    }
+}

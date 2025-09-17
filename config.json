@@ -1,5 +1,6 @@
 {
     "amount": 2,
+    "amountEconomy": 20,
     "amountGustavo": "2.0",
     "horariosJowJow": "03:10 EURUSD PUT;03:45 GBPJPY CALL;05:00",
     "taxasM15": "",
@@ -7,7 +8,7 @@
     "toCloseM5": ";;;;;;;;;;;;;;;;",
     "stopWinInfinity": 1000,
     "sorosNoSoros": 1,
-    "veefe": "",
+    "veefe": "WW",
     "lastAmount": 513.9487124390679,
     "cores": 1,
     "infinity": 14,
@@ -54,6 +55,8 @@
     "password": "gc896426",
     "copyBestIdsRange": 0,
     "pass": "senhaloka",
+    "ssid": "a6dc3b9b56c0a27a7e80a7b7e20fb21f",
     "cleanUp": 0,
-    "ssid": "5be629b8b84662f174fc23e94027821f"
+    "horariosObj": [],
+    "sessionBalance": -105.61
 }

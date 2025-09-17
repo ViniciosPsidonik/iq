@@ -12,7 +12,7 @@ let fsConfig = fs.readFileSync('config.json')
 let config = JSON.parse(fsConfig)
 let openedMap = new Map()
 let openedMapDigital = new Map()
-
+let mostrar = true
 
 const notifier = require('node-notifier');
 const path = require('path');
@@ -203,69 +203,49 @@ let taxasObj = new Map()
 //     console.log(candlesCount);
 // }, 5000);
 
+const serverPort = 7691; // Porta do servidor WebSocket
 
-const showRunningActives = setInterval(() => {
-    let fsConfig = fs.readFileSync('config.json')
-    let config = JSON.parse(fsConfig)
-    log = config.log
-    logg = config.logg
-    loggg = config.loggg
-    valorMinimo = config.valorMinimo
-    country = config.filtroPorPais
-    topTradersRange = config.topTradersRange
-    soros = config.soros
-    gale = config.gale
-    galeLevel = config.galeLevel
-    galeFactor = config.galeFactor
-    StopLoss = config.StopLoss
-    StopWin = config.StopWin
-    copy100Ids = config.copy100Ids
-    copyBestIdsRange = config.copyBestIdsRange
-    tradesPerActive = config.tradesPerActive
-    bestIdsLog = config.bestIdsLog
-    invertTrades = config.invertTrades
-    verpar = config.verpar
-    binarias = config.binarias
-    binariasTimes = config.binariasTimes
-    digital = config.digital
-    digitalTimes = config.digitalTimes
-    delaySeconds = config.delaySeconds ? config.delaySeconds : 1
-    showSchedules = config.showSchedules
-    taxas = config.taxas
+// Criar o servidor WebSocket
+const server = new WebSocket.Server({ port: serverPort });
 
-    if (config.cleanUp) {
-        runningActives = []
-        runningActivesBinary = []
-        runningActivesDigital = []
-        runningActivesDigitalFive = []
-        auth()
-        if (soros)
-            positionOpenedSoros = false
-        if (gale)
-            positionOpenedGale = false
-    }
+// Evento de conexão de cliente
+server.on('connection', (socket) => {
+    console.log('Novo cliente conectado');
 
-    if (config.showSchedules) {
-        console.log(schedules);
-    }
+    // Evento de recebimento de mensagem do cliente
+    socket.on('message', (message) => {
+        // console.log(`${currentTimehhmmss} || ${message}`)
+        // Processar a mensagem recebida, se necessário...
+        if (message !== "Conectar-se") {
+            let direction = message.split('/')[0]
+            let parInt = activesMapString.get(message.split('/')[1])
+            // if (typeof currentTimehhmmss != "undefined" && moment(moment().format("YYYY-MM-DD ") + currentTimehhmmss).isAfter(moment(moment().format("YYYY-MM-DD 00:01"))) && moment(moment().format("YYYY-MM-DD ") + currentTimehhmmss).isBefore(moment(moment().format("YYYY-MM-DD 17:00")))) {
+            // if (openedOrders.length == 0) {
+            // setTimeout(() => {
+            buyBefor(direction, parInt, 5);
+            // buyBefor(direction == 'call' ? 'put' : 'call', parInt, 1);
+            openedOrders.push(parInt);
+            // }, 300);
+            // }
+            // } else {
+            //     console.log(`${currentTimehhmmss} || Entrada fora do horario - ${message.split('/')[1]}`)
+            // }
+        }
+        // Enviar uma resposta para o cliente
+        socket.send('Resposta do servidor');
+    });
 
-    if (config.loggg) {
-        console.log('Turbo: ' + runningActives.length)
-        console.log('Binary: ' + runningActivesBinary.length)
-        console.log('Digital: ' + runningActivesDigital.length)
-        console.log('DigitalFive: ' + runningActivesDigitalFive.length)
-        console.log(`copyIds:  ${copyIds.length > 0 ? copyIds.length : 0}`)
-        console.log(`leadersArray:  ${!!leadersArray ? leadersArray.length : 0}`)
-        console.log(`positionOpenedSoros: ${positionOpenedSoros}`);
-        console.log(`positionOpenedGale: ${positionOpenedGale}`);
-        console.log('===================')
-    }
+    // Evento de fechamento da conexão do cliente
+    socket.on('close', () => {
+        console.log('Cliente desconectado');
+    });
+});
 
-    if (bestIdsLog) {
-        console.log(copyIds);
-    }
 
-}, 5000)
+console.log(`Servidor WebSocket ouvindo na porta ${serverPort}`);
+
+
+
 
 setInterval(() => {
     // await subs('live-deal-binary-option-placed' , 'unsubscribeMessage')
@@ -307,9 +287,6 @@ const b = async () => {
     }
 }
 
-setInterval(() => {
-    b()
-}, 240000)//60000
 
 let currentTime
 let currentTimemmssDate
@@ -427,10 +404,12 @@ const onMessage = e => {
         }
     }
 
-    if (message.name == 'heartbeat' || message.name == 'timesync') {
+    if (message.name == 'heartbeat' || message.name == 'timeSync') {
         currentTime = message.msg
+
         currentTimehhmmss = moment.unix(currentTime / 1000).utcOffset(-3).format("HH:mm:ss")
         currentTimehhmm = moment.unix(currentTime / 1000).utcOffset(-3).format("HH:mm")
+        // console.log(currentTimehhmm);
         currentTimemm = moment.unix(currentTime / 1000).utcOffset(-3).format("mm")
         currentTimemmss = moment.unix(currentTime / 1000).utcOffset(-3).format("ss")
         currentTimemmssDate = moment.unix(currentTime / 1000).utcOffset(-3).format("YYYY-MM-DD HH:mm:ss")
@@ -444,7 +423,8 @@ const onMessage = e => {
             porcentagensMap[Symbol.iterator] = function* () {
                 yield* [...this.entries()].sort((a, b) => a[1] - b[1]);
             }
-            console.log(porcentagensMap);
+            if (mostrar)
+                console.log(porcentagensMap);
         } else if (parseInt(timeIntLast) != 5 && parseInt(timeIntLast) != 0) {
             printou = false
         }
@@ -464,7 +444,8 @@ if (!backtest)
         porcentagensMap[Symbol.iterator] = function* () {
             yield* [...this.entries()].sort((a, b) => a[1] - b[1]);
         }
-        console.log(porcentagensMap);
+        if (mostrar)
+            console.log(porcentagensMap);
     }, 2000);
 
 let printou = false
@@ -589,7 +570,8 @@ function candleStuff(message) {
                     porcentagensMap.set(getActiveString(parseInt(message.request_id.split('/')[0]), newbinary), { win, loss });
                 }
             }
-            console.log(porcentagensMap);
+            if (mostrar)
+                console.log(porcentagensMap);
         }
     }
 }
@@ -872,7 +854,7 @@ function getCandle(active_id, size) {
                 "active_id": active_id,
                 "size": size,
                 "to": currentTime,
-                "count": 4,
+                "count": 6,
             }
         };
     } else {
@@ -1090,42 +1072,34 @@ const otcActives = [76, 77, 78, 79, 80, 81, 84, 85, 86]
 const otcActivesDigital = [76, 77, 78, 79, 80, 81, 84, 85, 86]
 const payoutActives = [108, 7, 943, 101, 7, 943, 101, 944, 99, 107, 2, 4, 1, 104, 102, 103, 3, 947, 5, 8, 100, 72, 6, 168, 105, 212, 76, 77, 78, 79, 80, 81, 84, 85, 86]
 
-const activesMapString = new Map([
-    ['AUDCAD', 7],
-    ['CHFJPY', 106],
-    ['EURAUD', 108],
-    ['EURCHF', 946],
-    ['EURCAD', 105],
-    ['EURNZD', 212],
+const activesMapStringBinary = new Map([
     ['AUDCHF', 943],
-    ['AUDJPY', 101],
     ['AUDNZD', 944],
-    ['AUDUSD', 99],
-    ['CADCHF', 107],
-    ['EURGBP', 2],
-    ['EURJPY', 4],
-    ['EURUSD', 1],
-    ['GBPAUD', 104],
+])
+const activesMapString = new Map([
+    ['AUDCAD', 1868],
+    ['CHFJPY', 2118],
+    ['EURAUD', 1874],
+    ['EURCHF', 2131],
+    ['EURCAD', 2117],
+    ['EURNZD', 1901],
+    ['AUDJPY', 1869],
+    ['AUDUSD', 1870],
+    ['CADCHF', 1871],
+    ['EURGBP', 1862],
+    ['EURJPY', 1864],
+    ['EURUSD', 1861],
+    ['GBPAUD', 1877],
     ['CADJPY', 945],
-    ['GBPCAD', 102],
-    ['GBPCHF', 103],
-    ['GBPJPY', 3],
-    ['GBPNZD', 947],
-    ['GBPUSD', 5],
-    ['NZDUSD', 8],
-    ['USDCAD', 100],
-    ['USDCHF', 72],
-    ['USDJPY', 6],
-    ['USDNOK', 168],
-    ['EURUSD-OTC', 76],
-    ['EURGBP-OTC', 77],
-    ['USDCHF-OTC', 78],
-    ['EURJPY-OTC', 79],
-    ['NZDUSD-OTC', 80],
-    ['GBPUSD-OTC', 81],
-    ['GBPJPY-OTC', 84],
-    ['USDJPY-OTC', 85],
-    ['AUDCAD-OTC', 86]
+    ['GBPCAD', 1897],
+    ['GBPCHF', 1898],
+    ['GBPJPY', 1866],
+    ['GBPNZD', 1880],
+    ['GBPUSD', 1867],
+    ['NZDUSD', 1896],
+    ['USDCAD', 1878],
+    ['USDCHF', 1879],
+    ['USDJPY', 1865],
 ])
 
 const newbinary = new Map([
@@ -1137,11 +1111,23 @@ const newbinary = new Map([
     ['EURGBP', 2],
     ['EURUSD', 1],
     ['EURJPY', 4],
-    // ['XAUUSD', 74],
-    // ['USOUSD', 971],
-    // ['USDCAD', 100],
-    // ['USDCHF', 72],
-    ['AUDUSD', 99]
+    ['USDCAD', 100],
+    ['NZDCAD', 1881],
+    ['AUDCHF', 1884],
+    ['GBPCHF', 1898],
+    ['EURAUD', 1874],
+    ['GBPAUD', 1877],
+    ['AUDCAD', 1868],
+    ['EURNZD', 1901],
+    ['EURCAD', 1875],
+    ['GBPCAD', 1897],
+    ['USDCHF', 72],
+    ['GBPNZD', 1880],
+    ['CADCHF', 1871],
+    ['AUDUSD', 99],
+    // ['CHFJPY', 1870],
+    // ['NZDJPY', 1882],
+    // ['EURCHF', 1876],
 ])
 
 
@@ -1149,7 +1135,7 @@ setInterval(() => {
     // setTimeout(() => {
     for (var [key, value] of newbinary) {
         if (value && !key.includes('OTC'))
-            getCandle(value, 60)
+            getCandle(value, 60 * 5)
     }
     // getCandle(1, 60)
 }, 5000);

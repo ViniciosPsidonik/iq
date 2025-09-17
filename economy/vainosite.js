@@ -8,7 +8,7 @@ var XLSX_CALC = require('xlsx-calc');
 
 let eventosGlobal = []
 let eventosAmanha = []
-async function buscarEventos(data, hora, URL, moeda, nomeEvento) {
+async function buscarEventos(data, hora, URL, bandeira, nomeEvento, moeda) {
     console.log(data);
     console.log(hora);
 
@@ -26,8 +26,9 @@ async function buscarEventos(data, hora, URL, moeda, nomeEvento) {
     }
 
     const contem = Object.keys(eventosGlobal).some(key => key.includes(nomeEvento));
+    const contemMoeda = eventosGlobal[nomeEvento]?.moeda == bandeira
 
-    if (!contem && olhaAmanha) {
+    if (olhaAmanha && (!contem || !contemMoeda)) {
         console.log('NAO contem AMANHA -> ', nomeEvento);
         await browser.close();
         return
@@ -55,24 +56,45 @@ async function buscarEventos(data, hora, URL, moeda, nomeEvento) {
         try {
             const eventos = await retornaDatas(page);
 
-            for (const eventoo of eventos) {
-                if (removerConteudoEntreParenteses(eventoo.data) == data && eventoo.horario == hora) {
-                    // console.log(eventos);
-                    achou = true;
-                    arrayDatas = eventos;
-                    console.log('achou');
-                    break;
-                }
+            const hoje = moment();
+
+            // Filtra apenas os registros cuja data não está no futuro
+            const dadosPassados = eventos.filter(item => {
+                const dataFormatada = moment(item.data + ' ' + item.horario, 'DD.MM.YYYY HH:mm');
+                return dataFormatada.isBefore(hoje);
+            }).slice(0, 20);
+
+            // console.log(dadosPassados)
+
+            if (olharultimas15 && dadosPassados.length >= 20) {
+                console.log('olharultimas15');
+                achou = true;
             }
+            // else {
+            //     for (const eventoo of eventos) {
+            //         if (removerConteudoEntreParenteses(eventoo.data) == data && eventoo.horario == hora) {
+            //             // console.log(eventos);
+            //             achou = true;
+            //             arrayDatas = eventos;
+            //             console.log('achou');
+            //             break;
+            //         }
+            //     }
+            // }
 
             if (!achou) {
                 console.log('click');
-                await page.click('.showMoreReplies').catch(() => console.log('Botão não encontrado'));
-                arrayDatas = eventos;
+                await page.click('.showMoreReplies').catch(() => {
+                    achou = true;
+                    console.log('Botão não encontrado')
+                });
+
 
                 // Aguarda 1 segundo antes de continuar
-                await new Promise(resolve => setTimeout(resolve, 1000));
+                await new Promise(resolve => setTimeout(resolve, 1500));
             }
+
+            arrayDatas = eventos;
         } catch (error) {
             console.log(error);
             console.log('error');
@@ -142,7 +164,7 @@ async function encontraEventos(page, browser) {
         // console.log(eventos);
         eventosGlobal = eventos;
 
-        await browser.close();
+        // await browser.close();
     }
 }
 
@@ -172,7 +194,7 @@ const name = './planilha1.xlsx'
 var worksheet
 // change some cell value
 // console.log(getCell('F4'));
-const jwt = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOjY1Nzc1MzQsImVtYWlsIjoidmluaXBzaWRvbmlrQGdtYWlsLmNvbSIsImlzcyI6IjI4MDQ6MTA4YzpkNGEyOjEyMDE6Njg4NDo0NTFhOjM1YzI6Nzk3MCIsImlhdCI6MTc0MTMxNzM4NywiZXhwIjoxNzQxMzIwOTg3LCJ0eXBlIjoxLCJwZXJtaXNzaW9ucyI6W119._supT8FTVnsdSoAIkjvtkmGIitAkL1fx1SOb_nVtOFc'
+const jwt = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOjY1Nzc1MzQsImVtYWlsIjoidmluaXBzaWRvbmlrQGdtYWlsLmNvbSIsImlzcyI6IjI4MDQ6MTA4YzpkNGIwOjQzMDE6NDEyZjpjYzA4Ojc3M2Q6M2U1OSIsImlhdCI6MTc0MjE2NDU3MCwiZXhwIjoxNzQyMTY4MTcwLCJ0eXBlIjoxLCJwZXJtaXNzaW9ucyI6W119.vFd5UxBqNJq1qdpEBKovZxhHZW-46M4S21HnZVsoNX0'
 let countMass = 3
 
 
@@ -180,16 +202,18 @@ let countMass = 3
 const axios = require('axios');
 const { url } = require("inspector");
 const { includes } = require("lodash");
+const { log } = require("console");
 let asset = {
+    'GBPUSD': 8,
     'EURGBP': 7,
     'EURUSD': 1,
     'USDJPY': 2,
     'GBPJPY': 13,
-    'GBPUSD': 8,
     'USDCAD': 4,
     'AUDCAD': 23,
     'EURJPY': 5,
     'EURCAD': 16,
+    'GBPCHF': 14,
 }
 
 const headers = {
@@ -209,7 +233,7 @@ const headers = {
 
 async function getData(url, params) {
     try {
-        console.log(params);
+        // console.log(params);
         // console.log(url);
 
         const response = await axios.get(url, { params, headers });
@@ -283,14 +307,14 @@ const preencheplanilha = async (arrayDatas, nome, nomeEvento, moeda, forcaPlanil
         console.log('================');
         console.log('key=', key);
 
-        if (!key.includes(moeda)) {
+        if (!key.includes(moeda) && (moeda == 'EUR' && !key.includes('GBP') || moeda == 'GBP' && !key.includes('EUR'))) {
             continue;
         }
         let countPlanilha = 8;
         worksheet = workbook.Sheets[key];
 
         for (datas of arrayDatas) {
-            const dateee = moment(datas.data + ' ' + datas.horario, "DD.MM.YYYY HH:mm:ss");
+            const dateee = moment(datas.data + ' ' + datas.horario, "DD.MM.YYYY HH:mm:ss").add(3, 'hours');;
             if (dateee.isAfter(moment())) {
                 continue;
             }
@@ -321,13 +345,14 @@ const preencheplanilha = async (arrayDatas, nome, nomeEvento, moeda, forcaPlanil
 
                     const url = `https://api.binarium.com/api/v1/assets/${asset[key]}/candles`;
 
-                    const agora = moment().add(3, 'hours'); // Tempo atual em UTC
+                    const agora = moment(); // Tempo atual em UTC
 
                     // console.log(agora);
                     // console.log(formatedDateTest);
 
                     if (formatedDateTest.isAfter(agora)) { // ✅ Corrigido aqui
                         console.log("⏩ Data futura, ignorando requisições.");
+                        countPlanilha++;
                         continue; // Sai da função
                     }
 
@@ -346,7 +371,7 @@ const preencheplanilha = async (arrayDatas, nome, nomeEvento, moeda, forcaPlanil
                         let corVela = candle.close > candle.open ? 'VERDE' : candle.close < candle.open ? 'VERMELHA' : 'DOJI';
                         modifyCell(letra + countPlanilha, corVela);
                         letra = getLetra(letra);
-                        console.log(corVela);
+                        // console.log(corVela);
 
                     }
 
@@ -357,7 +382,7 @@ const preencheplanilha = async (arrayDatas, nome, nomeEvento, moeda, forcaPlanil
                         let corVela = candle.close > candle.open ? 'VERDE' : candle.close < candle.open ? 'VERMELHA' : 'DOJI';
                         modifyCell(letra + countPlanilha, corVela);
                         letra = getLetra(letra);
-                        console.log(corVela);
+                        // console.log(corVela);
                     }
 
                     letra = 'K';
@@ -367,7 +392,7 @@ const preencheplanilha = async (arrayDatas, nome, nomeEvento, moeda, forcaPlanil
                         let corVela = candle.close > candle.open ? 'VERDE' : candle.close < candle.open ? 'VERMELHA' : 'DOJI';
                         modifyCell(letra + countPlanilha, corVela);
                         letra = getLetra(letra);
-                        console.log(corVela);
+                        // console.log(corVela);
                     }
 
                     // if()
@@ -490,78 +515,91 @@ let eventosUrl = [
         url: 'https://br.investing.com/economic-calendar/euro-summit-1644',
         moeda: 'EUR',
         nomeEvento: 'Cúpula da Zona do Euro',
+        bandeira: 'Zona Euro',
     },
     {
         alvoData: '02.02.2023 10:45',
         url: 'https://br.investing.com/economic-calendar/ecb-press-conference-396',
         moeda: 'EUR',
         nomeEvento: 'Coletiva de Imprensa do BCE',
+        bandeira: 'Zona Euro',
     },
     {
         alvoData: '04.10.2023 09:15',
         url: 'https://br.investing.com/economic-calendar/adp-nonfarm-employment-change-1',
         moeda: 'USD',
         nomeEvento: 'Variação de Empregos Privados ADP',
+        bandeira: 'EUA',
     },
     {
         alvoData: '19.10.2022 15:00',
         url: 'https://br.investing.com/economic-calendar/beige-book-10',
         moeda: 'USD',
         nomeEvento: 'Livro Bege',
+        bandeira: 'EUA',
     },
     {
         alvoData: '09.01.2024 07:00',
         url: 'https://br.investing.com/economic-calendar/unemployment-rate-299',
         moeda: 'EUR',
         nomeEvento: 'Taxa de Desemprego na Zona Euro',
+        bandeira: 'Zona Euro',
     },
     {
         alvoData: '30.05.2024 13:05',
         url: 'https://br.investing.com/economic-calendar/fomc-member-williams-speaks-1585',
         moeda: 'USD',
         nomeEvento: 'Discurso de Williams, membro do FOMC',
+        bandeira: 'EUA',
     },
     {
         alvoData: '20.10.2022 07:00',
         url: 'https://br.investing.com/economic-calendar/eu-leaders-summit-1647',
         moeda: 'EUR',
         nomeEvento: 'Cúpula de Líderes da UE',
+        bandeira: 'Zona Euro',
     },
     {
         alvoData: '13.07.2023 08:30',
         url: 'https://br.investing.com/economic-calendar/ecb-publishes-account-of-monetary-policy-meeting-1610',
         moeda: 'EUR',
         nomeEvento: 'BCE Publica Atas da Reunião de Política Monetária',
+        bandeira: 'Zona Euro',
     },
     {
         alvoData: '14.04.2022 08:45',
         url: 'https://br.investing.com/economic-calendar/ecb-monetary-policy-statement-1845',
         moeda: 'EUR',
         nomeEvento: 'Declaração de Política Monetária do BCE',
+        bandeira: 'Zona Euro',
     },
     {
         alvoData: '27.10.2022 09:15',
         url: 'https://br.investing.com/economic-calendar/ecb-marginal-lending-facility-1744',
         moeda: 'EUR',
         nomeEvento: 'BCE Facilidade Permanente de Cedência de Liquidez',
+        bandeira: 'Zona Euro',
     },
     {
         alvoData: '10.02.2023 18:00',
         url: 'https://br.investing.com/economic-calendar/fomc-member-harker-speaks-1666',
         moeda: 'EUR',
         nomeEvento: 'Discurso de Harker, membro do FOMC',
+        bandeira: 'EUA',
     },
     {
         alvoData: '06.02.2025 06:30',
         url: 'https://br.investing.com/economic-calendar/construction-pmi-44',
         moeda: 'GBP',
         nomeEvento: 'PMI de Construção',
+        bandeira: 'Reino Unido',
     },
     {
         alvoData: '28.02.2023 09:30',
         url: 'https://br.investing.com/economic-calendar/boe-mpc-member-catherine-l-mann-2009',
         moeda: 'GBP',
         nomeEvento: 'Discurso de Mann, membro do CPM do BoE',
+        bandeira: 'Reino Unido',
     },
 
     {
@@ -569,6 +607,7 @@ let eventosUrl = [
         url: 'https://br.investing.com/economic-calendar/german-buba-president-nagel-speech-2015',
         moeda: 'EUR',
         nomeEvento: 'Discurso de Nagel, Presidente do Bundesbank',
+        bandeira: 'Alemanha',
     },
 
     {
@@ -576,12 +615,14 @@ let eventosUrl = [
         url: 'https://br.investing.com/economic-calendar/ecb-president-lagarde-speaks-1965',
         moeda: 'EUR',
         nomeEvento: 'Discurso de Christine Lagarde, Presidente do BCE',
+        bandeira: 'Zona Euro',
     },
     {
         alvoData: '10.01.2023 07:00',
         url: 'https://br.investing.com/economic-calendar/german-buba-vice-president-buch-speaks-1978',
         moeda: 'EUR',
         nomeEvento: 'Pronunciamento de Buch, vice-presidente do BC alemão',
+        bandeira: 'Alemanha',
     },
 
     {
@@ -589,14 +630,197 @@ let eventosUrl = [
         url: 'https://br.investing.com/economic-calendar/german-factory-orders-130',
         moeda: 'EUR',
         nomeEvento: 'Encomendas à Indústria - Alemanha (Mensal)',
+        bandeira: 'Alemanha',
+    },
+    {
+        alvoData: '07.03.2025 04:00',
+        url: 'https://br.investing.com/economic-calendar/halifax-house-price-index-145',
+        moeda: 'GBP',
+        nomeEvento: 'Índice de Preços de Imóveis Halifax (Mensal)',
+        bandeira: 'Reino Unido',
+    },
+    {
+        alvoData: '07.10.2022 09:30',
+        url: 'https://br.investing.com/economic-calendar/employment-change-95',
+        moeda: 'CAD',
+        nomeEvento: 'Variação no Emprego',
+        bandeira: 'Canadá',
+    },
+    {
+        alvoData: '19.09.2017 11:00',
+        url: 'https://br.investing.com/economic-calendar/u.s.-president-trump-speaks-1694',
+        moeda: 'USD',
+        nomeEvento: 'Discurso de Trump, Presidente dos EUA',
+        bandeira: 'EUA',
+    },
+    {
+        alvoData: '19.10.2023 13:00',
+        url: 'https://br.investing.com/economic-calendar/fed-chair-powell-speaks-1738',
+        moeda: 'USD',
+        nomeEvento: 'Discurso de Powell, Presidente do Fed',
+        bandeira: 'EUA',
+    },
+    {
+        alvoData: '14.02.2017 13:00',
+        url: 'https://br.investing.com/economic-calendar/fed-monetary-policy-report-1836',
+        moeda: 'USD',
+        nomeEvento: 'Relatório de Política Monetária do Fed',
+        bandeira: 'EUA',
+    },
+    {
+        alvoData: '09.07.2024 14:30',
+        url: 'https://br.investing.com/economic-calendar/fomc-member-bowman-speaks-1835',
+        moeda: 'USD',
+        nomeEvento: 'Discurso de Bowman, Membro do FOMC',
+        bandeira: 'EUA',
+    },
+    {
+        alvoData: '20.01.2025 07:00',
+        url: 'https://br.investing.com/economic-calendar/eurogroup-meetings-1643',
+        moeda: 'EUR',
+        nomeEvento: 'Encontro do Eurogrupo',
+        bandeira: 'Zona Euro',
+    },
+    {
+        alvoData: '08.04.2024 03:00',
+        url: 'https://br.investing.com/economic-calendar/german-industrial-production-135',
+        moeda: 'EUR',
+        nomeEvento: 'Produção Industrial - Alemanha (Mensal)',
+        bandeira: 'Alemanha',
+    },
+    {
+        alvoData: '09.08.2024 04:00',
+        url: 'https://br.investing.com/economic-calendar/seco-consumer-climate-362',
+        moeda: 'CHF',
+        nomeEvento: 'Índice SECO de Confiança do Consumidor',
+        bandeira: 'Suiça',
+    },
+    {
+        alvoData: '02.04.2024 11:00',
+        url: 'https://br.investing.com/economic-calendar/jolts-job-openings-1057',
+        moeda: 'USD',
+        nomeEvento: 'Ofertas de Emprego JOLTS',
+        bandeira: 'EUA',
+    },
+    {
+        alvoData: '09.04.2024 13:00',
+        url: 'https://br.investing.com/economic-calendar/eia-short-term-energy-outlook-1986',
+        moeda: 'USD',
+        nomeEvento: 'Perspectiva Energética de Curto Prazo da EIA',
+        bandeira: 'EUA',
+    },
+    {
+        alvoData: '12.10.2023 13:00',
+        url: 'https://br.investing.com/economic-calendar/wasde-report-1764',
+        moeda: 'USD',
+        nomeEvento: 'Relatório WASDE',
+        bandeira: 'EUA',
+    },
+    {
+        alvoData: '10.10.2023 14:00',
+        url: 'https://br.investing.com/economic-calendar/3-year-note-auction-681',
+        moeda: 'USD',
+        nomeEvento: 'Leilão Americano Note a 3 anos',
+        bandeira: 'EUA',
+    },
+    {
+        alvoData: '18.10.2023 06:30',
+        url: 'https://br.investing.com/economic-calendar/german-10-year-bund-auction-580',
+        moeda: 'EUR',
+        nomeEvento: 'Leilão Alemão Bund a 10 anos',
+        bandeira: 'Alemanha',
+    },
+    {
+        alvoData: '26.01.2022 13:00',
+        url: 'https://br.investing.com/economic-calendar/boc-press-conference-1791',
+        moeda: 'CAD',
+        nomeEvento: 'Coletiva de Imprensa do BoC',
+        bandeira: 'Canadá',
+    },
+    {
+        alvoData: '26.01.2022 13:00',
+        url: "https://br.investing.com/economic-calendar/ecb's-lane-speaks-1971",
+        moeda: 'EUR',
+        nomeEvento: 'Pronunciamento de Lane, do BCE',
+        bandeira: 'Zona Euro',
+    },
+    {
+        alvoData: '26.01.2022 13:00',
+        url: "https://br.investing.com/economic-calendar/ecb-mccaul-speaks-1994",
+        moeda: 'EUR',
+        nomeEvento: 'Discurso de McCaul, membro do BCE',
+        bandeira: 'Zona Euro',
+    },
+    {
+        alvoData: '15.07.2025 08:00',
+        url: "https://br.investing.com/economic-calendar/opec-monthly-report-1673",
+        moeda: 'USD',
+        nomeEvento: 'Relatório Mensal da OPEP',
+        bandeira: 'EUA',
+    },
+    {
+        alvoData: '06.12.2023 12:00',
+        url: "https://br.investing.com/economic-calendar/boc-rate-statement-1710",
+        moeda: 'CAD',
+        nomeEvento: 'Banco do Canadá - Declaração de Taxa',
+        bandeira: 'Canadá',
+    },
+    {
+        alvoData: '06.12.2023 12:00',
+        url: "https://br.investing.com/economic-calendar/iea-monthly-report-1674",
+        moeda: 'USD',
+        nomeEvento: 'Relatório Mensal da IEA',
+        bandeira: 'EUA',
+    },
+    {
+        alvoData: '06.12.2023 12:00',
+        url: "https://br.investing.com/economic-calendar/ecb's-de-guindos-speaks-1790",
+        moeda: 'EUR',
+        nomeEvento: 'Discurso de Luis de Guindos, do BCE',
+        bandeira: 'Zona Euro',
+    },
+    {
+        alvoData: '06.12.2023 12:00',
+        url: "https://br.investing.com/economic-calendar/german-buba-balz-speaks-1996",
+        moeda: 'EUR',
+        nomeEvento: 'Discurso de Balz do Buba, Alemanha',
+        bandeira: 'Alemanha',
+    },
+    {
+        alvoData: '06.12.2023 12:00',
+        url: "https://br.investing.com/economic-calendar/german-buba-mauderer-speaks-1977",
+        moeda: 'EUR',
+        nomeEvento: 'Pronunciamento de Mauderer, do BC alemão',
+        bandeira: 'Alemanha',
+    },
+    {
+        alvoData: '06.12.2023 12:00',
+        url: "https://br.investing.com/economic-calendar/2-year-note-auction-569",
+        moeda: 'USD',
+        nomeEvento: 'Leilão Americano Note a 2 anos',
+        bandeira: 'EUA',
+    },
+    {
+        alvoData: '06.12.2023 12:00',
+        url: "https://br.investing.com/economic-calendar/fomc-member-kashkari-speaks-1665",
+        moeda: 'USD',
+        nomeEvento: 'Discurso de Kashkari, membro do FOMC',
+        bandeira: 'EUA',
+    },
+    {
+        alvoData: '06.12.2023 12:00',
+        url: "https://br.investing.com/economic-calendar/5-year-note-auction-570",
+        moeda: 'USD',
+        nomeEvento: 'Leilão Americano Note a 5 anos',
+        bandeira: 'EUA',
     },
 
-
-
-
 ]
-
+// Vendas de Casas Usadas (Fev)
+// Preços de Novas Casas (Mensal) (Fev) cad
 // console.log(eventosUrl.filter(eventol => eventol.nomeEvento == 'BCE Facilidade Permanente de Cedência de Liquidez'));
+// https://br.investing.com/economic-calendar/pending-home-sales-232
+// https://br.investing.com/economic-calendar/chicago-pmi-38
 
 
 async function processarEventos() {
@@ -608,10 +832,16 @@ async function processarEventos() {
         const horaFormatada = dataiterar.format("HH:mm");
 
 
-        await buscarEventos(dataFormatada.trim(), horaFormatada.trim(), URL, evento.moeda, evento.nomeEvento);
-    }
+        if (!irDiretoCalc) {
 
+            await buscarEventos(dataFormatada.trim(), horaFormatada.trim(), URL, evento.bandeira, evento.nomeEvento, evento.moeda);
+        } else {
+            nomesRecalcular.push('./planilhas/' + evento.nomeEvento + '.xlsx')
+        }
+
+    }
     console.log('INICIA RECALCULOS ====');
+    console.log(eventosAmanha);
 
     let terminou = false;
     nomesRecalcular.map(async evento => {
@@ -624,18 +854,19 @@ async function processarEventos() {
         console.log('moeda=', moeda);
 
         var workbook = XLSX.readFile(evento);
-        XLSX_CALC(workbook, { continue_after_error: true, log_error: false });
+        await XLSX_CALC(workbook, { continue_after_error: true, log_error: false });
 
         config[evento] = {}
 
         for (let key in asset) {
             console.log('================');
             console.log('key=', key);
-            if (key == 'EURCAD')
-                terminou = true
-            if (!key.includes(moeda)) {
-                continue;
-            }
+
+            // if (!key.includes(moeda)) {
+            //     continue;
+            // }
+
+            console.log('FAZZ');
             let countPlanilha = 8;
             worksheet = workbook.Sheets[key];
             let fluxoCounter = 4;
@@ -651,8 +882,8 @@ async function processarEventos() {
             if (config[evento][key].estrategias.length > 0) {
                 config[evento][key].estrategias = []
             }
+            // console.log(letra + fluxoCounter);
             while (letra != 'AN') {
-                // console.log(letra + fluxoCounter);
                 let fluxo = getCell(letra + fluxoCounter);
                 let reversao = getCell(letra + reversaoCounter);
 
@@ -660,7 +891,7 @@ async function processarEventos() {
                 // console.log('fluxo=', fluxo, 'reversao=', reversao);
 
 
-                if (fluxo >= 0.75) {
+                if (fluxo >= 0.77) {
                     console.log('-------------');
                     console.log('FLUXO/COMPRA - ', fluxo);
                     console.log(letra + fluxoCounter);
@@ -668,7 +899,7 @@ async function processarEventos() {
                     config[evento][key].estrategias.push('FLUXO/COMPRA - ' + fluxo + ' - ' + getCell(letra + 1))
                 }
 
-                if (reversao >= 0.75) {
+                if (reversao >= 0.77) {
                     console.log('-------------');
                     console.log('REVERSAO/VENDA - ', reversao);
                     console.log(letra + reversaoCounter);
@@ -678,29 +909,41 @@ async function processarEventos() {
 
                 letra = getLetra(letra);
             }
+
+            // if (key == 'EURCAD')
+            //     terminou = true
         }
+
+        console.log(config[evento]);
+
 
     })
 
 
-    const terminar = setInterval(() => {
-        if (terminou) {
-            console.log('Writeeee');
-            fs.writeFile('estrategias.json', JSON.stringify(config, null, 4), err => {
-            });
+    console.log('interval');
+    setTimeout(() => {
 
-            console.log(eventosAmanha);
-            clearInterval(terminar);
-        }
-    }, 1000);
+        // if (terminou) {
+        console.log('Writeeee');
+        fs.writeFile('estrategias.json', JSON.stringify(config, null, 4), err => {
+        });
+
+        console.log(eventosAmanha);
+        // clearInterval(terminar);
+        // }
+    }, 60000);
 
 }
 
+let olhaAmanha = true
+let clickAmanha = true
+let refaztodas = false
+let olharultimas15 = true
+let irDiretoCalc = false
+
 processarEventos();
 
-let olhaAmanha = false
-let clickAmanha = true
-let refaztodas = true
+
 
 
 //Coletiva de Imprensa do BCE - 2x4

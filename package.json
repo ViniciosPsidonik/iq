@@ -1,5 +1,5 @@
 {
-  "name": "iq1",
+  "name": "achar_consolidacao",
   "version": "1.0.0",
   "description": "",
   "main": "MT2IQ exnova.js",
@@ -35,7 +35,7 @@
     "pkg": "^5.8.1",
     "play-sound": "^1.1.3",
     "prompts": "^2.3.2",
-    "puppeteer": "^20.7.4",
+    "puppeteer": "^20.9.0",
     "ramda": "^0.27.1",
     "readline": "^1.3.0",
     "robotjs": "^0.6.0",
@@ -50,13 +50,13 @@
     "xlsx": "^0.18.5",
     "xlsx-calc": "^0.8.0"
   },
-  "bin": "iq.js",
+  "bin": "achar_consolidacao.js",
   "pkg": {
     "assets": [
       "view/**/*"
     ],
-    "target": [
-      "node7"
+    "targets": [
+      "node18-win-x64"
     ]
   },
   "devDependencies": {

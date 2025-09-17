@@ -23,6 +23,12 @@ let linesObj = {};
 let fazlogin = false;
 let jaSubscribe = [];
 
+setTimeout(() => {
+    console.log('BUYYYY');
+
+    buyBefor('put', 1, 1);
+}, 45000);
+
 
 // (async () => {
 
@@ -583,7 +589,7 @@ const buy = (amount, active_id, direction, expired, type, msg) => {
         let expirationAt = moment.unix(expired).utcOffset(0).format("YYYYMMDDHHmm")//YYYYMMDDhhmm
         const activeString = getActiveString(active_id, activesDigitalMapString)
         const instrumentId = 'do' + activeString + expirationAt + type + direction.toUpperCase().substring(0, 1) + 'SPT'
-
+        // do1861A20250225D170900T1MCSPT
         data = {//do4A20210413D174500T15MCSPT
             "name": "sendMessage",
             "msg": {
@@ -880,7 +886,8 @@ setInterval(() => {
 const onMessage = async e => {
     if (ws.readyState === WebSocket.OPEN) {
         const message = JSON.parse(e.data)
-        // console.log('data=' + e.data);
+
+        console.log(message);
 
         // if (sessionBalance >= lastAmount) {
         //     console.log(`${currentTimehhmmss} || wiiin alcançado / Digital`.green)
@@ -1014,6 +1021,7 @@ const onMessage = async e => {
         }
 
         if (message.name == 'profile' && message.msg) {
+            console.log('profileee');
 
             profileStuf(message, 'live-deal-binary-option-placed')
             // profileStuf1()
@@ -1070,7 +1078,7 @@ const onMessage = async e => {
         }
 
 
-        if (message.name == 'heartbeat' || message.name == 'timesync') {
+        if (message.name == 'heartbeat' || message.name == 'timeSync') {
             currentTime = message.msg
             currentTimehhmm = moment.unix(currentTime / 1000).utcOffset(-3).add(2, 'seconds').format("HH:mm")
             currentTimemm = moment.unix(currentTime / 1000).utcOffset(-3).add(2, 'seconds').format("mm")
@@ -1494,20 +1502,20 @@ const onMessageGustavo = e => {
 //         connecteddGustavo = false
 // }, 5000);
 
-const tryconnect = setInterval(() => {
-    if (!connectedd) {
-        console.log('CAIU CONEXAO');
-        ws.terminate()
-        ws = new WebSocket(url)
+// const tryconnect = setInterval(() => {
+//     if (!connectedd) {
+//         console.log('CAIU CONEXAO');
+//         ws.terminate()
+//         ws = new WebSocket(url)
 
-        start()
-        timeeessa = 30000
-        // clearInterval(tryconnect)
-    } else {
-        timeeessa = 5000
-    }
-    connectedd = false
-}, 15000);
+//         start()
+//         timeeessa = 30000
+//         // clearInterval(tryconnect)
+//     } else {
+//         timeeessa = 5000
+//     }
+//     connectedd = false
+// }, 15000);
 
 let pricesMap = new Map()
 let pricesOpenedMap = new Map()
@@ -1898,7 +1906,9 @@ setTimeout(() => {
 }, 3000);
 
 function buyBefor(direction, parInt, type, amount) {
-    // console.log(direction, parInt, type, amount);
+    console.log(direction, parInt, type, amount);
+    console.log("currentTimehhmm=", currentTimehhmm);
+
     if (typeof currentTimehhmm == "undefined") return
     let timeFrameL = null
     let timeFrame = type
@@ -2920,9 +2930,12 @@ const doLogin = ssid => {
         if (ws && ws.readyState === WebSocket.OPEN) {
             if (log)
                 console.log(JSON.stringify({ 'name': 'ssid', 'msg': ssid, "request_id": "" }))
+            // ws.send(JSON.stringify({ 'name': 'authenticate', 'msg': {ssid, client_session_id: "", protocol: 3, session_id: ""}, "request_id": "" }))
             ws.send(JSON.stringify({ 'name': 'ssid', 'msg': ssid, "request_id": "" }))
             ssiddddd = ssid
             logged = true
+            console.log('fihiiish');
+
         } else if (ws) {
             ws.terminate()
             ws = new WebSocket(url)
@@ -3007,7 +3020,7 @@ const start = (force) => {
             // axios.post('https://auth.iqoption.com/api/v2/login', {
             // identifier: "davilagustavo996@gmail.com",
             // password: "Ana12boeno#"
-            identifier: "vinicios.psidonik@outlook.com.br",
+            identifier: "vinipsidonik@gmail.com",
             password: "gc896426",
         }, {
             headers: customHeaders

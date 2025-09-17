@@ -1,6 +1,6 @@
 {
     "amount": 2,
-    "amountEconomy": 15,
+    "amountEconomy": 20,
     "amountGustavo": "2.0",
     "horariosJowJow": "03:10 EURUSD PUT;03:45 GBPJPY CALL;05:00",
     "taxasM15": "",
@@ -8,8 +8,8 @@
     "toCloseM5": ";;;;;;;;;;;;;;;;",
     "stopWinInfinity": 1000,
     "sorosNoSoros": 1,
-    "veefe": "WWWL",
-    "lastAmount": 500,
+    "veefe": "WLLWWLWLLWWLWLWLWWLWLLWWWLWLLLWLW",
+    "lastAmount": 300,
     "cores": 1,
     "infinity": 14,
     "notifyy": 0,
@@ -55,15 +55,8 @@
     "password": "gc896426",
     "copyBestIdsRange": 0,
     "pass": "senhaloka",
-    "ssid": "79cf083c11d0c20b46d8583b6ba628ef",
+    "ssid": "482c76a2fd1a3af6842df0648f7431dj",
     "cleanUp": 0,
-    "horariosObj": [
-        "04:00 GBPUSD CALL M15",
-        "04:15 GBPUSD CALL M15",
-        "12:02 EURGBP PUT M1",
-        "14:35 USDJPY PUT M5",
-        "15:30 GBPUSD PUT M15",
-        "15:34 EURUSD PUT M1"
-    ],
-    "sessionBalance": -206.39366542524908
+    "horariosObj": [],
+    "sessionBalance": -655.4836654252489
 }
